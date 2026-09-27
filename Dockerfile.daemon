@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+RUN apk add --no-cache bash curl
+
+WORKDIR /app
+
+# Instalar dependencias globales necesarias por meshctrl.js
+RUN npm install -g minimist ws
+
+# Descargar meshctrl.js y crear el binario ejecutable 'meshctrl' en el PATH
+RUN curl -fsSL https://raw.githubusercontent.com/Ylianst/MeshCentral/master/meshctrl.js -o /usr/local/bin/meshctrl.js \
+    && chmod +x /usr/local/bin/meshctrl.js \
+    && ln -s /usr/local/bin/meshctrl.js /usr/local/bin/meshctrl
+
+# Asegurar que node resuelva los módulos globales en Alpine
+ENV NODE_PATH=/usr/local/lib/node_modules
+
+EXPOSE 3001
+
+CMD ["node", "daemon.js"]

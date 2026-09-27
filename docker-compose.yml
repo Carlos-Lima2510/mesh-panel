@@ -1,0 +1,38 @@
+services:
+  web:
+    image: php:8.2-apache
+    container_name: tfg-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./src:/var/www/html:ro
+    networks:
+      - tfg-net
+
+  telemetry-daemon:
+    build:
+      context: .
+      dockerfile: Dockerfile.daemon
+    container_name: tfg-daemon
+    restart: unless-stopped
+    ports:
+      - "${SSE_PORT:-3001}:3001"
+    volumes:
+      - ./daemon:/app:ro
+    environment:
+      - MESH_URL=${MESH_URL}
+      - MESH_USER=${MESH_USER}
+      - MESH_PASS=${MESH_PASS}
+      - DHCP_SUBNET=${DHCP_SUBNET}
+      - PORT=3001
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
+      - NODE_NO_WARNINGS=${NODE_NO_WARNINGS}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - tfg-net
+
+networks:
+  tfg-net:
+    driver: bridge

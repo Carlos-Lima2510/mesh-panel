@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Observabilidad Aula - Modo Reactivo</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h2>Telemetría del Laboratorio</h2>
+      <div id="conn-status" class="status-badge" style="margin-top: 6px;">
+        <span class="pulse"></span> <span>Conectando...</span>
+      </div>
+    </div>
+
+    <div class="kpi-box">
+      <div class="kpi"><span class="dot" style="background: var(--verde)"></span> Operativos: <span id="kV">0</span></div>
+      <div class="kpi"><span class="dot" style="background: var(--amarillo)"></span> Fallo DHCP: <span id="kA">0</span></div>
+      <div class="kpi"><span class="dot" style="background: var(--naranja)"></span> Aislados: <span id="kN">0</span></div>
+    </div>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
