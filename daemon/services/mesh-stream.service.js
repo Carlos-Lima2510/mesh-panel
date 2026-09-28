@@ -10,7 +10,7 @@ class MeshStreamService {
   fetchInitialSnapshot() {
     return new Promise((resolve) => {
       console.log('[*] [COLD START] Obteniendo snapshot inicial de puestos...');
-      const cmd = 'meshctrl listdevices --url "$MESH_URL" --loginuser "$MESH_USER" --loginpass "$MESH_PASS" --json';
+      const cmd = 'meshctrl listdevices --url "$MESH_URL" --loginuser "$MESH_USER" --loginpass "$MESH_PASS" --json --ignore-cert';
 
       exec(cmd, {
         env: {
@@ -44,7 +44,8 @@ class MeshStreamService {
       '--url', '$MESH_URL',
       '--loginuser', '$MESH_USER',
       '--loginpass', '$MESH_PASS',
-      '--json'
+      '--json',
+      '--ignore-cert'
     ], {
       shell: true,
       env: {

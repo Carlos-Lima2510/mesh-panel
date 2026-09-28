@@ -10,7 +10,9 @@ const store = new InventoryStore();
 const sseServer = new SseServer(
   config.server.port,
   config.server.heartbeatIntervalMs,
-  () => store.getAll()
+  () => store.getAll(),
+  classifier, // <--- Pasamos el clasificador aquí
+  (updatedNode) => store.set(updatedNode.node_id, updatedNode) // <--- Actualizar el store
 );
 
 function handleMeshEvent(evt) {
