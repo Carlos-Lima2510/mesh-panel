@@ -24,13 +24,13 @@ export class DashboardRenderer {
             <span class="badge ${p.estado}">${p.estado}</span>
           </div>
           <div style="margin-top: 10px;">
-            <div class="row"><span>MeshAgent:</span><span>${p.telemetria.os_online ? 'ON' : 'OFF'}</span></div>
-            <div class="row"><span>Intel AMT:</span><span>${p.telemetria.amt_online ? 'ON' : 'OFF'}</span></div>
-            <div class="row"><span>IP OS:</span><span>${p.telemetria.ip_reportada || 'N/A'}</span></div>
+            <div class="row"><span>MeshAgent:</span><span>${p.telemetria?.os_online ? 'ON' : 'OFF'}</span></div>
+            <div class="row"><span>Intel AMT:</span><span>${p.telemetria?.amt_online ? 'ON' : 'OFF'}</span></div>
+            <div class="row"><span>IP OS:</span><span>${p.telemetria?.ip_reportada || 'N/A'}</span></div>
           </div>
         </div>
         <div>
-          <div class="diag">${p.diagnostico}</div>
+          <div class="diag">${p.diagnostico || ''}</div>
         </div>
       `;
       this.grid.appendChild(card);

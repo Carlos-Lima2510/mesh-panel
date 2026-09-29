@@ -4,10 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Observabilidad Aula - Modo Reactivo</title>
+  <title>Telemetría de Puestos - Consulta a Demanda</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* Estilos complementarios para la barra de acciones y el botón de escaneo */
     .header-actions {
       display: flex;
       align-items: center;
@@ -48,14 +47,14 @@
     <div>
       <h2>Telemetría del Laboratorio</h2>
       <div id="conn-status" class="status-badge" style="margin-top: 6px;">
-        <span class="pulse"></span> <span>Conectando...</span>
+        <span class="pulse"></span> <span>Consultas a demanda</span>
       </div>
     </div>
 
     <div class="header-actions">
-      <button id="btn-scan" class="btn-scan" onclick="triggerScanNow()">
-        <span id="btn-scan-icon">🔍</span>
-        <span id="btn-scan-text">Escanear Aula Ahora</span>
+      <button id="btn-scan" class="btn-scan">
+        <span id="btn-scan-icon">🔄</span>
+        <span id="btn-scan-text">Consultar Estado Puestos</span>
       </button>
 
       <div class="kpi-box">
@@ -70,44 +69,6 @@
   </header>
 
   <main class="grid" id="grid"></main>
-
-  <script>
-    // Manejador del sondeo activo bajo demanda
-    async function triggerScanNow() {
-      const btn = document.getElementById('btn-scan');
-      const textSpan = document.getElementById('btn-scan-text');
-      const iconSpan = document.getElementById('btn-scan-icon');
-
-      btn.disabled = true;
-      iconSpan.innerText = '⏳';
-      textSpan.innerText = 'Escaneando aula...';
-
-      try {
-        // En caso de que el frontend se sirva en un puerto distinto al del SSE (ej. 3000 vs 3001)
-        // ajusta la URL base si fuera necesario, ej: 'http://localhost:3001/api/scan-now'
-        // En la función triggerScanNow() de tu index.html:
-        const response = await fetch('http://localhost:3001/api/scan-now', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log('[*] [SCAN-NOW] Auditoría TCP completada:', data);
-      } catch (error) {
-        console.error('[-] [SCAN-NOW] Fallo al invocar el escaneo activo:', error);
-      } finally {
-        btn.disabled = false;
-        iconSpan.innerText = '🔍';
-        textSpan.innerText = 'Escanear Aula Ahora';
-      }
-    }
-  </script>
 
   <script type="module" src="js/app.js"></script>
 </body>
