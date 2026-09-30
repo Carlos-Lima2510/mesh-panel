@@ -1,30 +1,28 @@
 class ClassifierService {
   /**
-   * Clasifica el puesto basándose estrictamente en los bits de 'conn' según los 3 escenarios:
+   * Clasifica el puesto basándose en los bits de 'conn' según los 3 escenarios:
    *
-   * Definición de bits de MeshCentral (GetConnectivityState / SetConnectivityState):
+   * Definición de bits de MeshCentral:
    * - Bit 0 (1): MeshAgent (SO) conectado
    * - Bit 1 (2): Intel AMT CIRA conectado
    * - Bit 2 (4): Intel AMT local conectado
    * - Bit 3 (8): Intel AMT Relay conectado
    *
-   * Regla de correlación física del aula:
-   * Todos los puestos disponen de Intel AMT activado por hardware en el puerto de red.
-   * Si el cable está desconectado, Intel AMT pierde el enlace de inmediato (conn & 14 === 0).
-   * Si MeshCentral aún reporta MeshAgent activo (conn & 1 !== 0), se trata de un "socket zombie"
-   * transitorio fruto de la desconexión abrupta (MeshCentral tarda minutos en purgarlo).
-   *
-   * Escenario 1: Operativo (VERDE) -> Agente activo (conn & 1) y AMT activo (conn & 14)
-   * Escenario 2: Fallo Lógico DHCP (AMARILLO) -> Cable conectado (AMT activo conn & 14), pero Agente caído !(conn & 1)
-   * Escenario 3: Desconectado / Aislado (NARANJA) -> AMT inactivo (tanto conn === 0 como conn === 1 por corte abrupto)
+   * Parámetro 'linkAlive':
+   * Discrimina de forma instantánea cuando conn = 4 (Agente OFF + AMT ON).
+   * - Si linkAlive es false: El cable físico fue arrancado (AMT no contesta a nivel de red,
+   *   y su conexión en MeshCentral solo está esperando el timeout de CIRA/WSMAN de 30-45s).
+   *   Se clasifica de inmediato como NARANJA (evitando el parpadeo transitorio en AMARILLO).
+   * - Si linkAlive es true: El cable sigue conectado y AMT responde activamente en hardware,
+   *   pero el SO está incomunicado -> AMARILLO confirmado (Fallo Lógico DHCP).
    */
-  evaluate(conn = 0, ip = '') {
+  evaluate(conn = 0, ip = '', linkAlive = true) {
     const connInt = parseInt(conn, 10) || 0;
-    const rawOsOnline = (connInt & 1) !== 0;     // Bit 0 (1): MeshAgent reportado por MeshCentral
+    const rawOsOnline = (connInt & 1) !== 0;     // Bit 0 (1): MeshAgent
     const amtCira = (connInt & 2) !== 0;         // Bit 1 (2): Intel AMT CIRA
     const amtLocal = (connInt & 4) !== 0;        // Bit 2 (4): Intel AMT Local
     const amtRelay = (connInt & 8) !== 0;        // Bit 3 (8): Intel AMT Relay
-    const amtOnline = amtCira || amtLocal || amtRelay; // AMT activo (cualquier modalidad)
+    const amtOnline = amtCira || amtLocal || amtRelay; // AMT activo
 
     let amtType = 'none';
     if (amtLocal) amtType = 'local';
@@ -42,8 +40,20 @@ class ClassifierService {
       };
     }
 
-    // Escenario 2: Fallo Lógico / DHCP (Cable conectado con AMT activo, pero Agente del SO desconectado)
+    // Escenario 2 o Escenario 3: Agente caído con AMT aparentemente vivo en MeshCentral
     if (!rawOsOnline && amtOnline) {
+      // Si la comprobación de enlace físico demuestra que el cable fue arrancado:
+      if (!linkAlive) {
+        return {
+          estado: 'NARANJA',
+          categoria: 'DESCONECTADO_O_AISLADO',
+          diagnostico: 'Desconexión física detectada (sin respuesta de enlace en el cable; socket AMT de MeshCentral en espera de cierre).',
+          accion: 'inspeccion_fisica',
+          telemetria: { os_online: false, amt_online: false, amt_type: 'none', ip_reportada: ip, conn: connInt, cable_unplugged: true }
+        };
+      }
+
+      // Si el enlace físico responde (cable conectado y AMT activo en hardware):
       return {
         estado: 'AMARILLO',
         categoria: 'FALLO_LOGICO',
@@ -53,7 +63,7 @@ class ClassifierService {
       };
     }
 
-    // Escenario 3 (Subcaso corte abrupto): AMT cayó al perder el enlace físico, pero el agente sigue como socket zombie en MeshCentral
+    // Escenario 3 (Subcaso corte abrupto donde AMT cayó antes que el agente: conn === 1)
     if (rawOsOnline && !amtOnline) {
       return {
         estado: 'NARANJA',

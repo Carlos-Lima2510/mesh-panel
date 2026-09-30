@@ -39,14 +39,26 @@ En MeshCentral (obtenido a través de `meshctrl listdevices --json`, funciones i
 
 ---
 
-## 3. Desconexiones Abruptas y Sockets TCP Zombie
+## 3. Desconexiones Abruptas, Sockets TCP Zombie y Desambiguación de Cable
 
-Cuando un PC pierde la red abruptamente (desconexión física del cable o apagado de la interfaz con `ip link set down`), el sistema operativo no puede enviar un paquete `TCP FIN` o `TCP RST` a MeshCentral.
+Cuando un PC pierde la red abruptamente (desconexión física del cable o apagado de la interfaz con `ip link set down`), el sistema operativo no puede enviar un paquete `TCP FIN` o `TCP RST` a MeshCentral. Esto genera dos casos transitorios asimétricos que el panel resuelve de forma determinista:
 
+### Caso A: Agente Zombie en MeshCentral (`conn === 1`)
 1. **El problema del Socket Half-Open**: Para el servidor MeshCentral, el socket TCP WebSocket del agente sigue en estado `ESTABLISHED` hasta que vence un temporizador de inactividad o fallan las retransmisiones del kernel.
-2. **Detección Instantánea por Correlación de Hardware (Corte de Cable)**:
+2. **Detección Instantánea por Correlación de Hardware**:
    - Dado que en este laboratorio todos los puestos tienen Intel AMT activo en la misma tarjeta de red, **es físicamente imposible que un PC tenga cable conectado y AMT esté apagado**.
    - Si `conn === 1` (Agente supuestamente vivo, pero AMT caído), el clasificador [`ClassifierService`](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/classifier.service.js) no espera los timeouts del servidor: deduce de inmediato el corte de cable y marca el puesto en **`NARANJA`** en 0 segundos.
+
+### Caso B: Desconexión Física de Cable y Falso Parpadeo Amarillo (`conn = 4`)
+1. **El desfase de Timeouts (Agente vs AMT)**:
+   - Al desconectar el cable de red físico, el agente del SO cae de inmediato en 1–2 segundos (`conn & 1` pasa a `0`).
+   - Sin embargo, el socket CIRA / TLS local de Intel AMT gestionado internamente por MeshCentral (`mpsserver.js`) mantiene un temporizador `KEEPALIVE_INTERVAL = 30` (30 a 45 segundos) antes de declarar muerta la sesión de hardware.
+   - Durante esos 30–45 segundos, MeshCentral reporta `conn = 4` (Agente OFF, AMT ON), lo que sin filtro provocaría que el panel mostrase transitoriamente **`AMARILLO`** (falso Fallo Lógico) antes de pasar a **`NARANJA`**.
+2. **Solución Implementada: Desambiguador Físico ICMP (`linkAlive`)**:
+   - Cuando un equipo se encuentra en el estado candidato a `AMARILLO` (`!rawOsOnline && amtOnline`), el daemon ejecuta un sondeo ultrarrápido ICMP de 1 paquete (`ping -c 1 -w 1 -W 1 -q <ip>`).
+   - **Si el cable fue desconectado**: El enlace físico PHY está muerto a nivel de switch. El ping falla con 100% de pérdida en 1 segundo $\rightarrow$ El clasificador marca de inmediato **`NARANJA`** (Corte de cable detectado), eliminando por completo el falso amarillo.
+   - **Si es un Fallo Lógico real** (cable conectado, pero interfaz del SO caída o fallo DHCP): Gracias a que Intel AMT está configurado en modo `ACTIVE` en MEBx, el chip de hardware Intel ME responde activamente al eco ICMP en **< 0.1 ms** $\rightarrow$ El clasificador confirma con total certeza el estado **`AMARILLO`**.
+   - **Sobrecarga Cero**: Este sondeo solo se ejecuta a demanda y exclusivamente para puestos sospechosos de discrepancia transitoria; nunca se sondea a puestos operativos (`VERDE`) ni a puestos desconectados confirmados (`NARANJA`).
 
 ---
 
@@ -124,12 +136,12 @@ El proyecto sigue una arquitectura minimalista, desacoplada y orientada a consul
 ### Backend (`daemon/`):
 * [config.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/config.js): Parámetros de conexión a MeshCentral tomados de `.env`.
 * [services/mesh.service.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/mesh.service.js): Ejecuta a demanda `meshctrl listdevices --json --ignore-cert` mediante `child_process.exec`.
-* [services/classifier.service.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/classifier.service.js): Aplica la matriz de los 3 escenarios basándose en los bits de `conn` y gestiona la detección inmediata del corte abrupto (`conn === 1`).
+* [services/classifier.service.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/classifier.service.js): Aplica la matriz de los 3 escenarios basándose en los bits de `conn`, gestiona la detección inmediata del corte abrupto (`conn === 1`) y discrimina falsos amarillos mediante el indicador `linkAlive`.
 * [services/inventory.store.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/inventory.store.js): Almacén en memoria de los puestos evaluados.
 * [sse.server.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/sse.server.js): Servidor HTTP nativo de Node.js que expone:
   - `GET /api/devices`: Ejecuta la consulta a MeshCentral, clasifica y devuelve JSON.
   - `POST /api/scan-now`: Mismo comportamiento a demanda con broadcast a clientes conectados.
-* [daemon.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/daemon.js): Punto de entrada que orquesta los servicios.
+* [daemon.js](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/daemon.js): Punto de entrada que orquesta los servicios, ejecuta en paralelo la desambiguación ICMP `checkPhysicalLink(ip)` para puestos con posible fallo lógico y actualiza el almacén.
 
 ### Frontend (`src/`):
 * [index.html](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/src/index.html): Cuadrícula visual de puestos con botón interactivo de actualización y contadores KPI (Operativos, Fallo DHCP, Aislados).
@@ -172,7 +184,8 @@ sudo nmcli device connect eno2
 ### ✅ LO QUE HACEMOS AHORA (Fase Actual: Simplicidad y A Demanda)
 - Consultas a demanda con `meshctrl listdevices`.
 - Clasificación determinista con la máscara de bits de `conn`.
-- Correlación de hardware para corte físico de cable inmediato.
+- Correlación de hardware para corte físico de cable inmediato (`conn === 1`).
+- Desambiguación de enlace físico por ICMP ultrarrápido (< 0.1ms en Intel AMT) para eliminar falsos amarillos por keepalive de AMT (`conn === 4` o `conn === 2`).
 - Optimización de timeouts a nivel de kernel (`tcp_retries2=5`) y `config.json`.
 
 ### ❌ LO QUE NO HACEMOS AHORA (Pospuesto para Fases Posteriores)
@@ -181,7 +194,44 @@ sudo nmcli device connect eno2
 
 ---
 
-## 10. Reglas para Modelos y Desarrolladores
+## 10. Estudio de Casos Límite (Edge Cases) y Robustez del Sistema
+
+A partir del análisis técnico del aula y de la telemetría reportada por MeshCentral, se identifican los siguientes casos límite del modelo actual:
+
+### 1. Equipos sin Intel AMT aprovisionado (`conn === 1`)
+- **Situación**: Un PC tiene MeshAgent activo en Linux/Windows, pero Intel AMT no está aprovisionado en MEBx o la placa no dispone de tecnología vPro (`intelamt.state === 0`).
+- **Comportamiento en el Clasificador Actual**: Como `rawOsOnline` es `true` y `amtOnline` es `false`, la regla de corte abrupto interpreta que hubo una pérdida de enlace físico en hardware y clasifica el puesto como **`NARANJA`** (Falso positivo de desconexión).
+- **Causa Raíz**: La premisa inicial del laboratorio asume homogeneidad total (*todos los puestos tienen Intel AMT activo en la misma tarjeta*).
+- **Detección en MeshCentral**: El atributo `dev.intelamt.state`:
+  - `state === 0`: Sin aprovisionar / no gestionado.
+  - `state === 2`: Aprovisionado y gestionado.
+
+### 2. Equipos Apagados Voluntariamente (Estado ACPI S5 / Soft-Off) con Cable Conectado
+- **Situación**: El alumno o docente apaga el equipo (`sudo poweroff`) al finalizar la jornada, pero deja el cable de red y de corriente conectados.
+- **Comportamiento en el Clasificador Actual**:
+  - El SO está apagado (`conn & 1 === 0`).
+  - La tarjeta de red mantiene energía en standby (+5VSB) y el procesador Intel ME continúa activo en la LAN (`conn = 4`).
+  - El desambiguador ICMP lanza el ping y, como Intel AMT está en modo `ACTIVE`, el hardware Intel ME responde al eco en < 0.1 ms.
+  - **Resultado**: El clasificador lo evalúa como **`AMARILLO`** (Fallo Lógico), creyendo que el SO falló, cuando en realidad el equipo fue apagado voluntariamente.
+- **Detección en MeshCentral**: El campo `dev.pwr` de telemetría de energía:
+  - `pwr === 1`: Equipo físicamente encendido en la placa base.
+  - `pwr === 0`: Equipo en estado de suspensión o apagado suave (S5).
+
+### 3. Reinicios del Sistema Operativo (`sudo reboot`)
+- **Situación**: Durante un reinicio de Linux, el agente del SO se desconecta durante 20–30 segundos mientras el hardware de AMT permanece alimentado.
+- **Comportamiento**: Pasa transitoriamente a **`AMARILLO`** durante el intervalo del reinicio y vuelve automáticamente a **`VERDE`** en cuanto el agente reconecta con MeshCentral.
+
+### 4. Cambios Dinámicos de IP / Desfase de Caché en MeshCentral
+- **Situación**: Si un equipo cambia de dirección IP y MeshCentral tarda en actualizar el atributo `dev.ip`, el ping de desambiguación ICMP apuntaría a la IP previa.
+- **Comportamiento**: Fallaría el ping por timeout (1 s) y se clasificaría temporalmente como **`NARANJA`** hasta que MeshCentral refresque la IP asignada.
+
+### 5. Bloqueo de ICMP en Red o BIOS
+- **Situación**: Si en MEBx o en la política de red se bloquea el tráfico de eco ICMP.
+- **Comportamiento**: `checkPhysicalLink` siempre retornaría `false`, provocando que cualquier fallo lógico genuino se clasifique como corte físico (`NARANJA`).
+
+---
+
+## 11. Reglas para Modelos y Desarrolladores
 
 1. **Prioridad a la simplicidad**: Todo cambio en el backend debe apoyarse en llamadas limpias a `meshctrl listdevices`.
 2. **Respetar los 3 escenarios**: No inventar estados adicionales. Las máquinas o están Operativas (`VERDE`), en Fallo Lógico DHCP (`AMARILLO`) o Desconectadas (`NARANJA`).

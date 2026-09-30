@@ -1,3 +1,4 @@
+const { exec } = require('child_process');
 const config = require('./config');
 const ClassifierService = require('./services/classifier.service');
 const InventoryStore = require('./services/inventory.store');
@@ -8,26 +9,54 @@ const classifier = new ClassifierService();
 const store = new InventoryStore();
 const meshService = new MeshService(config);
 
+/**
+ * Comprueba si el host responde físicamente por ICMP en la red local.
+ * Intel AMT en modo ACTIVE responde directamente por hardware en < 1ms si el cable está conectado.
+ * Si el cable fue desconectado, falla con 100% pérdida.
+ */
+function checkPhysicalLink(ip) {
+  return new Promise((resolve) => {
+    if (!ip || !/^[0-9a-fA-F.:]+$/.test(ip)) {
+      return resolve(false);
+    }
+    exec(`ping -c 1 -w 1 -W 1 -q ${ip}`, (error) => {
+      resolve(!error);
+    });
+  });
+}
+
 async function refreshDevices() {
   const rawDevices = await meshService.fetchDevices();
-  const processed = [];
 
-  for (const dev of rawDevices) {
-    const nodeId = dev._id || dev.id;
-    const conn = dev.conn ?? 0;
-    const ip = dev.ip || null;
-    const evaluation = classifier.evaluate(conn, ip);
+  const processed = await Promise.all(
+    rawDevices.map(async (dev) => {
+      const nodeId = dev._id || dev.id;
+      const conn = dev.conn ?? 0;
+      const ip = dev.ip || dev.host || null;
 
-    const record = {
-      node_id: nodeId,
-      nombre: dev.name || ('Puesto-' + (nodeId ? nodeId.substring(0, 6) : 'X')),
-      grupo: dev.groupname || dev.meshid || 'General',
-      ...evaluation
-    };
+      // Solo verificamos enlace físico si hay discrepancia (agente OFF pero AMT aparentemente ON en MeshCentral)
+      const connInt = parseInt(conn, 10) || 0;
+      const rawOsOnline = (connInt & 1) !== 0;
+      const amtOnline = (connInt & 14) !== 0;
 
-    store.set(nodeId, record);
-    processed.push(record);
-  }
+      let linkAlive = true;
+      if (!rawOsOnline && amtOnline && ip) {
+        linkAlive = await checkPhysicalLink(ip);
+      }
+
+      const evaluation = classifier.evaluate(conn, ip, linkAlive);
+
+      const record = {
+        node_id: nodeId,
+        nombre: dev.name || ('Puesto-' + (nodeId ? nodeId.substring(0, 6) : 'X')),
+        grupo: dev.groupname || dev.meshid || 'General',
+        ...evaluation
+      };
+
+      store.set(nodeId, record);
+      return record;
+    })
+  );
 
   return processed;
 }
