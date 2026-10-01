@@ -33,18 +33,21 @@ async function refreshDevices() {
       const nodeId = dev._id || dev.id;
       const conn = dev.conn ?? 0;
       const ip = dev.ip || dev.host || null;
+      const pwr = dev.pwr !== undefined ? dev.pwr : null;
+      const amtProvisioned = dev.intelamt ? dev.intelamt.state === 2 : false;
 
       // Solo verificamos enlace físico si hay discrepancia (agente OFF pero AMT aparentemente ON en MeshCentral)
+      // Y además la placa base NO está apagada por el usuario (pwr !== 0)
       const connInt = parseInt(conn, 10) || 0;
       const rawOsOnline = (connInt & 1) !== 0;
       const amtOnline = (connInt & 14) !== 0;
 
       let linkAlive = true;
-      if (!rawOsOnline && amtOnline && ip) {
+      if (!rawOsOnline && amtOnline && pwr !== 0 && ip) {
         linkAlive = await checkPhysicalLink(ip);
       }
 
-      const evaluation = classifier.evaluate(conn, ip, linkAlive);
+      const evaluation = classifier.evaluate(conn, ip, linkAlive, pwr, amtProvisioned);
 
       const record = {
         node_id: nodeId,

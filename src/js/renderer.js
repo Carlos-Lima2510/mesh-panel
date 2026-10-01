@@ -3,16 +3,18 @@ export class DashboardRenderer {
     this.grid = document.getElementById(gridElementId);
     this.kpiV = document.getElementById(kpiIds.v);
     this.kpiA = document.getElementById(kpiIds.a);
+    this.kpiG = document.getElementById(kpiIds.g);
     this.kpiN = document.getElementById(kpiIds.n);
   }
 
   render(puestosMap) {
     this.grid.innerHTML = '';
-    let v = 0, a = 0, n = 0;
+    let v = 0, a = 0, g = 0, n = 0;
 
     puestosMap.forEach(p => {
       if (p.estado === 'VERDE') v++;
       else if (p.estado === 'AMARILLO') a++;
+      else if (p.estado === 'GRIS') g++;
       else n++;
 
       const card = document.createElement('div');
@@ -36,8 +38,9 @@ export class DashboardRenderer {
       this.grid.appendChild(card);
     });
 
-    this.kpiV.textContent = v;
-    this.kpiA.textContent = a;
-    this.kpiN.textContent = n;
+    if (this.kpiV) this.kpiV.textContent = v;
+    if (this.kpiA) this.kpiA.textContent = a;
+    if (this.kpiG) this.kpiG.textContent = g;
+    if (this.kpiN) this.kpiN.textContent = n;
   }
 }

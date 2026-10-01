@@ -1,6 +1,7 @@
 :root {
   --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --muted: #94a3b8;
   --border: #334155; --verde: #22c55e; --amarillo: #eab308; --naranja: #f97316;
+  --gris: #94a3b8;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
 body { background: var(--bg); color: var(--text); padding: 24px; min-height: 100vh; }
@@ -16,11 +17,13 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 .card.VERDE { border-left-color: var(--verde); }
 .card.AMARILLO { border-left-color: var(--amarillo); }
 .card.NARANJA { border-left-color: var(--naranja); }
+.card.GRIS { border-left-color: var(--gris); }
 .card-top { display: flex; justify-content: space-between; align-items: baseline; }
 .badge { font-size: 0.75rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
 .badge.VERDE { background: rgba(34,197,94,0.15); color: var(--verde); }
 .badge.AMARILLO { background: rgba(234,179,8,0.15); color: var(--amarillo); }
 .badge.NARANJA { background: rgba(249,115,22,0.15); color: var(--naranja); }
+.badge.GRIS { background: rgba(148,163,184,0.15); color: var(--gris); }
 .row { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; }
 .row span:last-child { font-weight: 600; color: var(--text); }
 .diag { font-size: 0.75rem; color: var(--muted); background: rgba(0,0,0,0.25); padding: 8px; border-radius: 4px; min-height: 40px; }

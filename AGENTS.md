@@ -14,13 +14,14 @@ Físicamente solo pueden existir **3 escenarios**:
 
 | Escenario | Estado Visual | Condición Técnica Real | Comportamiento en Red y MeshCentral |
 | :--- | :--- | :--- | :--- |
-| **1. Operativo** | `VERDE` | Puesto con cable conectado, DHCP/red lógica del SO correcta. Agente activo y AMT enlazado. | MeshAgent responde y AMT responde (`conn = 5` o `conn = 3`). Ambos canales de comunicación están activos. |
-| **2. Fallo Lógico / DHCP** | `AMARILLO` | Cable de red conectado físicamente, pero configuración de red lógica/DHCP dañada o interfaz caída en el SO. El agente no puede comunicar. | AMT sigue conectado gracias al enlace físico y a su cliente DHCP activo por hardware. El agente en MeshCentral cae. |
-| **3. Aislado / Desconectado** | `NARANJA` | Puesto desconectado físicamente del cable o conectado a una red aislada sin salida hacia el servidor MeshCentral. | Ni el agente ni AMT tienen comunicación con MeshCentral (`conn = 0`). Si el corte fue abrupto, se detecta de inmediato como `conn = 1`. |
+| **1. Operativo** | `VERDE` | Puesto con cable conectado, DHCP/red lógica del SO correcta. Agente activo y AMT enlazado (o agente activo sin AMT). | MeshAgent responde y AMT responde (`conn = 5` o `conn = 3`). Ambos canales de comunicación están activos. |
+| **2. Fallo Lógico / DHCP** | `AMARILLO` | Cable de red conectado físicamente y PC encendido (`pwr = 1`), pero configuración de red lógica/DHCP dañada o interfaz caída en el SO. | AMT sigue conectado (`conn = 4`) y la placa está encendida. Responde ping ICMP por hardware. El agente en MeshCentral cae. |
+| **3. Apagado (S5 / Standby)** | `GRIS` | Equipo apagado voluntariamente por el usuario (`sudo poweroff`) con cables de corriente y red conectados. | Intel AMT activo en standby (`conn = 4`), pero placa apagada (`pwr = 0`). No se ejecuta ping ICMP. |
+| **4. Aislado / Desconectado** | `NARANJA` | Puesto desconectado físicamente del cable o conectado a una red aislada sin salida hacia el servidor MeshCentral. | Ni el agente ni AMT tienen comunicación con MeshCentral (`conn = 0`). Si el corte fue abrupto, se detecta de inmediato como `conn = 1`. |
 
 ---
 
-## 2. Decodificación del Estado mediante el Bitfield `conn`
+## 2. Decodificación del Estado mediante el Bitfield `conn` y `pwr`
 
 En MeshCentral (obtenido a través de `meshctrl listdevices --json`, funciones internas `GetConnectivityState` / `SetConnectivityState` de `meshcentral.js`), el campo entero `conn` es una **máscara de bits** que refleja los canales de comunicación activos:
 
@@ -33,9 +34,12 @@ En MeshCentral (obtenido a través de `meshctrl listdevices --json`, funciones i
 
 ### Matriz de Decodificación y Clasificación:
 * **`conn & 1` y `conn & 14` activos** (ej. `conn = 5` [1+4] o `conn = 3` [1+2]): **Escenario 1 (Operativo / `VERDE`)**.
-* **`!(conn & 1)` y `conn & 14` activo** (ej. `conn = 4` o `conn = 2`): **Escenario 2 (Fallo Lógico DHCP / `AMARILLO`)**.
-* **`conn === 0` (o sin atributo `conn`)**: **Escenario 3 (Desconectado o Aislado / `NARANJA`)**.
-* **`conn === 1` (`conn & 1` activo pero `!(conn & 14)`)**: **Escenario 3 (Corte Físico Abrupto / `NARANJA`)**. Al perderse el enlace eléctrico, AMT cae de inmediato en hardware; si el agente sigue en MeshCentral, se trata de un socket TCP zombie. Se clasifica instantáneamente como `NARANJA`.
+* **`conn & 1` activo pero máquina sin AMT aprovisionado** (`intelamt.state !== 2`): **Escenario 1 (Operativo / `VERDE`)**.
+* **`!(conn & 1)` y `conn & 14` activo con `pwr === 0`**: **Escenario 3 (Apagado / `GRIS`)**. Placa apagada en standby; sin ping ICMP.
+* **`!(conn & 1)` y `conn & 14` activo con `pwr !== 0` y `linkAlive === true`**: **Escenario 2 (Fallo Lógico DHCP / `AMARILLO`)**.
+* **`conn === 0` (o sin atributo `conn`)**: **Escenario 4 (Desconectado o Aislado / `NARANJA`)**.
+* **`conn === 1` en máquina con AMT aprovisionado**: **Escenario 4 (Corte Físico Abrupto / `NARANJA`)**. Socket zombie.
+* **`conn = 4` con `linkAlive === false`**: **Escenario 4 (Corte Físico de Cable / `NARANJA`)**. Cable desconectado.
 
 ---
 
@@ -200,22 +204,14 @@ A partir del análisis técnico del aula y de la telemetría reportada por MeshC
 
 ### 1. Equipos sin Intel AMT aprovisionado (`conn === 1`)
 - **Situación**: Un PC tiene MeshAgent activo en Linux/Windows, pero Intel AMT no está aprovisionado en MEBx o la placa no dispone de tecnología vPro (`intelamt.state === 0`).
-- **Comportamiento en el Clasificador Actual**: Como `rawOsOnline` es `true` y `amtOnline` es `false`, la regla de corte abrupto interpreta que hubo una pérdida de enlace físico en hardware y clasifica el puesto como **`NARANJA`** (Falso positivo de desconexión).
-- **Causa Raíz**: La premisa inicial del laboratorio asume homogeneidad total (*todos los puestos tienen Intel AMT activo en la misma tarjeta*).
-- **Detección en MeshCentral**: El atributo `dev.intelamt.state`:
-  - `state === 0`: Sin aprovisionar / no gestionado.
-  - `state === 2`: Aprovisionado y gestionado.
+- **Solución Implementada**: Se evalúa `dev.intelamt.state === 2`. Si el puesto no está aprovisionado en AMT (`amtProvisioned = false`), el clasificador lo reconoce como operativo por software y lo marca como **`VERDE`** en lugar de falso corte de cable.
 
 ### 2. Equipos Apagados Voluntariamente (Estado ACPI S5 / Soft-Off) con Cable Conectado
 - **Situación**: El alumno o docente apaga el equipo (`sudo poweroff`) al finalizar la jornada, pero deja el cable de red y de corriente conectados.
-- **Comportamiento en el Clasificador Actual**:
-  - El SO está apagado (`conn & 1 === 0`).
-  - La tarjeta de red mantiene energía en standby (+5VSB) y el procesador Intel ME continúa activo en la LAN (`conn = 4`).
-  - El desambiguador ICMP lanza el ping y, como Intel AMT está en modo `ACTIVE`, el hardware Intel ME responde al eco en < 0.1 ms.
-  - **Resultado**: El clasificador lo evalúa como **`AMARILLO`** (Fallo Lógico), creyendo que el SO falló, cuando en realidad el equipo fue apagado voluntariamente.
-- **Detección en MeshCentral**: El campo `dev.pwr` de telemetría de energía:
-  - `pwr === 1`: Equipo físicamente encendido en la placa base.
-  - `pwr === 0`: Equipo en estado de suspensión o apagado suave (S5).
+- **Solución Implementada**: Se consulta el atributo `dev.pwr` de MeshCentral:
+  - Si `pwr === 0`: La placa base está apagada en modo S5/Standby.
+  - El clasificador lo categoriza como **`APAGADO`** y lo pinta de color **`GRIS`**.
+  - **Optimización Crítica para 60 PCs**: Al detectar `pwr === 0`, **se omite completamente el ping ICMP**. Cuando los 60 ordenadores del aula se apagan al terminar la clase, la consulta sigue tardando solo **0.2 segundos** y no se lanza ningún ping innecesario.
 
 ### 3. Reinicios del Sistema Operativo (`sudo reboot`)
 - **Situación**: Durante un reinicio de Linux, el agente del SO se desconecta durante 20–30 segundos mientras el hardware de AMT permanece alimentado.
@@ -234,5 +230,5 @@ A partir del análisis técnico del aula y de la telemetría reportada por MeshC
 ## 11. Reglas para Modelos y Desarrolladores
 
 1. **Prioridad a la simplicidad**: Todo cambio en el backend debe apoyarse en llamadas limpias a `meshctrl listdevices`.
-2. **Respetar los 3 escenarios**: No inventar estados adicionales. Las máquinas o están Operativas (`VERDE`), en Fallo Lógico DHCP (`AMARILLO`) o Desconectadas (`NARANJA`).
-3. **Consistencia de datos**: El frontend espera objetos con las propiedades `estado`, `categoria`, `diagnostico` y el subobjeto `telemetria` con `os_online`, `amt_online` y `conn`.
+2. **Respetar los 4 estados visuales**: Las máquinas o están Operativas (`VERDE`), en Fallo Lógico DHCP (`AMARILLO`), Apagadas en Standby (`GRIS`) o Desconectadas (`NARANJA`).
+3. **Consistencia de datos**: El frontend espera objetos con las propiedades `estado`, `categoria`, `diagnostico` y el subobjeto `telemetria` con `os_online`, `amt_online`, `pwr` y `conn`.

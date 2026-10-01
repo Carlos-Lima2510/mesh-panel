@@ -10,6 +10,7 @@ const scanIcon = document.getElementById('btn-scan-icon');
 const renderer = new DashboardRenderer('grid', {
   v: 'kV',
   a: 'kA',
+  g: 'kG',
   n: 'kN'
 });
 
