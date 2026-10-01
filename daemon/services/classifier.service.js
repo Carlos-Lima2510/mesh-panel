@@ -1,21 +1,4 @@
 class ClassifierService {
-  /**
-   * Clasifica el puesto basándose en los bits de 'conn' según los 3 escenarios:
-   *
-   * Definición de bits de MeshCentral:
-   * - Bit 0 (1): MeshAgent (SO) conectado
-   * - Bit 1 (2): Intel AMT CIRA conectado
-   * - Bit 2 (4): Intel AMT local conectado
-   * - Bit 3 (8): Intel AMT Relay conectado
-   *
-   * Parámetro 'linkAlive':
-   * Discrimina de forma instantánea cuando conn = 4 (Agente OFF + AMT ON).
-   * - Si linkAlive es false: El cable físico fue arrancado (AMT no contesta a nivel de red,
-   *   y su conexión en MeshCentral solo está esperando el timeout de CIRA/WSMAN de 30-45s).
-   *   Se clasifica de inmediato como NARANJA (evitando el parpadeo transitorio en AMARILLO).
-   * - Si linkAlive es true: El cable sigue conectado y AMT responde activamente en hardware,
-   *   pero el SO está incomunicado -> AMARILLO confirmado (Fallo Lógico DHCP).
-   */
   evaluate(conn = 0, ip = '', linkAlive = true) {
     const connInt = parseInt(conn, 10) || 0;
     const rawOsOnline = (connInt & 1) !== 0;     // Bit 0 (1): MeshAgent
@@ -29,7 +12,6 @@ class ClassifierService {
     else if (amtCira) amtType = 'cira';
     else if (amtRelay) amtType = 'relay';
 
-    // Escenario 1: Operativo (Agente y AMT ambos en línea)
     if (rawOsOnline && amtOnline) {
       return {
         estado: 'VERDE',
@@ -40,9 +22,7 @@ class ClassifierService {
       };
     }
 
-    // Escenario 2 o Escenario 3: Agente caído con AMT aparentemente vivo en MeshCentral
     if (!rawOsOnline && amtOnline) {
-      // Si la comprobación de enlace físico demuestra que el cable fue arrancado:
       if (!linkAlive) {
         return {
           estado: 'NARANJA',
@@ -53,7 +33,6 @@ class ClassifierService {
         };
       }
 
-      // Si el enlace físico responde (cable conectado y AMT activo en hardware):
       return {
         estado: 'AMARILLO',
         categoria: 'FALLO_LOGICO',
@@ -63,7 +42,6 @@ class ClassifierService {
       };
     }
 
-    // Escenario 3 (Subcaso corte abrupto donde AMT cayó antes que el agente: conn === 1)
     if (rawOsOnline && !amtOnline) {
       return {
         estado: 'NARANJA',
@@ -74,7 +52,6 @@ class ClassifierService {
       };
     }
 
-    // Escenario 3: Ambos completamente desconectados (conn === 0)
     return {
       estado: 'NARANJA',
       categoria: 'DESCONECTADO_O_AISLADO',
