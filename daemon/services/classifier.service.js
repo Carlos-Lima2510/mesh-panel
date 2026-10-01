@@ -12,7 +12,6 @@ class ClassifierService {
     else if (amtCira) amtType = 'cira';
     else if (amtRelay) amtType = 'relay';
 
-    // Escenario 1: Operativo (Agente y AMT ambos en línea)
     if (rawOsOnline && amtOnline) {
       return {
         estado: 'VERDE',
@@ -23,8 +22,6 @@ class ClassifierService {
       };
     }
 
-    // Escenario 1 (Variante sin Intel AMT aprovisionado):
-    // Si el PC tiene agente en línea y no dispone de AMT aprovisionado (state !== 2)
     if (rawOsOnline && !amtOnline && !amtProvisioned) {
       return {
         estado: 'VERDE',
@@ -35,20 +32,18 @@ class ClassifierService {
       };
     }
 
-    // Escenario 2 / Apagado / Corte: Agente caído con AMT activo en MeshCentral
     if (!rawOsOnline && amtOnline) {
-      // Si la placa base está físicamente apagada (ACPI S5 / Soft-Off):
-      if (pwr === 0) {
+      // Si la placa base está físicamente apagada en modo Soft-Off / Standby (pwr !== 1, ej. pwr = 6, 8 o 0):
+      if (pwr !== 1 && pwr !== null && pwr !== undefined) {
         return {
           estado: 'GRIS',
           categoria: 'APAGADO',
-          diagnostico: `Equipo apagado (S5 / Soft-Off). Cable conectado y gestión Intel AMT ${amtType} en standby.`,
+          diagnostico: `Equipo apagado (Soft-Off / Standby). Cable conectado y gestión Intel AMT ${amtType} en standby.`,
           accion: 'encender_remoto',
-          telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr: 0 }
+          telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr }
         };
       }
 
-      // Si la placa está encendida pero no responde al ping (cable físico desconectado):
       if (!linkAlive) {
         return {
           estado: 'NARANJA',
@@ -59,7 +54,6 @@ class ClassifierService {
         };
       }
 
-      // Si la placa está encendida y responde al ping (cable conectado pero SO mudo):
       return {
         estado: 'AMARILLO',
         categoria: 'FALLO_LOGICO',
@@ -69,7 +63,6 @@ class ClassifierService {
       };
     }
 
-    // Escenario 3 (Subcaso corte abrupto en máquina con AMT aprovisionado):
     if (rawOsOnline && !amtOnline && amtProvisioned) {
       return {
         estado: 'NARANJA',
@@ -80,7 +73,6 @@ class ClassifierService {
       };
     }
 
-    // Escenario 3: Ambos completamente desconectados (conn === 0)
     return {
       estado: 'NARANJA',
       categoria: 'DESCONECTADO_O_AISLADO',

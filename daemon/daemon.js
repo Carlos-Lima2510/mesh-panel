@@ -37,13 +37,13 @@ async function refreshDevices() {
       const amtProvisioned = dev.intelamt ? dev.intelamt.state === 2 : false;
 
       // Solo verificamos enlace físico si hay discrepancia (agente OFF pero AMT aparentemente ON en MeshCentral)
-      // Y además la placa base NO está apagada por el usuario (pwr !== 0)
+      // Y además la placa base está físicamente encendida (pwr === 1)
       const connInt = parseInt(conn, 10) || 0;
       const rawOsOnline = (connInt & 1) !== 0;
       const amtOnline = (connInt & 14) !== 0;
 
       let linkAlive = true;
-      if (!rawOsOnline && amtOnline && pwr !== 0 && ip) {
+      if (!rawOsOnline && amtOnline && pwr === 1 && ip) {
         linkAlive = await checkPhysicalLink(ip);
       }
 

@@ -209,9 +209,9 @@ A partir del análisis técnico del aula y de la telemetría reportada por MeshC
 ### 2. Equipos Apagados Voluntariamente (Estado ACPI S5 / Soft-Off) con Cable Conectado
 - **Situación**: El alumno o docente apaga el equipo (`sudo poweroff`) al finalizar la jornada, pero deja el cable de red y de corriente conectados.
 - **Solución Implementada**: Se consulta el atributo `dev.pwr` de MeshCentral:
-  - Si `pwr === 0`: La placa base está apagada en modo S5/Standby.
-  - El clasificador lo categoriza como **`APAGADO`** y lo pinta de color **`GRIS`**.
-  - **Optimización Crítica para 60 PCs**: Al detectar `pwr === 0`, **se omite completamente el ping ICMP**. Cuando los 60 ordenadores del aula se apagan al terminar la clase, la consulta sigue tardando solo **0.2 segundos** y no se lanza ningún ping innecesario.
+  - En MeshCentral e Intel AMT (estándar DMTF CIM), **`pwr === 1`** indica encendido (*Power On / S0*), mientras que valores como **`pwr === 6`** (*Power Off - Hard / Soft-off*), **`pwr === 8`** (*Power Off - Soft*) o **`pwr === 0`** indican que la placa base está apagada en modo S5/Standby.
+  - Cuando `pwr !== 1`, el clasificador lo categoriza como **`APAGADO`** y lo pinta de color **`GRIS`**.
+  - **Optimización Crítica para 60 PCs**: Al detectar `pwr !== 1`, **se omite completamente el ping ICMP**. Cuando los 60 ordenadores del aula se apagan al terminar la clase, la consulta sigue tardando solo **0.2 segundos** y no se lanza ningún ping innecesario.
 
 ### 3. Reinicios del Sistema Operativo (`sudo reboot`)
 - **Situación**: Durante un reinicio de Linux, el agente del SO se desconecta durante 20–30 segundos mientras el hardware de AMT permanece alimentado.
