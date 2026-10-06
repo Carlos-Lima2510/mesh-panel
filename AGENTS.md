@@ -227,8 +227,95 @@ A partir del análisis técnico del aula y de la telemetría reportada por MeshC
 
 ---
 
-## 11. Reglas para Modelos y Desarrolladores
+## 11. Limitaciones de Hardware OEM y Heterogeneidad del Parque (Dell SKU 631-ADPL)
+
+Durante el despliegue y análisis en el aula principal de 60 puestos de trabajo (lote de producción), se identificaron discrepancias críticas de hardware frente al lote piloto de desarrollo (`UEA-C236`, `UEA-C403`).
+
+### 11.1 Análisis Técnico del Lote de Producción Dell (SKU 631-ADPL)
+
+En la orden de compra y especificación técnica de Dell para este lote de 60 PCs figuran los siguientes identificadores de fábrica:
+* **Descripción principal**: `631-ADPL : Sin gestión de sistemas fuera de banda` (*No Out-of-Band Systems Management*).
+* **Códigos internos de ingeniería Dell**:
+  - `INFO,RYLTY,ME,DISABLE,DAKAR`
+  - `INFO,MGMT,INTEL,ME,DISABLE`
+
+#### ¿Por qué es físicamente imposible activar Intel AMT por software o BIOS en este lote?
+1. **Fundido de Fusibles FPF (Field Programmable Fuses)**:
+   - En el proceso de fabricación en fábrica (línea OEM de Dell), el motor de gestión Intel ME (Intel Management Engine integrado en el chipset/PCH) se configura de forma irreversible quemando fusibles físicos en silicio (FPFs).
+   - Cuando se selecciona la opción "Sin gestión fuera de banda", los fusibles de habilitación de gestión remota se queman en modo `DISABLE`.
+2. **Firmware de Consumo (Consumer SKU 1.5 MB vs Corporate SKU 5 MB)**:
+   - Los equipos vPro disponen de una memoria flash SPI con la imagen de firmware "Corporate" (~5 MB a 11 MB), que contiene la pila de red TCP/IP autónoma, el servidor web TLS y los servicios WS-Management/CIM.
+   - Los equipos con SKU `631-ADPL` se ensamblan con la imagen "Consumer/Basic" (~1.5 MB), que solo incluye funciones básicas de arranque y control térmico, careciendo por completo del código ejecutable de AMT.
+3. **Licencia de Royalties vPro No Pagada (`INFO,RYLTY,ME,DISABLE`)**:
+   - Intel cobra un canon/royalty por cada procesador/chipset con vPro activo. El código indica explícitamente que la licencia no fue adquirida. Cualquier intento de inyectar firmware de AMT es rechazado por la firma criptográfica RSA pública de Intel quemada en el procesador.
+4. **Consecuencia en BIOS / MEBx**:
+   - No existe menú de configuración de Intel AMT en la BIOS (`System Management`), ni combinación de teclas de acceso rápido (`Ctrl + P`).
+   - Ninguna herramienta de software (Intel SCS, ACUConfig, utilidades de flasheo de BIOS o agentes en Windows/Linux) puede activar AMT en estas placas.
+
+---
+
+### 11.2 Arquitectura Híbrida / Heterogénea del Panel de Control
+
+El diseño del backend (`mesh-panel`) está preparado de fábrica para convivir con un parque informático heterogéneo sin requerir bifurcaciones de código:
+
+| Característica | Lote Piloto / Desarrollo (ej. `C236`, `C403`) | Lote Producción Aula 60 PCs (Dell `631-ADPL`) |
+| :--- | :--- | :--- |
+| **Tecnología Hardware** | Intel vPro / Intel AMT activo (`intelamt.state === 2`) | Sin Intel AMT (`intelamt.state === 0` o no aprovisionado) |
+| **Canal de Observabilidad** | Doble canal: MeshAgent (SO) + Intel AMT (Out-of-band) | Canal único: MeshAgent (SO en Windows) |
+| **Estados Visuales Soportados** | **4 Estados**: `VERDE`, `AMARILLO`, `GRIS`, `NARANJA` | **2 Estados**: `VERDE` (en sesión) y `NARANJA` (apagado / aislado) |
+| **Detección Fallo Lógico / DHCP** | Sí (`AMARILLO` asistido por ping ICMP a chip AMT) | No aplicable (si cae la red del SO, el agente desconecta $\rightarrow$ `NARANJA`) |
+| **Detección Apagado Standby (S5)** | Sí (`GRIS` mediante `pwr === 6` / `conn = 4`) | No (al apagarse, cae el agente $\rightarrow$ `NARANJA`) |
+| **Encendido Remoto (Power On)** | Intel AMT Power On nativo (puerto 16993 / WSMAN) | Wake-on-LAN tradicional (Magic Packet a MAC de tarjeta integrada) |
+
+#### Manejo transparente en el clasificador ([`classifier.service.js`](file:///home/carlos.alvarado@ctdesarrollo-sdr.org/Escritorio/Projects/mesh-panel/daemon/services/classifier.service.js)):
+* Gracias a la evaluación de `amtProvisioned = dev.intelamt?.state === 2`, cuando un PC del aula de 60 equipos conecta con MeshCentral (`conn === 1`), el clasificador **no lo interpreta como socket zombie ni corte abrupto**, clasificándolo correctamente en **`VERDE` (Operativo)**.
+
+---
+
+### 11.3 Gestión de Energía en Aulas: Suspensión (S3) vs Apagado (S5)
+
+Se detectó una discrepancia en el comportamiento del socket de red según el modo de reposo del equipo:
+
+#### Discrepancia Técnica entre S3 y S5:
+1. **Apagado Completo Voluntario (Estado ACPI S5 / Soft-off / `shutdown` / `poweroff`)**:
+   - La fuente de alimentación y la placa base mantienen activo el raíl de espera de 5 voltios (+5VSB).
+   - En equipos con Intel AMT, el procesador Intel ME permanece activo y mantiene levantada su sesión TLS local con MeshCentral en el puerto 16993.
+   - MeshCentral reporta `conn = 4, pwr = 6` de forma continua y estable $\rightarrow$ El panel clasifica el equipo como **`GRIS` (`APAGADO`)**.
+2. **Suspensión del Sistema Operativo (Estado ACPI S3 / Sleep / Standby)**:
+   - Al suspenderse el SO, la política de gestión energética de la interfaz de red (Intel ME Wake in S3) hace que el procesador ME cierre las conexiones TCP/TLS activas para pasar a un modo de escucha pasiva de paquetes de reactivación.
+   - Al cerrarse el socket TLS, MeshCentral detecta desconexión total (`conn = 0`) $\rightarrow$ El panel clasifica el puesto como **`NARANJA`** (falsa desconexión física).
+
+#### Rechazo de Scripts Residentes en Clientes:
+* Desplegar scripts auxiliares o interceptores de eventos de suspensión en los 60 puestos de Windows (hooks de PowerShell, tareas programadas, llamadas curl a APIs intermedias) vulnera la directriz de **cero mantenimiento en el cliente** (*zero-touch architecture*), introduce fragilidad ante actualizaciones del SO y genera problemas de permisos y cortafuegos.
+
+#### Solución Estándar de la Industria para Laboratorios y Aulas:
+En entornos educativos y empresariales de aulas de ordenadores, la mejor práctica de administración de sistemas consiste en **deshabilitar la suspensión del sistema operativo manteniendo el apagado de pantallas**:
+1. **Configuración en Windows (mediante GPO o comando de provisión)**:
+   ```cmd
+   :: Desactivar suspensión automática con alimentación de CA
+   powercfg /change standby-timeout-ac 0
+
+   :: Desactivar hibernación
+   powercfg /hibernate off
+
+   :: Apagar monitor tras 10-15 minutos de inactividad (ahorra el ~80% de energía de la estación)
+   powercfg /change monitor-timeout-ac 10
+   ```
+2. **Configuración en Linux (Ubuntu/Debian)**:
+   ```bash
+   sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+   ```
+3. **Flujo de Vida Resultante en el Panel**:
+   - Durante la jornada docente: Los equipos permanecen encendidos y reportando al agente $\rightarrow$ **`VERDE`**. Si el alumno no los usa, la pantalla se apaga pero la telemetría permanece viva.
+   - Al cierre del aula: Apagado programado masivo mediante comando desde MeshCentral o tarea nocturna (`shutdown /s /t 0`) $\rightarrow$ Los equipos con AMT pasan limpiamente a **`GRIS`**, y los equipos estándar pasan a **`NARANJA`** listos para ser despertados por WoL al día siguiente.
+
+---
+
+## 12. Reglas para Modelos y Desarrolladores
 
 1. **Prioridad a la simplicidad**: Todo cambio en el backend debe apoyarse en llamadas limpias a `meshctrl listdevices`.
-2. **Respetar los 4 estados visuales**: Las máquinas o están Operativas (`VERDE`), en Fallo Lógico DHCP (`AMARILLO`), Apagadas en Standby (`GRIS`) o Desconectadas (`NARANJA`).
+2. **Respetar los estados visuales del parque heterogéneo**:
+   - Puestos con AMT: Operativo (`VERDE`), Fallo Lógico DHCP (`AMARILLO`), Apagado Standby (`GRIS`) o Desconectado (`NARANJA`).
+   - Puestos sin AMT (Dell 631-ADPL): Operativo (`VERDE`) o Desconectado/Apagado (`NARANJA`).
 3. **Consistencia de datos**: El frontend espera objetos con las propiedades `estado`, `categoria`, `diagnostico` y el subobjeto `telemetria` con `os_online`, `amt_online`, `pwr` y `conn`.
+4. **Arquitectura Zero-Touch en clientes**: Nunca introducir scripts, agentes secundarios ni daemons auxiliares en las máquinas cliente (Windows o Linux); toda la observabilidad debe provenir de MeshAgent y del hardware Intel AMT gestionados por el servidor MeshCentral.
