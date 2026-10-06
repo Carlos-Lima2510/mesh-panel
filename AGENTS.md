@@ -311,6 +311,59 @@ En entornos educativos y empresariales de aulas de ordenadores, la mejor prácti
 
 ---
 
+### 11.4 Impacto Operativo Real de la Carencia de Intel AMT
+
+Tener o no tener Intel AMT marca la línea divisoria entre **observar un sistema operativo por software** o **controlar la placa base y la corriente por hardware**:
+
+1. **En el Panel de Observabilidad**:
+   - **Colapso de granularidad**: Se reduce de 4 estados a solo 2 estados (`VERDE` y `NARANJA`).
+   - **Pérdida de diagnóstico causal**: Un PC apagado voluntariamente por el usuario (`shutdown`), un corte de cable, un fallo de DHCP o un pantallazo azul (BSOD) se traducen en el mismo síntoma: `NARANJA` (desconectado).
+   - **Desfase en la detección de cortes**: Sin la correlación de hardware instantánea de AMT, la detección de un corte abrupto de red queda supeditada al temporizador TCP del kernel (`tcp_retries2 = 5` $\rightarrow$ 10-12s) en lugar de deducirse en 0 segundos.
+2. **En la Administración de Sistemas del Aula**:
+   - **Encendido Remoto**: Dependencia de Wake-on-LAN tradicional (*Magic Packet* UDP broadcast de capa 2). Si el servidor está en una VLAN distinta al aula, los routers descartan los paquetes broadcast a menos que se configure *IP Directed-Broadcast* o *WoL relay*.
+   - **KVM Fuera de Banda (BIOS / BSOD)**: Imposibilidad de ver la pantalla si el SO no ha cargado, si está en bucle de reparación de inicio o congelado en pantalla azul. Con AMT, el KVM por hardware permite operar la BIOS y diagnósticos antes de que arranque Windows.
+   - **Recuperación de Cuelgues Críticos**: Si el sistema operativo se bloquea por saturación de CPU/RAM, el agente deja de responder y es imposible reiniciar el equipo de forma remota; se requiere intervención física en el botón de encendido.
+   - **Despliegue y Mantenimiento**: No se dispone de redirección de medios virtuales (IDE-R) para bootear ISOs de recuperación en remoto.
+
+---
+
+### 11.5 Alternativas Zero-Touch de Desambiguación para Puestos sin AMT (Infraestructura de Red)
+
+Dado el requisito de **no instalar agentes secundarios ni scripts en los 60 puestos cliente de Windows**, la única fuente fiable de telemetría física independiente del sistema operativo reside en la **infraestructura de red (Switch gestionado y Capa 2/3)**:
+
+#### Alternativa 1: Consulta al Switch del Aula por SNMP (La vía estándar)
+El switch gestionado del aula (Cisco, HP/Aruba, Dell, UniFi) monitoriza en tiempo real el estado físico de cada boca Ethernet:
+- **Estado de Puerto (`ifOperStatus`)**:
+  - `DOWN (2)`: Cable desconectado físicamente al 100%.
+  - `UP (1)`: Cable conectado físicamente con enlace PHY activo.
+- **Detección de Standby mediante Velocidad de Enlace (*Link Speed*)**:
+  - Si Wake-on-LAN está activo en la BIOS de Dell, la tarjeta de red integrada reduce su velocidad en standby para ahorrar energía:
+    - **Enlace a 10 Mbps o 100 Mbps**: PC **Apagado en Standby (S5)** con cable conectado $\rightarrow$ Equivale a **`GRIS`**.
+    - **Enlace a 1 Gbps**: PC **Encendido físicamente**.
+    - **Enlace caído (No link)**: **Cable desconectado** o regleta sin corriente $\rightarrow$ **`NARANJA`**.
+
+#### Alternativa 2: Detección de Red Aislada vs Salida MeshCentral (Ping LAN / ARP)
+Cuando el agente no conecta con MeshCentral (`conn = 0`), puede deberse a que el equipo está en una VLAN aislada, con puerta de enlace errónea o cortafuegos bloqueando la salida hacia el servidor:
+- **Ping ICMP en LAN Local**: Si el daemon o una sonda en la misma subred recibe respuesta ICMP del PC pero MeshCentral lo reporta desconectado $\rightarrow$ **Red Aislada o Fallo de Enrutamiento / Proxy / DNS** $\rightarrow$ **`AMARILLO`**.
+- **Inspección de Tabla ARP (`ip neigh` / caché del switch)**: Si el router o gateway conserva la entrada ARP activa para la MAC del puesto, el hardware y la capa de enlace están demostradamente activos.
+
+#### Alternativa 3: Sondeo No Invasivo de Servicios del SO (SMB 445 / RPC 135)
+Para aislar si el problema es que el servicio de MeshAgent ha fallado o se ha detenido mientras Windows sigue operativo:
+- Un sondeo TCP ultrarrápido (timeout 200 ms) al puerto estándar de Windows **445 (SMB)**:
+  - **Puerto 445 responde + MeshAgent desconectado** $\rightarrow$ Windows encendido y red viva; fallo lógico exclusivo del servicio del agente.
+
+#### Matriz de Diagnóstico de Infraestructura Resultante:
+
+| Consulta Switch | Ping LAN Local | MeshAgent | Diagnóstico Deductivo | Estado Visual |
+| :---: | :---: | :---: | :--- | :---: |
+| **Port DOWN** | ❌ Falla | ❌ Off | **Cable desconectado físicamente** | `NARANJA` |
+| **Port UP (10/100M)**| ❌ Falla | ❌ Off | **PC Apagado en Standby (WoL armado)**| `GRIS` |
+| **Port UP (1G)** | ✅ Responde | ❌ Off | **Red Aislada / Fallo salida a Mesh** | `AMARILLO` |
+| **Port UP (1G)** | ❌ Falla | ❌ Off | **Fallo DHCP / Interfaz caída / Freeze**| `AMARILLO` |
+| **Port UP (1G)** | ✅ Responde | ✅ On | **Puesto Operativo en Sesión** | `VERDE` |
+
+---
+
 ## 12. Reglas para Modelos y Desarrolladores
 
 1. **Prioridad a la simplicidad**: Todo cambio en el backend debe apoyarse en llamadas limpias a `meshctrl listdevices`.
