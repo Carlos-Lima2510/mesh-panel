@@ -47,29 +47,8 @@ class ClassifierService {
         };
       }
 
-      // B) Si el switch reporta enlace Gigabit (1 Gbps) pero el agente no responde: Fallo Lógico / Red
-      if (switchPort && switchPort.link === 'UP' && switchPort.speed >= 1000) {
-        if (linkAlive && ip) {
-          return {
-            estado: 'AMARILLO',
-            categoria: 'RED_AISLADA',
-            diagnostico: `Red aislada / Fallo de salida. Cable conectado (Puerto ${switchPort.port} a ${switchPort.speed} Mbps) y responde ping en LAN local, pero sin conexión a MeshCentral.`,
-            accion: 'verificar_enrutamiento',
-            telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr, switch: switchPort }
-          };
-        } else {
-          return {
-            estado: 'AMARILLO',
-            categoria: 'FALLO_LOGICO',
-            diagnostico: `Fallo lógico. Cable conectado a 1 Gbps (Intel AMT ${amtType} activo), pero agente del SO caído (posible fallo DHCP).`,
-            accion: 'remediar_dhcp',
-            telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr, switch: switchPort }
-          };
-        }
-      }
-
-      // C) Si la placa base está físicamente apagada en modo Soft-Off / Standby (pwr !== 1 o enlace switch <= 100M):
-      if ((pwr !== 1 && pwr !== null && pwr !== undefined) || (switchPort && switchPort.link === 'UP' && switchPort.speed <= 100)) {
+      // B) Si la placa base está físicamente apagada en modo Soft-Off / Standby (pwr !== 1, ej. pwr = 6, 8 o 0):
+      if (pwr !== 1 && pwr !== null && pwr !== undefined) {
         return {
           estado: 'GRIS',
           categoria: 'APAGADO',
@@ -79,6 +58,7 @@ class ClassifierService {
         };
       }
 
+      // C) Si el cable no responde a sondeo físico (cable desconectado sin confirmación de switch):
       if (!linkAlive) {
         return {
           estado: 'NARANJA',
@@ -86,6 +66,17 @@ class ClassifierService {
           diagnostico: 'Desconexión física detectada (sin respuesta de enlace en el cable; socket AMT de MeshCentral en espera de cierre).',
           accion: 'inspeccion_fisica',
           telemetria: { os_online: false, amt_online: false, amt_type: 'none', ip_reportada: ip, conn: connInt, cable_unplugged: true, pwr, switch: switchPort }
+        };
+      }
+
+      // D) La placa base SÍ está encendida (pwr === 1), pero el agente no conecta: Fallo Lógico o Red Aislada
+      if (linkAlive && ip) {
+        return {
+          estado: 'AMARILLO',
+          categoria: 'RED_AISLADA',
+          diagnostico: `Red aislada / Fallo de salida. Cable conectado (Intel AMT ${amtType} activo) y responde ping en LAN local, pero sin conexión a MeshCentral.`,
+          accion: 'verificar_enrutamiento',
+          telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr, switch: switchPort }
         };
       }
 
