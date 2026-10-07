@@ -17,7 +17,7 @@ RUN echo '#!/bin/bash' > /entrypoint.sh \
     && echo '    ip link set "port$i" up' >> /entrypoint.sh \
     && echo 'done' >> /entrypoint.sh \
     && echo 'echo "[+] Puertos port1 a port8 creados y activos (UP)."' >> /entrypoint.sh \
-    && echo 'echo "[+] Iniciando snmpd en UDP 1616..."' >> /entrypoint.sh \
+    && echo 'echo "[+] Iniciando agente snmpd en UDP 1616..."' >> /entrypoint.sh \
     && echo 'exec /usr/sbin/snmpd -f -Lo -u root udp:1616' >> /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
