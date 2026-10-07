@@ -6,12 +6,14 @@ class SseServer {
    * @param {number} heartbeatIntervalMs 
    * @param {Function} onRefreshRequestFn
    * @param {Function} getSnapshotFn 
+   * @param {Object} [switchService]
    */
-  constructor(port, heartbeatIntervalMs, onRefreshRequestFn, getSnapshotFn) {
+  constructor(port, heartbeatIntervalMs, onRefreshRequestFn, getSnapshotFn, switchService = null) {
     this.port = port;
     this.heartbeatIntervalMs = heartbeatIntervalMs;
     this.onRefreshRequest = onRefreshRequestFn;
     this.getSnapshot = getSnapshotFn;
+    this.switchService = switchService;
     this.clients = [];
     this.server = null;
   }
@@ -45,6 +47,46 @@ class SseServer {
           res.writeHead(500, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ success: false, error: error.message }));
         }
+      }
+
+      if (req.method === 'GET' && urlPath === '/api/switch') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({
+          success: true,
+          mode: this.switchService ? this.switchService.mode : 'disabled',
+          ports: this.switchService ? this.switchService.getAllMockPorts() : {}
+        }));
+      }
+
+      if (req.method === 'POST' && urlPath === '/api/switch') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', async () => {
+          try {
+            const data = JSON.parse(body || '{}');
+            if (this.switchService && data.nombre) {
+              this.switchService.setMockPort(data.nombre, {
+                port: data.port,
+                link: data.link,
+                speed: data.speed
+              });
+            }
+            const puestos = await this.onRefreshRequest();
+            this.broadcastInit(puestos);
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({
+              success: true,
+              updated: data,
+              ports: this.switchService ? this.switchService.getAllMockPorts() : {},
+              puestos
+            }));
+          } catch (err) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ success: false, error: err.message }));
+          }
+        });
+        return;
       }
 
       if (req.method === 'GET' && urlPath === '/api/health') {

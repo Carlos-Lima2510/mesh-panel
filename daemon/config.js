@@ -11,5 +11,10 @@ module.exports = {
     port: parseInt(process.env.PORT, 10) || 3001,
     heartbeatIntervalMs: 25000,
     reconnectDelayMs: 5000,
+  },
+  switch: {
+    mode: process.env.SWITCH_MODE || 'mock',
+    host: process.env.SWITCH_HOST || '127.0.0.1',
+    community: process.env.SWITCH_COMMUNITY || 'public',
   }
 };

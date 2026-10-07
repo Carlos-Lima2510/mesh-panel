@@ -3,11 +3,13 @@ const config = require('./config');
 const ClassifierService = require('./services/classifier.service');
 const InventoryStore = require('./services/inventory.store');
 const MeshService = require('./services/mesh.service');
+const SwitchService = require('./services/switch.service');
 const SseServer = require('./sse.server');
 
 const classifier = new ClassifierService();
 const store = new InventoryStore();
 const meshService = new MeshService(config);
+const switchService = new SwitchService(config.switch);
 
 /**
  * Comprueba si el host responde físicamente por ICMP en la red local.
@@ -36,18 +38,21 @@ async function refreshDevices() {
       const pwr = dev.pwr !== undefined ? dev.pwr : null;
       const amtProvisioned = dev.intelamt ? dev.intelamt.state === 2 : false;
 
-      // Solo verificamos enlace físico si hay discrepancia (agente OFF pero AMT aparentemente ON en MeshCentral)
-      // Y además la placa base está físicamente encendida (pwr === 1)
       const connInt = parseInt(conn, 10) || 0;
       const rawOsOnline = (connInt & 1) !== 0;
       const amtOnline = (connInt & 14) !== 0;
 
+      // Obtener telemetría del switch para este puesto
+      const switchPort = await switchService.getPortForDevice(dev);
+
       let linkAlive = true;
-      if (!rawOsOnline && amtOnline && pwr === 1 && ip) {
+      if (switchPort && switchPort.link === 'UP' && switchPort.speed >= 1000 && !rawOsOnline && ip) {
+        linkAlive = await checkPhysicalLink(ip);
+      } else if (!rawOsOnline && amtOnline && pwr === 1 && ip) {
         linkAlive = await checkPhysicalLink(ip);
       }
 
-      const evaluation = classifier.evaluate(conn, ip, linkAlive, pwr, amtProvisioned);
+      const evaluation = classifier.evaluate(conn, ip, linkAlive, pwr, amtProvisioned, switchPort);
 
       const record = {
         node_id: nodeId,
@@ -68,7 +73,8 @@ const sseServer = new SseServer(
   config.server.port,
   config.server.heartbeatIntervalMs,
   refreshDevices,
-  () => store.getAll()
+  () => store.getAll(),
+  switchService
 );
 
 (async () => {

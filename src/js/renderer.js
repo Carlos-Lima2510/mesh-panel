@@ -28,6 +28,7 @@ export class DashboardRenderer {
           <div style="margin-top: 10px;">
             <div class="row"><span>MeshAgent:</span><span>${p.telemetria?.os_online ? 'ON' : 'OFF'}</span></div>
             <div class="row"><span>Intel AMT:</span><span>${p.telemetria?.amt_online ? 'ON' : 'OFF'}</span></div>
+            <div class="row"><span>Switch:</span><span>${p.telemetria?.switch ? `P${p.telemetria.switch.port} (${p.telemetria.switch.link} ${p.telemetria.switch.speed}M)` : 'N/A'}</span></div>
             <div class="row"><span>IP OS:</span><span>${p.telemetria?.ip_reportada || 'N/A'}</span></div>
           </div>
         </div>
