@@ -36,7 +36,7 @@ class ClassifierService {
 
     // 3. Equipos con AMT activo pero Agente caído
     if (!rawOsOnline && amtOnline) {
-      // Si el switch reporta que la boca física está DOWN, prima el corte de cable físico
+      // A) Si el switch reporta que la boca física está DOWN, prima el corte de cable físico
       if (switchPort && switchPort.link === 'DOWN') {
         return {
           estado: 'NARANJA',
@@ -47,8 +47,29 @@ class ClassifierService {
         };
       }
 
-      // Si la placa base está físicamente apagada en modo Soft-Off / Standby (pwr !== 1, ej. pwr = 6, 8 o 0):
-      if (pwr !== 1 && pwr !== null && pwr !== undefined) {
+      // B) Si el switch reporta enlace Gigabit (1 Gbps) pero el agente no responde: Fallo Lógico / Red
+      if (switchPort && switchPort.link === 'UP' && switchPort.speed >= 1000) {
+        if (linkAlive && ip) {
+          return {
+            estado: 'AMARILLO',
+            categoria: 'RED_AISLADA',
+            diagnostico: `Red aislada / Fallo de salida. Cable conectado (Puerto ${switchPort.port} a ${switchPort.speed} Mbps) y responde ping en LAN local, pero sin conexión a MeshCentral.`,
+            accion: 'verificar_enrutamiento',
+            telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr, switch: switchPort }
+          };
+        } else {
+          return {
+            estado: 'AMARILLO',
+            categoria: 'FALLO_LOGICO',
+            diagnostico: `Fallo lógico. Cable conectado a 1 Gbps (Intel AMT ${amtType} activo), pero agente del SO caído (posible fallo DHCP).`,
+            accion: 'remediar_dhcp',
+            telemetria: { os_online: false, amt_online: true, amt_type: amtType, ip_reportada: ip, conn: connInt, pwr, switch: switchPort }
+          };
+        }
+      }
+
+      // C) Si la placa base está físicamente apagada en modo Soft-Off / Standby (pwr !== 1 o enlace switch <= 100M):
+      if ((pwr !== 1 && pwr !== null && pwr !== undefined) || (switchPort && switchPort.link === 'UP' && switchPort.speed <= 100)) {
         return {
           estado: 'GRIS',
           categoria: 'APAGADO',
