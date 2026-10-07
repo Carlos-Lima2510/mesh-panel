@@ -50,11 +50,25 @@ class SseServer {
       }
 
       if (req.method === 'GET' && urlPath === '/api/switch') {
+        let ports = {};
+        if (this.switchService) {
+          if (this.switchService.mode === 'snmp') {
+            const snmpMap = await this.switchService.fetchSnmpSwitchData();
+            if (snmpMap) {
+              for (const [k, v] of snmpMap.entries()) ports[k] = v;
+            } else {
+              ports = this.switchService.getAllMockPorts();
+            }
+          } else {
+            ports = this.switchService.getAllMockPorts();
+          }
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({
           success: true,
           mode: this.switchService ? this.switchService.mode : 'disabled',
-          ports: this.switchService ? this.switchService.getAllMockPorts() : {}
+          host: this.switchService ? this.switchService.host : null,
+          ports
         }));
       }
 

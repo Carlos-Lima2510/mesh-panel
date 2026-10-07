@@ -1,0 +1,26 @@
+FROM debian:bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    snmpd \
+    snmp \
+    iproute2 \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN echo "rocommunity public default" > /etc/snmp/snmpd.conf
+
+RUN echo '#!/bin/bash' > /entrypoint.sh \
+    && echo 'set -e' >> /entrypoint.sh \
+    && echo 'echo "[+] Creando 8 puertos virtuales (port1 .. port8)..."' >> /entrypoint.sh \
+    && echo 'for i in {1..8}; do' >> /entrypoint.sh \
+    && echo '    ip link add "port$i" type dummy 2>/dev/null || true' >> /entrypoint.sh \
+    && echo '    ip link set "port$i" up' >> /entrypoint.sh \
+    && echo 'done' >> /entrypoint.sh \
+    && echo 'echo "[+] Puertos port1 a port8 creados y activos (UP)."' >> /entrypoint.sh \
+    && echo 'echo "[+] Iniciando snmpd en UDP 1616..."' >> /entrypoint.sh \
+    && echo 'exec /usr/sbin/snmpd -f -Lo -u root udp:1616' >> /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+EXPOSE 1616/udp
+
+ENTRYPOINT ["/entrypoint.sh"]

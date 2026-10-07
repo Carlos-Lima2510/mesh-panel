@@ -26,10 +26,26 @@ services:
       - MESH_PASS=${MESH_PASS}
       - DHCP_SUBNET=${DHCP_SUBNET}
       - PORT=3001
+      - SWITCH_MODE=${SWITCH_MODE:-snmp}
+      - SWITCH_HOST=${SWITCH_HOST:-virtual-switch:1616}
+      - SWITCH_COMMUNITY=${SWITCH_COMMUNITY:-public}
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
       - NODE_NO_WARNINGS=${NODE_NO_WARNINGS}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    networks:
+      - tfg-net
+
+  virtual-switch:
+    build:
+      context: .
+      dockerfile: Dockerfile.switch
+    container_name: tfg-switch
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "1616:1616/udp"
     networks:
       - tfg-net
 

@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache bash curl
+RUN apk add --no-cache bash curl net-snmp-tools
 
 WORKDIR /app
 

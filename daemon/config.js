@@ -13,8 +13,8 @@ module.exports = {
     reconnectDelayMs: 5000,
   },
   switch: {
-    mode: process.env.SWITCH_MODE || 'mock',
-    host: process.env.SWITCH_HOST || '127.0.0.1',
+    mode: process.env.SWITCH_MODE || 'snmp',
+    host: process.env.SWITCH_HOST || 'virtual-switch:1616',
     community: process.env.SWITCH_COMMUNITY || 'public',
   }
 };

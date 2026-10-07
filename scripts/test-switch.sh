@@ -1,49 +1,47 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Script de prueba interactivo para la simulación de telemetría de Switch
+# Script de prueba interactivo para Switch Virtual SNMP Real (tfg-switch)
 # ==============================================================================
 
-DAEMON_URL="http://localhost:3001"
+echo "=========================================================="
+echo "      CONTROL DEL SWITCH VIRTUAL SNMP REAL (tfg-switch)   "
+echo "=========================================================="
+echo "1) Desconectar cable en UEA-C403 (port5 DOWN)        -> [NARANJA]"
+echo "2) Conectar cable en UEA-C403 (port5 UP a 1 Gbps)     -> [AMARILLO]"
+echo "3) Desconectar cable en UEA-C226 (port1 DOWN)        -> [NARANJA]"
+echo "4) Conectar cable en UEA-C226 (port1 UP a 1 Gbps)     -> [VERDE]"
+echo "5) Ver tabla SNMP MIB-II de puertos en tfg-switch"
+echo "6) Salir"
+echo "=========================================================="
 
-echo "=========================================================="
-echo "      SIMULADOR DE TELEMETRÍA DE SWITCH (CAMINO 2)        "
-echo "=========================================================="
-echo "1) Simular CABLE DESCONECTADO en UEA-C403 (Port 5 -> DOWN 0M)       -> [NARANJA]"
-echo "2) Simular PC APAGADO EN STANDBY en UEA-C403 (Port 5 -> UP 10M WoL)  -> [GRIS]"
-echo "3) Simular FALLO LÓGICO / DHCP en UEA-C403 (Port 5 -> UP 1000M 1G)   -> [AMARILLO]"
-echo "4) Consultar estado actual de puertos del switch (/api/switch)"
-echo "5) Salir"
-echo "=========================================================="
-
-read -p "Selecciona una opción [1-5]: " opcion
+read -p "Selecciona una opción [1-6]: " opcion
 
 case $opcion in
   1)
-    echo "[*] Enviando evento: Port 5 -> DOWN (Cable desconectado)..."
-    curl -s -X POST "$DAEMON_URL/api/switch" \
-      -H "Content-Type: application/json" \
-      -d '{"nombre":"UEA-C403","port":5,"link":"DOWN","speed":0}' | python3 -m json.tool
-    echo "[+] Listo. Abre http://localhost:8080 y pulsa 'Consultar Estado' para ver UEA-C403 en NARANJA."
+    echo "[*] Desconectando cable físico en port5 (UEA-C403)..."
+    docker exec tfg-switch ip link set port5 down
+    echo "[+] Listo. Consulta http://localhost:8080 o /api/devices para ver UEA-C403 en NARANJA."
     ;;
   2)
-    echo "[*] Enviando evento: Port 5 -> UP @ 10 Mbps (PC apagado en standby WoL)..."
-    curl -s -X POST "$DAEMON_URL/api/switch" \
-      -H "Content-Type: application/json" \
-      -d '{"nombre":"UEA-C403","port":5,"link":"UP","speed":10}' | python3 -m json.tool
-    echo "[+] Listo. Abre http://localhost:8080 y pulsa 'Consultar Estado' para ver UEA-C403 en GRIS."
+    echo "[*] Conectando cable físico en port5 (UEA-C403)..."
+    docker exec tfg-switch ip link set port5 up
+    echo "[+] Listo. Consulta http://localhost:8080 o /api/devices para ver UEA-C403 en AMARILLO."
     ;;
   3)
-    echo "[*] Enviando evento: Port 5 -> UP @ 1000 Mbps (Cable conectado 1G, fallo lógico)..."
-    curl -s -X POST "$DAEMON_URL/api/switch" \
-      -H "Content-Type: application/json" \
-      -d '{"nombre":"UEA-C403","port":5,"link":"UP","speed":1000}' | python3 -m json.tool
-    echo "[+] Listo. Abre http://localhost:8080 y pulsa 'Consultar Estado' para ver UEA-C403 en AMARILLO."
+    echo "[*] Desconectando cable físico en port1 (UEA-C226)..."
+    docker exec tfg-switch ip link set port1 down
+    echo "[+] Listo. Consulta http://localhost:8080 o /api/devices para ver UEA-C226 en NARANJA."
     ;;
   4)
-    echo "[*] Puertos actuales del switch:"
-    curl -s "$DAEMON_URL/api/switch" | python3 -m json.tool
+    echo "[*] Conectando cable físico en port1 (UEA-C226)..."
+    docker exec tfg-switch ip link set port1 up
+    echo "[+] Listo. Consulta http://localhost:8080 o /api/devices para ver UEA-C226 en VERDE."
     ;;
   5)
+    echo "[*] Consulta SNMP real (snmpwalk ifOperStatus) a virtual-switch:1616..."
+    docker exec tfg-daemon snmpwalk -v2c -c public virtual-switch:1616 1.3.6.1.2.1.2.2.1.8
+    ;;
+  6)
     echo "Saliendo."
     ;;
   *)
