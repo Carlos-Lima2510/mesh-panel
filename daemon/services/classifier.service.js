@@ -12,6 +12,17 @@ class ClassifierService {
     else if (amtCira) amtType = 'cira';
     else if (amtRelay) amtType = 'relay';
 
+    // 0. Comprobación Física de Capa 1: Si el switch confirma que el puerto está en DOWN (cable desconectado):
+    if (switchPort && switchPort.link === 'DOWN') {
+      return {
+        estado: 'NARANJA',
+        categoria: 'DESCONECTADO_O_AISLADO',
+        diagnostico: `Desconexión física confirmada por el switch (Puerto ${switchPort.port} en estado DOWN; socket en espera de cierre).`,
+        accion: 'inspeccion_fisica',
+        telemetria: { os_online: false, amt_online: false, amt_type: 'none', ip_reportada: ip, conn: connInt, cable_unplugged: true, pwr, switch: switchPort }
+      };
+    }
+
     // 1. Equipos con Agente y AMT activos
     if (rawOsOnline && amtOnline) {
       return {
