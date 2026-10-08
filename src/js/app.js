@@ -123,9 +123,11 @@ window.ejecutarWoL = async function (nodeId) {
     });
     const data = await res.json();
     if (data.success) {
-      alert(`[+] Paquete Wake-on-LAN emitido con éxito hacia el host.`);
+      const msg = (data.resultado && data.resultado.salida) || 'Paquete Wake-on-LAN emitido con éxito hacia el host.';
+      alert(`[+] ${msg}`);
     } else {
-      alert(`[!] Error emitiendo WoL: ${data.error}`);
+      const msg = (data.resultado && data.resultado.salida) || data.error || 'Error desconocido';
+      alert(`[!] Error emitiendo WoL: ${msg}`);
     }
     fetchDevices();
   } catch (err) {

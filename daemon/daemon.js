@@ -162,8 +162,9 @@ const server = http.createServer(async (req, res) => {
         }
 
         const resultado = await laboratorioService.ejecutarAccion(nodeId, 'WAKE_ON_LAN');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, resultado }));
+        const exito = Boolean(resultado && resultado.success);
+        res.writeHead(exito ? 200 : 400, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: exito, resultado }));
       } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, error: err.message }));

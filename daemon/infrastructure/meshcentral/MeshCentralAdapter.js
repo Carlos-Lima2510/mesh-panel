@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+const { execFile } = require('child_process');
 
 class MeshCentralAdapter {
 
@@ -10,10 +10,17 @@ class MeshCentralAdapter {
 
   listarDispositivos() {
     return new Promise((resolve, reject) => {
-      const cmd = `meshctrl listdevices --url "${this.url}" --loginuser "${this.user}" --loginpass "${this.pass}" --json --ignore-cert`;
+      const args = [
+        'listdevices',
+        '--url', this.url,
+        '--loginuser', this.user,
+        '--loginpass', this.pass,
+        '--json',
+        '--ignore-cert'
+      ];
 
       console.log('[*] [MeshCentralAdapter] Ejecutando: meshctrl listdevices...');
-      exec(cmd, { timeout: 10000 }, (error, stdout, stderr) => {
+      execFile('meshctrl', args, { timeout: 10000 }, (error, stdout, stderr) => {
         if (error) {
           console.error('[!] [MeshCentralAdapter] Error al ejecutar comando:', error.message);
           if (stderr) console.error('[!] [MeshCentralAdapter] stderr:', stderr);
@@ -35,16 +42,32 @@ class MeshCentralAdapter {
 
   despertarDispositivo(nodeId) {
     return new Promise((resolve, reject) => {
-      const cmd = `meshctrl devicepower --url "${this.url}" --loginuser "${this.user}" --loginpass "${this.pass}" --wake --id "${nodeId}" --ignore-cert`;
+      const args = [
+        'devicepower',
+        '--url', this.url,
+        '--loginuser', this.user,
+        '--loginpass', this.pass,
+        '--wake',
+        '--id', nodeId,
+        '--ignore-cert'
+      ];
 
       console.log(`[*] [MeshCentralAdapter] Enviando Wake-on-LAN a ${nodeId}...`);
-      exec(cmd, { timeout: 10000 }, (error, stdout) => {
+      execFile('meshctrl', args, { timeout: 10000 }, (error, stdout, stderr) => {
         if (error) {
           console.error(`[!] [MeshCentralAdapter] Error en Wake-on-LAN para ${nodeId}:`, error.message);
           return reject(error);
         }
-        console.log(`[+] [MeshCentralAdapter] WoL completado con éxito:`, stdout.trim());
-        resolve({ success: true, salida: stdout.trim() });
+
+        const salida = stdout ? stdout.trim() : '';
+        const esError = salida.toLowerCase().includes('invalid') || salida.toLowerCase().includes('error');
+        if (esError) {
+          console.warn(`[-] [MeshCentralAdapter] Fallo en WoL para ${nodeId}: ${salida}`);
+          return resolve({ success: false, salida });
+        }
+
+        console.log(`[+] [MeshCentralAdapter] WoL completado con éxito: ${salida}`);
+        resolve({ success: true, salida });
       });
     });
   }
