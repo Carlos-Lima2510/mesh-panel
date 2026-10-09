@@ -4,42 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telemetría de Puestos - Consulta a Demanda</title>
+  <title>Telemetría de Puestos - Panel de Observabilidad</title>
   <link rel="stylesheet" href="css/styles.css">
-  <style>
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .btn-scan {
-      background: #2563eb;
-      color: #ffffff;
-      border: 1px solid #3b82f6;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.2s ease, opacity 0.2s ease, transform 0.1s ease;
-    }
-
-    .btn-scan:hover:not(:disabled) {
-      background: #1d4ed8;
-      transform: translateY(-1px);
-    }
-
-    .btn-scan:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-  </style>
 </head>
 
 <body>
@@ -52,30 +18,76 @@
     </div>
 
     <div class="header-actions">
-      <div class="mode-selector" style="display: flex; background: #e2e8f0; border-radius: 6px; padding: 2px; border: 1px solid #cbd5e1; gap: 2px;">
-        <button id="btn-mode-clase" class="btn-mode active" style="border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer; background: #2563eb; color: #fff;">
+      <div class="mode-selector">
+        <button id="btn-mode-clase" class="btn-mode active-clase" type="button">
           🎓 Modo Clase
         </button>
-        <button id="btn-mode-practica" class="btn-mode" style="border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.82rem; font-weight: 600; cursor: pointer; background: transparent; color: #475569;">
+        <button id="btn-mode-practica" class="btn-mode" type="button">
           🧪 Modo Práctica
         </button>
       </div>
 
-      <button id="btn-scan" class="btn-scan">
+      <button id="btn-scan" class="btn-scan" type="button">
         <span id="btn-scan-icon">🔄</span>
         <span id="btn-scan-text">Consultar Estado Puestos</span>
       </button>
 
-      <div class="kpi-box">
-        <div class="kpi"><span class="dot" style="background: var(--verde)"></span> Operativos: <span id="kV">0</span></div>
-        <div class="kpi"><span class="dot" style="background: var(--amarillo)"></span> Fallo DHCP: <span id="kA">0</span></div>
-        <div class="kpi"><span class="dot" style="background: var(--gris)"></span> Apagados: <span id="kG">0</span></div>
-        <div class="kpi"><span class="dot" style="background: var(--naranja)"></span> Aislados: <span id="kN">0</span></div>
+      <div class="kpi-box" id="kpi-box" role="group" aria-label="Filtro rápido por estado">
+        <button type="button" class="kpi active" data-filter="ALL" id="kpi-filter-all" title="Mostrar todos los puestos">
+          <span class="dot" style="background: var(--text);"></span> Todos: <span id="kT">0</span>
+        </button>
+        <button type="button" class="kpi" data-filter="VERDE" id="kpi-filter-verde" title="Filtrar por puestos operativos">
+          <span class="dot" style="background: var(--verde);"></span> Operativos: <span id="kV">0</span>
+        </button>
+        <button type="button" class="kpi" data-filter="AMARILLO" id="kpi-filter-amarillo" title="Filtrar por fallo DHCP o red aislada">
+          <span class="dot" style="background: var(--amarillo);"></span> Fallo DHCP / Práctica: <span id="kA">0</span>
+        </button>
+        <button type="button" class="kpi" data-filter="GRIS" id="kpi-filter-gris" title="Filtrar por puestos apagados">
+          <span class="dot" style="background: var(--gris);"></span> Apagados: <span id="kG">0</span>
+        </button>
+        <button type="button" class="kpi" data-filter="NARANJA" id="kpi-filter-naranja" title="Filtrar por cables desconectados">
+          <span class="dot" style="background: var(--naranja);"></span> Desconectados: <span id="kN">0</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="grid" id="grid"></main>
+  <section class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="search"
+        id="search-input"
+        class="search-input"
+        placeholder="Buscar por puesto, IP, MAC o boca switch (ej. PC-01, P12)..."
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Buscar puestos"
+      >
+      <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda" style="display: none;">&times;</button>
+    </div>
+
+    <div class="filter-status-box">
+      <span id="filter-counter" class="filter-counter">Mostrando <strong>0</strong> de <strong>0</strong> puestos</span>
+      <button id="btn-reset-filters" class="btn-reset-filters" type="button" style="display: none;">
+        ✕ Restablecer filtros
+      </button>
+    </div>
+  </section>
+
+  <!-- DISTRIBUCIÓN DIRECTA DEL AULA: 56 PUESTOS (2 HILERAS DE 5 COLUMNAS Y PASILLO CENTRAL) -->
+  <main class="classroom-container">
+    <div class="classroom-headers">
+      <div></div>
+      <div class="col-header">Hilera Izquierda (Puestos 1 - 28)</div>
+      <div class="aisle-header">Pasillo</div>
+      <div class="col-header">Hilera Derecha (Puestos 29 - 56)</div>
+    </div>
+
+    <div class="classroom-grid" id="classroom-grid">
+      <!-- 6 filas de escritorios con tarjetas de tamaño idéntico y estricto -->
+    </div>
+  </main>
 
   <script type="module" src="js/app.js"></script>
 </body>

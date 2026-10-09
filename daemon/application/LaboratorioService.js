@@ -13,12 +13,11 @@ class LaboratorioService {
     this.promesaRefresco = null;
 
     this.mapeoBocas = {
-      'ubuntu': 'port1',
-      'UEA-C226': 'port2',
-      'UEA-C232': 'port3',
-      'UEA-C234': 'port4',
-      'UEA-C236': 'port5',
-      'UEA-C403': 'port6',
+      'UEA-C226': 'port1',
+      'UEA-C232': 'port2',
+      'UEA-C234': 'port3',
+      'UEA-C236': 'port4',
+      'UEA-C403': 'port5',
       ...mapeoBocas
     };
 
