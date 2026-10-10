@@ -628,3 +628,143 @@ header {
   font-size: 0.8rem;
   margin-bottom: 12px;
 }
+
+
+/* ==========================================================================
+   GESTIÓN DE DISTRIBUCIONES ESPACIALES Y MODO REORGANIZACIÓN
+   ========================================================================== */
+
+.distribution-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #111827;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.dist-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.select-distribucion {
+  background: transparent;
+  color: var(--text);
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.select-distribucion option {
+  background: #1e293b;
+  color: var(--text);
+}
+
+.btn-edit-layout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #1e293b;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-layout:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+.btn-edit-layout.active-editing {
+  background: #7c3aed;
+  border-color: #a78bfa;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
+}
+
+/* Banner de Modo Reorganización */
+.edit-mode-banner {
+  background: rgba(124, 58, 237, 0.15);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: #e9d5ff;
+  font-size: 0.85rem;
+}
+
+.edit-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-done-edit {
+  background: #7c3aed;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-done-edit:hover {
+  background: #6d28d9;
+}
+
+/* Tarjetas en Modo Edición y Arrastre */
+.card-compact.in-edit-mode {
+  cursor: grab;
+  border-style: dashed;
+  user-select: none;
+}
+
+.card-compact.in-edit-mode:active {
+  cursor: grabbing;
+}
+
+.card-compact.is-dragging {
+  opacity: 0.35;
+  transform: scale(0.95);
+}
+
+.card-compact.drag-over {
+  border-color: #a78bfa !important;
+  background: rgba(124, 58, 237, 0.2) !important;
+  box-shadow: 0 0 0 2px #a78bfa !important;
+  transform: scale(1.02);
+}
+
+.card-compact.slot-selected-move {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.5) !important;
+}
+
+.drag-handle-hint {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #c084fc;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 0;
+}

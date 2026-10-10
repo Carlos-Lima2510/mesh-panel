@@ -1,11 +1,4 @@
 class Red {
-  /**
-   * @param {Object} params
-   * @param {string} params.id 
-   * @param {string} params.nombre 
-   * @param {string} params.subred 
-   * @param {boolean} [params.esAislada=false] 
-   */
   constructor({ id, nombre, subred, esAislada = false }) {
     this.id = id;
     this.nombre = nombre;

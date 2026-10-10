@@ -27,6 +27,19 @@
         </button>
       </div>
 
+      <div class="distribution-selector">
+        <label for="select-distribucion" class="dist-label">📐 Plano:</label>
+        <select id="select-distribucion" class="select-distribucion" aria-label="Seleccionar plano de distribución">
+          <option value="dist-aula-56">Disposición Aula (56)</option>
+          <option value="dist-examen">Disposición Examen (28)</option>
+        </select>
+      </div>
+
+      <button id="btn-toggle-edit" class="btn-edit-layout" type="button" title="Activar modo para arrastrar y reorganizar puestos">
+        <span id="btn-edit-icon">✏️</span>
+        <span id="btn-edit-text">Reorganizar</span>
+      </button>
+
       <button id="btn-scan" class="btn-scan" type="button">
         <span id="btn-scan-icon">🔄</span>
         <span id="btn-scan-text">Consultar Estado Puestos</span>
@@ -74,6 +87,14 @@
       </button>
     </div>
   </section>
+
+  <!-- BANNER MODO REORGANIZACIÓN ESPACIAL -->
+  <div id="edit-mode-banner" class="edit-mode-banner" style="display: none;">
+    <div class="edit-banner-content">
+      <span>✏️ <strong>Modo Reorganización Activo:</strong> Arrastra un puesto o haz clic sobre un equipo y luego en otra mesa para moverlo o intercambiarlo.</span>
+    </div>
+    <button id="btn-done-edit" type="button" class="btn-done-edit">Guardar y Finalizar</button>
+  </div>
 
   <!-- DISTRIBUCIÓN DIRECTA DEL AULA: 56 PUESTOS (2 HILERAS DE 5 COLUMNAS Y PASILLO CENTRAL) -->
   <main class="classroom-container">

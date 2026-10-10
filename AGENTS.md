@@ -109,10 +109,31 @@ El backend de `daemon/` está desacoplado siguiendo arquitectura hexagonal / DDD
 ```
 daemon/
 ├── domain/                  # Lógica pura del dominio (sin dependencias externas)
-│   ├── Accion.js            # Acciones operativas (WAKE_ON_LAN, REMEDIAR_DHCP, etc.)
-│   ├── Host.js              # Entidad Workstation (evalúa estado cruzando Capa 1 y 7)
-│   ├── Laboratorio.js       # Aggregate Root (gestiona hosts, redes, modo y KPIs)
-│   └── Red.js               # Entidad de segmentos lógicos (Red Docencia, Red Aislada)
+│   ├── Accion.js            # Acciones operativas (WAKE_ON_LAN, POWER_OFF, etc.)
+│   ├── Host.js              # Entidad Workstation (delega evaluación en EvaluadorEstado)
+│   ├── Puesto.js            # Entidad de mesa física (aloja/desaloja un Host)
+│   ├── Distribucion.js      # Plano espacial del aula (valida solapes e invariantes)
+│   ├── Laboratorio.js       # Aggregate Root (gestiona hosts, redes, distribuciones y KPIs)
+│   ├── Red.js               # Entidad de segmentos lógicos (Red Docencia, Red Aislada)
+│   └── estado/              # Jerarquía polimórfica desacoplada de Estados
+│       ├── Estado.js        # Clase base abstracta
+│       ├── EstadoOperativo.js
+│       ├── EstadoStandby.js
+│       ├── EstadoFalloLogico.js
+│       ├── EstadoRedAislada.js
+│       ├── EstadoDesconectado.js
+│       ├── EvaluadorEstado.js # Servicio puro de correlación Capa 1 + Capa 7
+│       └── index.js
+├── interfaces/              # Capa de presentación / HTTP
+│   └── http/
+│       ├── Router.js        # Router HTTP nativo ligero con parseo y CORS
+│       ├── SseBroadcaster.js # Gestor de streaming SSE en vivo
+│       ├── routes.js        # Registro desacoplado de rutas
+│       └── controllers/
+│           ├── LaboratorioController.js
+│           ├── DistribucionController.js
+│           ├── PowerController.js
+│           └── SwitchController.js
 ├── infrastructure/          # Adaptadores y comunicación con el exterior
 │   ├── meshcentral/
 │   │   └── MeshCentralAdapter.js   # CLI Wrapper (meshctrl listdevices, wake)
@@ -121,21 +142,35 @@ daemon/
 │       ├── SnmpSwitchProvider.js   # SNMP v2c MIB-II real (snmpwalk)
 │       └── SimulatedSwitchProvider.js # Proveedor simulado para tests/dev
 ├── application/             # Capa de casos de uso y orquestación
-│   └── LaboratorioService.js       # Orquesta polling, caché, deduplicación y cambio de modos
+│   └── LaboratorioService.js       # Orquesta polling, caché, layouts y deduplicación
 ├── config.js                # Configuración de entorno (.env)
-└── daemon.js                # Servidor HTTP nativo, caché reactiva y SSE stream
+└── daemon.js                # Bootstrap e inyección de dependencias limpia
 ```
 
 ### 5.1 Entidades de Dominio
 * **[`Laboratorio`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Laboratorio.js)**:
-  - Aggregate Root. Mantiene la colección de `hosts` y `redes`.
+  - Aggregate Root. Mantiene la colección de `hosts`, `redes` y `distribuciones`.
   - Mantiene el atributo `modo` (`'CLASE'` | `'PRACTICA'`).
   - Al cambiar de modo, **re-evalúa inmediatamente en memoria** a todos sus hosts sin consultas de red externas.
+  - Gestiona la distribución activa del aula (`establecerDistribucionActiva()`).
   - Genera métricas consolidadas (`total`, `verde`, `amarillo`, `gris`, `naranja`).
+* **[`Distribucion`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Distribucion.js)**:
+  - Modela el plano de planta espacial del laboratorio (ej. *"Disposición Aula (56 Puestos)"*, *"Disposición Examen"*).
+  - Gestiona una colección de `Puesto`s.
+  - Asegura invariantes de negocio: impide colisiones de coordenadas en una misma mesa y garantiza que ningún equipo esté asignado a dos mesas a la vez.
+  - Habilita operaciones de movimiento (`moverHost()`) e intercambio de puestos (*swap* mediante `intercambiarPuestos()`).
+* **[`Puesto`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Puesto.js)**:
+  - Modela la plaza física o mesa dentro del aula (`id`, `etiqueta`, `fila`, `columna`).
+  - Aloja a lo sumo un `Host` (`0..1`), permitiendo representar mesas libres o puestos reservados.
 * **[`Host`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Host.js)**:
-  - Entidad central del puesto de trabajo.
-  - Almacena configuración estática (`bocaSwitch`, `mac`, `soportaWoL`).
-  - Contiene el método puro `evaluarEstado(modoLab)` que ejecuta la matriz determinista.
+  - Entidad central del puesto de trabajo informático.
+  - Almacena configuración estática (`bocaSwitch`, `mac`, `soportaWoL`, `slot`, `puestoId`).
+  - Delega su evaluación en `EvaluadorEstado` y prescribe acciones operativas a través de su `Estado`.
+* **[`Estado`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/estado/Estado.js) y Subclases**:
+  - Jerarquía polimórfica que elimina bloques condicionales anémicos.
+  - Cada estado (`EstadoOperativo`, `EstadoStandby`, `EstadoFalloLogico`, `EstadoRedAislada`, `EstadoDesconectado`) encapsula su color, semántica y qué `Accion` prescribe.
+* **[`EvaluadorEstado`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/estado/EvaluadorEstado.js)**:
+  - Servicio de dominio que implementa la matriz determinista cruzando Capa 1 + Capa 7 + Modo de aula.
 * **[`Red`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Red.js)**:
   - Modela las redes lógicas (`id`, `nombre`, `subred`, `es_aislada`).
   - Define si permite salida hacia MeshCentral (`permiteSalidaMeshCentral()`).
@@ -202,8 +237,13 @@ El servidor expone los siguientes endpoints limpios en el puerto `3001`:
 | :--- | :--- | :---: | :--- |
 | `GET` | `/api/laboratorio` | **~14 ms** | Devuelve el snapshot del agregador `laboratorio` con métricas, redes y puestos clasificados. |
 | `POST` | `/api/laboratorio/modo` | **~15 ms** | Alterna el modo del aula (`{"modo": "CLASE"}` o `{"modo": "PRACTICA"}`) y emite SSE. |
+| `GET` | `/api/distribuciones` | **~14 ms** | Consulta la lista de planos espaciales disponibles y la distribución activa. |
+| `POST` | `/api/distribuciones/activar` | **~15 ms** | Cambia el plano de aula activo (`{"id": "..."}`) y difunde el nuevo layout vía SSE. |
+| `POST` | `/api/distribuciones/mover` | **~15 ms** | Reubica o intercambia un puesto de mesa (`{"host_id": "...", "slot": N}`) y difunde vía SSE. |
 | `POST` | `/api/power/wake` | **~250 ms** | Envía Magic Packet Wake-on-LAN al host especificado (`{"node_id": "..."}`). |
 | `POST` | `/api/power/off` | **~250 ms** | Envía orden de apagado remoto (Power Off) vía MeshAgent (`{"node_id": "..."}`). |
+| `GET` | `/api/switch` | **~20 ms** | Devuelve el estado de todos los puertos del switch. |
+| `POST` | `/api/switch` | **~20 ms** | Modifica el enlace físico de un puerto en entorno de pruebas simulado. |
 | `GET` | `/events` | Streaming | Canal Server-Sent Events (SSE) para actualización reactiva en tiempo real. |
 
 ---
@@ -269,3 +309,40 @@ docker exec -it tfg-daemon snmpwalk -v 2c -c public virtual-switch:1616 1.3.6.1.
 3. **No reintroducir ICMP Pings**: La comprobación de enlace físico pertenece exclusivamente al Switch (`SNMP`), nunca a pings ICMP desde el daemon.
 4. **Priorizar Rendimiento No Bloqueante**: Las peticiones de lectura deben servirse desde el snapshot en memoria de `LaboratorioService`; nunca ejecutar procesos CLI síncronos en bucles por puesto.
 5. **Respetar el Contrato de la API**: Toda respuesta de estado debe ser consumida a través de la raíz `laboratorio` (`laboratorio.hosts`, `laboratorio.metricas`, `laboratorio.modo`).
+
+---
+
+## 11. Línea de Trabajo y Evolución: Modelo Espacial de Distribuciones, Puestos y Desacoplamiento de Estados
+
+Esta línea de trabajo consolida un salto arquitectónico clave en el dominio del proyecto, desacoplando la topología lógica de red de la disposición espacial del aula y eliminando el código anémico en la gestión de estados.
+
+### 11.1 Justificación Teórica y Necesidad en el Dominio
+1. **Desacoplamiento Topología de Red vs Disposición Espacial**:
+   - Un `Host` informático posee una MAC, una IP, una boca de switch (`bocaSwitch`) y pertenece a una `Red`. A la infraestructura de red no le concierne en qué mesa física se sienta el usuario.
+   - El aula real es dinámica: los mismos 56 equipos Dell pueden organizarse para una clase ordinaria (2 hileras con pasillo central), para un examen (ocupando mesas alternas para evitar copias), o en islas de trabajo en grupo.
+   - Forzar coordenadas espaciales dentro de `Host` provocaba acoplamiento rígido e impedía tener múltiples disposiciones visuales.
+2. **Introducción de `Distribucion` y `Puesto`**:
+   - `Laboratorio` 1 $\rightarrow$ N `Distribucion`: El aula mantiene un catálogo de planos espaciales y una distribución activa.
+   - `Distribucion` 1 $\rightarrow$ N `Puesto`: Cada plano se compone de puestos físicos o casillas (`fila`, `columna`, `etiqueta`).
+   - `Puesto` 1 $\rightarrow$ 0..1 `Host`: Modela de forma natural mesas vacías (sin PC asignado) o puestos reservados.
+   - **Invariantes garantizados**: La entidad `Distribucion` valida en memoria que no existan dos puestos con la misma coordenada física ni un mismo `Host` asignado simultáneamente a múltiples mesas.
+3. **Desacoplamiento de Estados Polimórficos (`domain/estado/`)**:
+   - Se reemplazó el `if/else` monolítico en `Host` por clases de estado aisladas (`EstadoOperativo`, `EstadoStandby`, `EstadoFalloLogico`, `EstadoRedAislada`, `EstadoDesconectado`).
+   - Cada clase de estado prescribe su propia semántica, diagnóstico y qué `Accion` operativa permite.
+   - La evaluación determinista se delega en el servicio puro `EvaluadorEstado`.
+4. **Capa HTTP Modular (`interfaces/http/`)**:
+   - Se reemplazó el servidor monolítico `daemon.js` por un enrutador nativo desacoplado (`Router.js`), un emisor de eventos reactivo (`SseBroadcaster.js`), un mapa de rutas explícito (`routes.js`) y controladores específicos (`LaboratorioController`, `DistribucionController`, `PowerController`, `SwitchController`).
+
+### 11.2 Capacidades Habilitadas en Producción
+* **Selector Dinámico de Planos**: El operador o docente puede conmutar entre la disposición ordinaria de 56 puestos y la disposición de examen en $< 15\text{ ms}$ vía `POST /api/distribuciones/activar`.
+* **Reorganización Interactiva de Puestos**:
+  - El frontend incluye un modo interactivo de edición con soporte para **Drag & Drop** nativo y selección por clic para intercambio (*swap*) de mesas.
+  - Las reubicaciones se persisten en memoria en `LaboratorioService` y se transmiten inmediatamente a todos los navegadores conectados mediante Server-Sent Events (`POST /api/distribuciones/mover`).
+
+### 11.3 Futuras Extensiones a Considerar para el TFG / Proyecto
+1. **Persistencia en Almacenamiento Externo**:
+   - Guardar las distribuciones personalizadas creadas por los usuarios en un archivo JSON local persistente o base de datos ligera para que sobrevivan a reinicios completos del daemon.
+2. **Diseñador Visual de Aulas Arbitrarias**:
+   - Permitir a los administradores crear nuevas distribuciones desde cero mediante un lienzo interactivo en el navegador, definiendo el número de filas, columnas, pasillos y mesas en forma de U o islas.
+3. **Mapeo Automatizado Switch $\leftrightarrow$ Mesa**:
+   - Asistente de configuración que asocie automáticamente el puerto del switch con el número de puesto del aula física durante la instalación inicial del laboratorio.

@@ -2,6 +2,7 @@
  * DashboardRenderer
  * Renderizado de la distribución del laboratorio (56 puestos físicos en 2 hileras de 5 columnas)
  * con tarjetas de tamaño estrictamente idéntico tanto para puestos activos como vacíos.
+ * Soporta modo interactivo de reorganización (Drag & Drop y Clic para Intercambiar).
  */
 
 function escapeHtml(str) {
@@ -39,6 +40,12 @@ export class DashboardRenderer {
     this.slotElements = new Map();
     this.emptyStateEl = null;
 
+    // Estado para modo de reorganización
+    this.editMode = false;
+    this.selectedSlotForMove = null;
+    this.currentSlotToHost = new Map();
+    this.onMoveHost = null;
+
     // Crear la estructura física de 56 escritorios
     this.inicializarEstructuraMapa();
   }
@@ -63,9 +70,7 @@ export class DashboardRenderer {
       const leftBlock = document.createElement('div');
       leftBlock.className = 'row-block';
       rowData.left.forEach(slotNum => {
-        const slotCard = document.createElement('div');
-        slotCard.className = 'card-compact card-empty';
-        slotCard.dataset.slot = slotNum;
+        const slotCard = this._crearSlotCard(slotNum);
         leftBlock.appendChild(slotCard);
         this.slotElements.set(slotNum, slotCard);
       });
@@ -86,9 +91,7 @@ export class DashboardRenderer {
       const rightBlock = document.createElement('div');
       rightBlock.className = 'row-block';
       rowData.right.forEach(slotNum => {
-        const slotCard = document.createElement('div');
-        slotCard.className = 'card-compact card-empty';
-        slotCard.dataset.slot = slotNum;
+        const slotCard = this._crearSlotCard(slotNum);
         rightBlock.appendChild(slotCard);
         this.slotElements.set(slotNum, slotCard);
       });
@@ -105,6 +108,87 @@ export class DashboardRenderer {
   }
 
   /**
+   * Crea un contenedor de escritorio con soporte de Drag & Drop y Clic para mover.
+   */
+  _crearSlotCard(slotNum) {
+    const slotCard = document.createElement('div');
+    slotCard.className = 'card-compact card-empty';
+    slotCard.dataset.slot = slotNum;
+
+    // Soporte Drag & Drop HTML5 nativo
+    slotCard.addEventListener('dragstart', (e) => {
+      if (!this.editMode) {
+        e.preventDefault();
+        return;
+      }
+      const host = this.currentSlotToHost.get(slotNum);
+      if (!host) {
+        e.preventDefault();
+        return;
+      }
+      slotCard.classList.add('is-dragging');
+      e.dataTransfer.setData('text/plain', JSON.stringify({ hostId: host.node_id, fromSlot: slotNum }));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    slotCard.addEventListener('dragend', () => {
+      slotCard.classList.remove('is-dragging');
+      document.querySelectorAll('.card-compact').forEach(c => c.classList.remove('drag-over'));
+    });
+
+    slotCard.addEventListener('dragover', (e) => {
+      if (!this.editMode) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      slotCard.classList.add('drag-over');
+    });
+
+    slotCard.addEventListener('dragleave', () => {
+      slotCard.classList.remove('drag-over');
+    });
+
+    slotCard.addEventListener('drop', (e) => {
+      if (!this.editMode) return;
+      e.preventDefault();
+      slotCard.classList.remove('drag-over');
+      try {
+        const raw = e.dataTransfer.getData('text/plain');
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (data && data.hostId && data.fromSlot !== slotNum) {
+          if (typeof this.onMoveHost === 'function') {
+            this.onMoveHost(data.hostId, slotNum);
+          }
+        }
+      } catch (_) {}
+    });
+
+    // Soporte Clic para Intercambiar / Mover
+    slotCard.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-action')) return;
+      if (!this.editMode) return;
+
+      if (!this.selectedSlotForMove) {
+        const host = this.currentSlotToHost.get(slotNum);
+        if (host) {
+          this.selectedSlotForMove = { hostId: host.node_id, slotNum };
+          slotCard.classList.add('slot-selected-move');
+        }
+      } else {
+        const prev = this.selectedSlotForMove;
+        this.selectedSlotForMove = null;
+        document.querySelectorAll('.slot-selected-move').forEach(el => el.classList.remove('slot-selected-move'));
+
+        if (prev.slotNum !== slotNum && typeof this.onMoveHost === 'function') {
+          this.onMoveHost(prev.hostId, slotNum);
+        }
+      }
+    });
+
+    return slotCard;
+  }
+
+  /**
    * Resuelve el slot físico (1 a 56) de cada host.
    */
   construirSlotMap(puestosMap) {
@@ -115,6 +199,8 @@ export class DashboardRenderer {
       let slot = null;
       if (typeof p.slot === 'number' && p.slot >= 1 && p.slot <= 56) {
         slot = p.slot;
+      } else if (p.puesto_id && /^puesto-0*(\d+)$/i.test(p.puesto_id)) {
+        slot = parseInt(p.puesto_id.replace(/^puesto-0*/i, ''), 10);
       } else if (typeof p.posicion === 'number' && p.posicion >= 1 && p.posicion <= 56) {
         slot = p.posicion;
       } else if (p.boca_switch && /^port0*([1-9]|[1-4][0-9]|5[0-6])$/i.test(p.boca_switch)) {
@@ -200,7 +286,9 @@ export class DashboardRenderer {
     const slotStr = String(slotNum).padStart(2, '0');
 
     let bottomActionHtml = '';
-    if (p.accion && p.accion.ejecutable) {
+    if (this.editMode) {
+      bottomActionHtml = `<div class="drag-handle-hint">✥ Arrastra o haz clic</div>`;
+    } else if (p.accion && p.accion.ejecutable) {
       if (p.accion.tipo === 'POWER_OFF') {
         bottomActionHtml = `<button type="button" class="btn-action btn-power-off" onclick="window.ejecutarPowerOff('${escapeHtml(p.node_id)}')">🛑 Apagar</button>`;
       } else if (p.accion.tipo === 'WAKE_ON_LAN') {
@@ -238,6 +326,10 @@ export class DashboardRenderer {
    */
   generarEmptySlotHtml(slotNum) {
     const slotStr = String(slotNum).padStart(2, '0');
+    const bottomHint = this.editMode
+      ? `<div class="drag-handle-hint">Soltar aquí</div>`
+      : `<div class="diag-compact" title="Puesto disponible">Disponible</div>`;
+
     return `
       <div>
         <div class="card-top">
@@ -254,7 +346,7 @@ export class DashboardRenderer {
         </div>
       </div>
       <div class="card-bottom">
-        <div class="diag-compact" title="Puesto disponible">Disponible</div>
+        ${bottomHint}
       </div>
     `;
   }
@@ -267,11 +359,19 @@ export class DashboardRenderer {
     const query = options.query || '';
     const hasFilter = filter !== 'ALL' || Boolean(query && query.trim());
 
+    if (options.editMode !== undefined) {
+      this.editMode = Boolean(options.editMode);
+    }
+    if (options.onMoveHost) {
+      this.onMoveHost = options.onMoveHost;
+    }
+
     let totalV = 0, totalA = 0, totalG = 0, totalN = 0;
     let visibleCount = 0;
     const totalCount = puestosMap.size;
 
     const slotToHost = this.construirSlotMap(puestosMap);
+    this.currentSlotToHost = slotToHost;
 
     // Contabilizar métricas locales
     puestosMap.forEach(p => {
@@ -291,9 +391,18 @@ export class DashboardRenderer {
       if (!slotCard) continue;
 
       const host = slotToHost.get(slotNum);
+
+      // Activar arrastre si estamos en modo edición
+      slotCard.setAttribute('draggable', (this.editMode && Boolean(host)) ? 'true' : 'false');
+      if (this.editMode) {
+        slotCard.classList.add('in-edit-mode');
+      } else {
+        slotCard.classList.remove('in-edit-mode', 'slot-selected-move', 'drag-over');
+      }
+
       if (host) {
         const isMatch = this.matches(host, filter, query);
-        slotCard.className = `card-compact ${host.estado}`;
+        slotCard.className = `card-compact ${host.estado}${this.editMode ? ' in-edit-mode' : ''}`;
         slotCard.innerHTML = this.generarCompactCardHtml(host, slotNum);
 
         if (hasFilter) {
@@ -308,7 +417,7 @@ export class DashboardRenderer {
           slotCard.classList.remove('dimmed', 'match-highlight');
         }
       } else {
-        slotCard.className = 'card-compact card-empty';
+        slotCard.className = `card-compact card-empty${this.editMode ? ' in-edit-mode' : ''}`;
         slotCard.innerHTML = this.generarEmptySlotHtml(slotNum);
         if (hasFilter) {
           slotCard.classList.add('dimmed');

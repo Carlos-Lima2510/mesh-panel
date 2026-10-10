@@ -5,6 +5,7 @@ const puestos = new Map();
 let activeFilter = 'ALL';
 let searchQuery = '';
 let lastMetricas = null;
+let isEditMode = false;
 
 const connBadge = document.getElementById('conn-status');
 const btnScan = document.getElementById('btn-scan');
@@ -13,6 +14,11 @@ const scanIcon = document.getElementById('btn-scan-icon');
 
 const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
+
+const selectDistribucion = document.getElementById('select-distribucion');
+const btnToggleEdit = document.getElementById('btn-toggle-edit');
+const btnDoneEdit = document.getElementById('btn-done-edit');
+const editBanner = document.getElementById('edit-mode-banner');
 
 const searchInput = document.getElementById('search-input');
 const btnClearSearch = document.getElementById('btn-clear-search');
@@ -58,6 +64,35 @@ function actualizarBotonesModo(modo) {
 }
 
 /**
+ * Sincroniza el selector de distribuciones espaciales.
+ */
+function sincronizarDistribuciones(distribuciones, activa) {
+  if (!selectDistribucion || !Array.isArray(distribuciones) || distribuciones.length === 0) return;
+
+  const activaId = activa ? activa.id : null;
+  const opcionesActuales = Array.from(selectDistribucion.options).map(o => o.value);
+  const idsNuevos = distribuciones.map(d => d.id);
+
+  // Si cambiaron las opciones, regenerar
+  const cambio = opcionesActuales.length !== idsNuevos.length ||
+    idsNuevos.some((id, idx) => opcionesActuales[idx] !== id);
+
+  if (cambio) {
+    selectDistribucion.innerHTML = '';
+    distribuciones.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = `${d.nombre} (${d.total_puestos || d.puestos?.length || 56})`;
+      selectDistribucion.appendChild(opt);
+    });
+  }
+
+  if (activaId && selectDistribucion.value !== activaId) {
+    selectDistribucion.value = activaId;
+  }
+}
+
+/**
  * Sincroniza la clase activa en los botones KPI de filtrado rápido.
  */
 function actualizarBotonesFiltro(filtro) {
@@ -72,12 +107,14 @@ function actualizarBotonesFiltro(filtro) {
 }
 
 /**
- * Dispara el renderizado reactivo con los filtros y búsqueda activos.
+ * Dispara el renderizado reactivo con los filtros, modo de edición y búsqueda activos.
  */
 function actualizarVista() {
   renderer.render(puestos, lastMetricas, {
     filter: activeFilter,
     query: searchQuery,
+    editMode: isEditMode,
+    onMoveHost: moverHost,
     onReset: resetearFiltros
   });
 }
@@ -95,6 +132,98 @@ function resetearFiltros() {
 }
 
 /**
+ * Alterna el modo interactivo de reorganización espacial.
+ */
+function toggleModoEdicion(forzar = null) {
+  isEditMode = forzar !== null ? forzar : !isEditMode;
+
+  if (btnToggleEdit) {
+    if (isEditMode) {
+      btnToggleEdit.classList.add('active-editing');
+      const text = btnToggleEdit.querySelector('#btn-edit-text');
+      if (text) text.textContent = 'Editando...';
+    } else {
+      btnToggleEdit.classList.remove('active-editing');
+      const text = btnToggleEdit.querySelector('#btn-edit-text');
+      if (text) text.textContent = 'Reorganizar';
+    }
+  }
+
+  if (editBanner) {
+    editBanner.style.display = isEditMode ? 'flex' : 'none';
+  }
+
+  actualizarVista();
+}
+
+/**
+ * Mueve un host a una nueva ubicación o intercambia puestos mediante la API.
+ */
+async function moverHost(hostId, targetSlot) {
+  try {
+    setStatusBadge(`Reubicando en puesto #${targetSlot}...`);
+    const res = await fetch(`${DAEMON_URL}/api/distribuciones/mover`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ host_id: hostId, slot: targetSlot })
+    });
+    const data = await res.json();
+    if (data.success && data.laboratorio) {
+      procesarDatosLaboratorio(data.laboratorio);
+      setStatusBadge(`Puesto #${targetSlot} actualizado con éxito`);
+    } else {
+      alert(`[!] Error al mover puesto: ${data.error || 'Error desconocido'}`);
+    }
+  } catch (err) {
+    console.error('[-] Error reubicando puesto:', err);
+    setStatusBadge('Error al mover puesto', true);
+  }
+}
+
+/**
+ * Cambia la distribución espacial activa (plano).
+ */
+async function cambiarDistribucion(id) {
+  try {
+    setStatusBadge(`Cambiando plano a ${id}...`);
+    const res = await fetch(`${DAEMON_URL}/api/distribuciones/activar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.success && data.laboratorio) {
+      procesarDatosLaboratorio(data.laboratorio);
+      setStatusBadge(`Plano activo: ${data.laboratorio.distribucion_activa?.nombre || id}`);
+    }
+  } catch (err) {
+    console.error('[-] Error activando distribución:', err);
+    setStatusBadge('Error al cambiar plano', true);
+  }
+}
+
+/**
+ * Procesa la carga de datos del agregado Laboratorio.
+ */
+function procesarDatosLaboratorio(lab) {
+  if (!lab) return;
+
+  if (Array.isArray(lab.hosts)) {
+    puestos.clear();
+    lab.hosts.forEach(p => puestos.set(p.node_id, p));
+  }
+
+  actualizarBotonesModo(lab.modo);
+  sincronizarDistribuciones(lab.distribuciones, lab.distribucion_activa);
+  lastMetricas = lab.metricas;
+  actualizarVista();
+
+  const timeStr = new Date().toLocaleTimeString();
+  const nombreDist = lab.distribucion_activa ? lab.distribucion_activa.nombre : 'Aula';
+  setStatusBadge(`${lab.nombre} [${lab.modo}] | ${nombreDist} | ${timeStr}`);
+}
+
+/**
  * Consulta el estado consolidado del laboratorio al daemon backend.
  */
 export async function fetchDevices() {
@@ -109,15 +238,8 @@ export async function fetchDevices() {
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     const data = await res.json();
 
-    const lab = data.laboratorio;
-    if (lab && Array.isArray(lab.hosts)) {
-      actualizarBotonesModo(lab.modo);
-      puestos.clear();
-      lab.hosts.forEach(p => puestos.set(p.node_id, p));
-      lastMetricas = lab.metricas;
-      actualizarVista();
-      const timeStr = new Date().toLocaleTimeString();
-      setStatusBadge(`${lab.nombre} [Modo ${lab.modo}] | ${timeStr}`);
+    if (data.laboratorio) {
+      procesarDatosLaboratorio(data.laboratorio);
     }
   } catch (err) {
     console.error('[-] Error al consultar laboratorio:', err);
@@ -144,13 +266,7 @@ async function cambiarModo(modo) {
     });
     const data = await res.json();
     if (data.success && data.laboratorio) {
-      actualizarBotonesModo(data.laboratorio.modo);
-      puestos.clear();
-      data.laboratorio.hosts.forEach(p => puestos.set(p.node_id, p));
-      lastMetricas = data.laboratorio.metricas;
-      actualizarVista();
-      const timeStr = new Date().toLocaleTimeString();
-      setStatusBadge(`${data.laboratorio.nombre} [Modo ${data.laboratorio.modo}] | ${timeStr}`);
+      procesarDatosLaboratorio(data.laboratorio);
     }
   } catch (err) {
     console.error('[-] Error al cambiar modo:', err);
@@ -159,10 +275,27 @@ async function cambiarModo(modo) {
 }
 
 // -----------------------------------------------------------------------------
+// EVENT LISTENERS: Distribuciones y Modo Reorganización
+// -----------------------------------------------------------------------------
+
+if (selectDistribucion) {
+  selectDistribucion.addEventListener('change', (e) => {
+    cambiarDistribucion(e.target.value);
+  });
+}
+
+if (btnToggleEdit) {
+  btnToggleEdit.addEventListener('click', () => toggleModoEdicion());
+}
+
+if (btnDoneEdit) {
+  btnDoneEdit.addEventListener('click', () => toggleModoEdicion(false));
+}
+
+// -----------------------------------------------------------------------------
 // EVENT LISTENERS: Búsqueda y Filtros Interactivos
 // -----------------------------------------------------------------------------
 
-// Input de búsqueda en tiempo real
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     searchQuery = e.target.value;
@@ -182,7 +315,6 @@ if (searchInput) {
   });
 }
 
-// Botón para limpiar texto de búsqueda
 if (btnClearSearch) {
   btnClearSearch.addEventListener('click', () => {
     if (searchInput) searchInput.value = '';
@@ -193,16 +325,13 @@ if (btnClearSearch) {
   });
 }
 
-// Botón para restablecer todos los filtros
 if (btnResetFilters) {
   btnResetFilters.addEventListener('click', resetearFiltros);
 }
 
-// Botones KPI interactivos (filtro por estado con toggle)
 kpiButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     const targetFilter = btn.dataset.filter || 'ALL';
-    // Si se vuelve a pulsar el filtro activo (salvo ALL), se desactiva y vuelve a ALL
     if (activeFilter === targetFilter && targetFilter !== 'ALL') {
       activeFilter = 'ALL';
     } else {
@@ -213,12 +342,10 @@ kpiButtons.forEach(btn => {
   });
 });
 
-// Botón de escaneo manual
 if (btnScan) {
   btnScan.addEventListener('click', fetchDevices);
 }
 
-// Modos de laboratorio
 if (btnModeClase) {
   btnModeClase.addEventListener('click', () => cambiarModo('CLASE'));
 }
@@ -292,12 +419,7 @@ const client = new SseClient(`${DAEMON_URL}/events`, {
   },
   onData: (data) => {
     if (data.tipo === 'INIT' && data.laboratorio) {
-      const lab = data.laboratorio;
-      actualizarBotonesModo(lab.modo);
-      puestos.clear();
-      lab.hosts.forEach(p => puestos.set(p.node_id, p));
-      lastMetricas = lab.metricas;
-      actualizarVista();
+      procesarDatosLaboratorio(data.laboratorio);
     }
   }
 });

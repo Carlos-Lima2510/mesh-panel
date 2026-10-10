@@ -1,7 +1,6 @@
-const Accion = require('./Accion');
+const { EstadoDesconectado, EvaluadorEstado } = require('./estado');
 
 class Host {
-
   constructor({
     id,
     nombre,
@@ -21,11 +20,26 @@ class Host {
     this.red = red;
     this.enlaceFisico = enlaceFisico;
 
-    this.estado = 'NARANJA';
-    this.categoria = 'DESCONECTADO_O_AISLADO';
-    this.diagnostico = '';
-    this.accion = Accion.inspeccionCable();
+    this.estado = new EstadoDesconectado('Estado inicial no evaluado.');
     this.telemetria = {};
+    this.slot = null;
+    this.puestoId = null;
+  }
+
+  get accion() {
+    return this.estado.obtenerAccion();
+  }
+
+  get color() {
+    return this.estado.color;
+  }
+
+  get categoria() {
+    return this.estado.categoria;
+  }
+
+  get diagnostico() {
+    return this.estado.diagnostico;
   }
 
   evaluarEstado({ osOnline, amtOnline = false, pwr = null, conn = 0, modoLaboratorio = 'CLASE' }) {
@@ -47,68 +61,23 @@ class Host {
       pwr
     };
 
-    if (this.enlaceFisico.link === 'DOWN') {
-      if (modoLaboratorio === 'PRACTICA') {
-        this.estado = 'AMARILLO';
-        this.categoria = 'RED_AISLADA';
-        this.diagnostico = `Puesto en Red Aislada (Modo Práctica activo; cable conectado al switch de prácticas).`;
-        this.accion = new Accion('NINGUNA', 'Puesto en sesión de prácticas en red aislada.', false);
-        return;
-      }
-
-      this.estado = 'NARANJA';
-      this.categoria = 'DESCONECTADO_O_AISLADO';
-      this.diagnostico = `Cable desconectado físicamente (Puerto ${this.enlaceFisico.port} en estado DOWN en el switch principal).`;
-      this.accion = Accion.inspeccionCable();
-      return;
-    }
-
-    if (osOnline) {
-      this.estado = 'VERDE';
-      this.categoria = 'OPERATIVO';
-      this.diagnostico = 'Puesto 100% operativo (MeshAgent conectado al servidor).';
-      this.accion = Accion.powerOff();
-      return;
-    }
-
-    const apagadoPorMesh = amtOnline && pwr !== null && pwr !== 1;
-    const apagadoPorSwitch = this.enlaceFisico.link === 'UP' && this.enlaceFisico.speed <= 100;
-
-    if (apagadoPorMesh || apagadoPorSwitch) {
-      this.estado = 'GRIS';
-      this.categoria = 'APAGADO';
-      this.diagnostico = `Equipo apagado en Standby (Puerto ${this.enlaceFisico.port} a ${this.enlaceFisico.speed} Mbps; listo para Wake-on-LAN).`;
-      this.accion = Accion.wakeOnLan();
-      return;
-    }
-
-    if (this.enlaceFisico.link === 'UP' && this.enlaceFisico.speed >= 1000) {
-      if (this.red && this.red.esAislada) {
-        this.estado = 'AMARILLO';
-        this.categoria = 'RED_AISLADA';
-        this.diagnostico = `Puesto en ${this.red.nombre}. Cable a 1 Gbps pero en segmento aislado sin salida a MeshCentral.`;
-        this.accion = new Accion('NINGUNA', 'Puesto en red aislada intencionada.', false);
-        return;
-      }
-
-      this.estado = 'AMARILLO';
-      this.categoria = 'FALLO_LOGICO';
-      this.diagnostico = `Fallo lógico o DHCP${this.red ? ' en ' + this.red.nombre : ''}. Cable a 1 Gbps pero el agente no conecta con MeshCentral.`;
-      this.accion = Accion.remediarDhcp();
-      return;
-    }
-
-    this.estado = 'NARANJA';
-    this.categoria = 'DESCONECTADO_O_AISLADO';
-    this.diagnostico = 'Sin comunicación. Cable desconectado o puesto sin red.';
-    this.accion = Accion.inspeccionCable();
+    this.estado = EvaluadorEstado.evaluar({
+      enlaceFisico: this.enlaceFisico,
+      osOnline,
+      amtOnline,
+      pwr,
+      red: this.red,
+      modoLaboratorio
+    });
   }
 
   toJSON() {
     return {
       node_id: this.id,
       nombre: this.nombre,
-      estado: this.estado,
+      slot: this.slot,
+      puesto_id: this.puestoId,
+      estado: this.color,
       categoria: this.categoria,
       diagnostico: this.diagnostico,
       boca_switch: this.bocaSwitch,
