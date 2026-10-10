@@ -71,6 +71,38 @@ class MeshCentralAdapter {
       });
     });
   }
+
+  apagarDispositivo(nodeId) {
+    return new Promise((resolve, reject) => {
+      const args = [
+        'devicepower',
+        '--url', this.url,
+        '--loginuser', this.user,
+        '--loginpass', this.pass,
+        '--off',
+        '--id', nodeId,
+        '--ignore-cert'
+      ];
+
+      console.log(`[*] [MeshCentralAdapter] Enviando orden de apagado (Power Off) a ${nodeId}...`);
+      execFile('meshctrl', args, { timeout: 10000 }, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`[!] [MeshCentralAdapter] Error al apagar ${nodeId}:`, error.message);
+          return reject(error);
+        }
+
+        const salida = stdout ? stdout.trim() : '';
+        const esError = salida.toLowerCase().includes('invalid') || salida.toLowerCase().includes('error');
+        if (esError) {
+          console.warn(`[-] [MeshCentralAdapter] Fallo al apagar ${nodeId}: ${salida}`);
+          return resolve({ success: false, salida });
+        }
+
+        console.log(`[+] [MeshCentralAdapter] Apagado completado con éxito: ${salida}`);
+        resolve({ success: true, salida });
+      });
+    });
+  }
 }
 
 module.exports = MeshCentralAdapter;

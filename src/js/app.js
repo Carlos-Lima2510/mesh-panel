@@ -252,6 +252,34 @@ window.ejecutarWoL = async function (nodeId) {
   }
 };
 
+/**
+ * Apagado remoto del equipo mediante MeshCentral
+ */
+window.ejecutarPowerOff = async function (nodeId) {
+  if (!confirm('¿Confirmas el apagado remoto de este equipo?')) {
+    return;
+  }
+  try {
+    setStatusBadge('Enviando orden de apagado...');
+    const res = await fetch(`${DAEMON_URL}/api/power/off`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ node_id: nodeId, accion: 'POWER_OFF' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      const msg = (data.resultado && data.resultado.salida) || 'Orden de apagado enviada con éxito hacia el host.';
+      alert(`[+] ${msg}`);
+    } else {
+      const msg = (data.resultado && data.resultado.salida) || data.error || 'Error desconocido';
+      alert(`[!] Error al apagar equipo: ${msg}`);
+    }
+    fetchDevices();
+  } catch (err) {
+    alert(`[!] Error de red: ${err.message}`);
+  }
+};
+
 // -----------------------------------------------------------------------------
 // CLIENTE SSE EN TIEMPO REAL
 // -----------------------------------------------------------------------------

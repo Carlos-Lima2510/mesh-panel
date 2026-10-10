@@ -1,21 +1,12 @@
-// ==============================================================================
-// ENTRYPOINT: DAEMON.JS
-// ==============================================================================
-// Punto de entrada del servidor backend.
-// Ensambla las capas: Infraestructura -> Aplicación -> API HTTP / SSE.
-
 const http = require('http');
 const config = require('./config');
 
-// Capa de Infraestructura
 const MeshCentralAdapter = require('./infrastructure/meshcentral/MeshCentralAdapter');
 const SnmpSwitchProvider = require('./infrastructure/network/SnmpSwitchProvider');
 const SimulatedSwitchProvider = require('./infrastructure/network/SimulatedSwitchProvider');
 
-// Capa de Aplicación
 const LaboratorioService = require('./application/LaboratorioService');
 
-// 1. Instanciar Adaptadores de Infraestructura
 const meshAdapter = new MeshCentralAdapter({
   url: config.meshUrl,
   user: config.meshUser,
@@ -26,30 +17,23 @@ const networkProvider = config.switchMode === 'simulado'
   ? new SimulatedSwitchProvider()
   : new SnmpSwitchProvider({ host: config.switchHost, community: config.switchCommunity });
 
-// 2. Instanciar Servicio de Aplicación
 const laboratorioService = new LaboratorioService({
   meshCentralAdapter: meshAdapter,
   networkProvider: networkProvider
 });
 
-// Clientes SSE conectados
 const clientesSSE = [];
 
-/**
- * Consulta y difunde el estado del laboratorio.
- */
 async function refrescarLaboratorio(forzar = false) {
   const laboratorio = await laboratorioService.obtenerLaboratorio({ forzar });
   const datosLab = laboratorio.toJSON();
 
-  // Difundir evento INIT a clientes SSE conectados
   const payload = JSON.stringify({ tipo: 'INIT', laboratorio: datosLab });
   clientesSSE.forEach(res => res.write(`data: ${payload}\n\n`));
 
   return datosLab;
 }
 
-// 3. Servidor HTTP / REST API
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -62,7 +46,6 @@ const server = http.createServer(async (req, res) => {
 
   const urlPath = req.url.split('?')[0].replace(/\/$/, '');
 
-  // ENDPOINTS: Consultar laboratorio / Escaneo a demanda
   if (
     (req.method === 'GET' && (urlPath === '/api/laboratorio' || urlPath === '/api/devices')) ||
     (req.method === 'POST' && (urlPath === '/api/laboratorio/scan' || urlPath === '/api/scan-now' || urlPath === '/api/devices' || urlPath === '/api/refresh'))
@@ -82,7 +65,6 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // ENDPOINT: Consultar estado de los puertos de red
   if (req.method === 'GET' && urlPath === '/api/switch') {
     try {
       const puertos = await laboratorioService.obtenerPuertosRed();
@@ -98,7 +80,6 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // ENDPOINT: Cambiar modo de operación (CLASE vs PRACTICA)
   if (req.method === 'POST' && urlPath === '/api/laboratorio/modo') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -108,11 +89,9 @@ const server = http.createServer(async (req, res) => {
         const nuevoModo = data.modo === 'PRACTICA' ? 'PRACTICA' : 'CLASE';
         console.log(`[*] [Modo] Cambiando modo de laboratorio a: ${nuevoModo}`);
         
-        // Re-evaluación instantánea en memoria (0 ms)
         const lab = laboratorioService.establecerModo(nuevoModo);
         const datosLab = lab.toJSON();
         
-        // Emitir inmediatamente a clientes SSE
         const payload = JSON.stringify({ tipo: 'INIT', laboratorio: datosLab });
         clientesSSE.forEach(c => c.write(`data: ${payload}\n\n`));
 
@@ -126,7 +105,6 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ENDPOINT: Modificar puerto si está en modo simulado en memoria
   if (req.method === 'POST' && urlPath === '/api/switch') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -148,8 +126,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ENDPOINT: Ejecutar acción sobre un host (ej. Wake-on-LAN)
-  if (req.method === 'POST' && (urlPath === '/api/power/wake' || urlPath.startsWith('/api/host/'))) {
+  if (req.method === 'POST' && (urlPath === '/api/power/wake' || urlPath === '/api/power/off' || urlPath === '/api/power/shutdown' || urlPath.startsWith('/api/host/'))) {
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
@@ -161,11 +138,22 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ success: false, error: 'Falta node_id del host' }));
         }
 
-        const resultado = await laboratorioService.ejecutarAccion(nodeId, 'WAKE_ON_LAN');
+        let tipoAccion = data.accion;
+        if (!tipoAccion) {
+          if (urlPath === '/api/power/off' || urlPath === '/api/power/shutdown') {
+            tipoAccion = 'POWER_OFF';
+          } else {
+            tipoAccion = 'WAKE_ON_LAN';
+          }
+        }
+
+        console.log(`[*] [Acción] Solicitando ${tipoAccion} para: ${nodeId}`);
+        const resultado = await laboratorioService.ejecutarAccion(nodeId, tipoAccion);
         const exito = Boolean(resultado && resultado.success);
         res.writeHead(exito ? 200 : 400, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: exito, resultado }));
       } catch (err) {
+        console.error(`[!] [Acción] Error procesando acción:`, err.message);
         res.writeHead(500, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: false, error: err.message }));
       }
@@ -173,13 +161,11 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // ENDPOINT: Server-Sent Events (SSE)
   if (req.headers.accept && req.headers.accept.includes('text/event-stream')) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Emitir estado actual instantáneamente desde caché en memoria
     laboratorioService.obtenerLaboratorio({ forzar: false })
       .then(lab => {
         const d = lab.toJSON();
@@ -199,23 +185,19 @@ const server = http.createServer(async (req, res) => {
   res.end(JSON.stringify({ error: 'Ruta no encontrada' }));
 });
 
-// Heartbeat SSE cada 25 segundos
 setInterval(() => {
   clientesSSE.forEach(res => res.write(':heartbeat\n\n'));
 }, 25000);
 
-// Polling reactivo en segundo plano cada 5 segundos si hay clientes conectados
 setInterval(async () => {
   if (clientesSSE.length > 0) {
     try {
       await refrescarLaboratorio(true);
     } catch (err) {
-      // Ignorar fallos transitorios en polling periódico
     }
   }
 }, 5000);
 
-// Iniciar servidor
 server.listen(config.port, '0.0.0.0', async () => {
   console.log(`[+] Servidor Daemon escuchando en http://0.0.0.0:${config.port}`);
   console.log(`[+] Modo de red: ${config.switchMode.toUpperCase()}`);

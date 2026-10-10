@@ -67,7 +67,7 @@ class Host {
       this.estado = 'VERDE';
       this.categoria = 'OPERATIVO';
       this.diagnostico = 'Puesto 100% operativo (MeshAgent conectado al servidor).';
-      this.accion = Accion.ninguna();
+      this.accion = Accion.powerOff();
       return;
     }
 

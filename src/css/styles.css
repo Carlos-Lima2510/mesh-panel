@@ -526,6 +526,7 @@ header {
   text-overflow: ellipsis;
 }
 
+.btn-action,
 .btn-wol {
   margin-top: 2px;
   width: 100%;
@@ -533,16 +534,33 @@ header {
   font-size: 0.68rem;
   border-radius: 3px;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.btn-wol {
   border: 1px solid #475569;
   background: #1e293b;
   color: #f8fafc;
-  font-weight: 600;
-  transition: all 0.2s ease;
 }
 
 .btn-wol:hover:not(:disabled) {
   background: #334155;
   border-color: #64748b;
+}
+
+.btn-power-off {
+  border: 1px solid #7f1d1d;
+  background: rgba(185, 28, 28, 0.25);
+  color: #fca5a5;
+}
+
+.btn-power-off:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.45);
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* Puesto Libre / Vacío (Mismo tamaño exacto: 122px alto y 100% columna) */

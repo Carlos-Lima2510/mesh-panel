@@ -201,7 +201,13 @@ export class DashboardRenderer {
 
     let bottomActionHtml = '';
     if (p.accion && p.accion.ejecutable) {
-      bottomActionHtml = `<button type="button" class="btn-wol" onclick="window.ejecutarWoL('${escapeHtml(p.node_id)}')">⚡ WoL</button>`;
+      if (p.accion.tipo === 'POWER_OFF') {
+        bottomActionHtml = `<button type="button" class="btn-action btn-power-off" onclick="window.ejecutarPowerOff('${escapeHtml(p.node_id)}')">🛑 Apagar</button>`;
+      } else if (p.accion.tipo === 'WAKE_ON_LAN') {
+        bottomActionHtml = `<button type="button" class="btn-action btn-wol" onclick="window.ejecutarWoL('${escapeHtml(p.node_id)}')">⚡ WoL</button>`;
+      } else {
+        bottomActionHtml = `<button type="button" class="btn-action btn-wol" onclick="window.ejecutarWoL('${escapeHtml(p.node_id)}')">${escapeHtml(p.accion.tipo)}</button>`;
+      }
     } else {
       bottomActionHtml = `<div class="diag-compact" title="${escapeHtml(p.diagnostico || '')}">${escapeHtml(p.diagnostico || 'Operativo')}</div>`;
     }

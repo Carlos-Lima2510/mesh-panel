@@ -136,6 +136,9 @@ class LaboratorioService {
     if (tipoAccion === 'WAKE_ON_LAN') {
       return await this.meshAdapter.despertarDispositivo(nodeId);
     }
+    if (tipoAccion === 'POWER_OFF' || tipoAccion === 'SHUTDOWN' || tipoAccion === 'APAGAR') {
+      return await this.meshAdapter.apagarDispositivo(nodeId);
+    }
     throw new Error(`Acción ${tipoAccion} no es ejecutable remotamente.`);
   }
 

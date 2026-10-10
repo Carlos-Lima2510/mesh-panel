@@ -94,7 +94,7 @@ El sistema modela el **Modo de Operación del Laboratorio**:
 
 | Estado Visual | Switch Principal (Capa 1) | MeshAgent (Capa 7) | Modo Laboratorio | Diagnóstico | Acción Propuesta |
 | :---: | :---: | :---: | :---: | :--- | :---: |
-| 🟢 **VERDE** | `UP` | Conectado (`conn & 1`) | Cualquiera | **Operativo**: PC encendido en red docente. | `NINGUNA` |
+| 🟢 **VERDE** | `UP` | Conectado (`conn & 1`) | Cualquiera | **Operativo**: PC encendido en red docente. | 🛑 `POWER_OFF` |
 | ⚫ **GRIS** | `UP` (10/100 Mbps o Standby) | Desconectado | Cualquiera | **Apagado (Standby)**: Cable conectado, PC apagado en modo S5. | ⚡ `WAKE_ON_LAN` |
 | 🟡 **AMARILLO** | `UP` (1 Gbps) | Desconectado | Cualquiera | **Fallo Lógico / DHCP**: Enlace físico a 1 Gbps pero el agente no conecta. | `REMEDIAR_DHCP` |
 | 🟡 **AMARILLO** | `DOWN` | Desconectado | `PRACTICA` | **Red Aislada de Prácticas**: Cable movido al switch de prácticas. | `NINGUNA` |
@@ -141,7 +141,7 @@ daemon/
   - Define si permite salida hacia MeshCentral (`permiteSalidaMeshCentral()`).
 * **[`Accion`](file:///home/carlos-lima/Documentos/mesh-panel/daemon/domain/Accion.js)**:
   - Modela acciones remediadoras o de control (`tipo`, `descripcion`, `ejecutable`).
-  - Habilita la ejecución remota de Wake-on-LAN si el puesto está apagado y tiene MAC conocida.
+  - Habilita la ejecución remota de Wake-on-LAN si el puesto está apagado y apagado remoto (Power Off) vía MeshAgent si el puesto está encendido.
 
 ---
 
@@ -203,6 +203,7 @@ El servidor expone los siguientes endpoints limpios en el puerto `3001`:
 | `GET` | `/api/laboratorio` | **~14 ms** | Devuelve el snapshot del agregador `laboratorio` con métricas, redes y puestos clasificados. |
 | `POST` | `/api/laboratorio/modo` | **~15 ms** | Alterna el modo del aula (`{"modo": "CLASE"}` o `{"modo": "PRACTICA"}`) y emite SSE. |
 | `POST` | `/api/power/wake` | **~250 ms** | Envía Magic Packet Wake-on-LAN al host especificado (`{"node_id": "..."}`). |
+| `POST` | `/api/power/off` | **~250 ms** | Envía orden de apagado remoto (Power Off) vía MeshAgent (`{"node_id": "..."}`). |
 | `GET` | `/events` | Streaming | Canal Server-Sent Events (SSE) para actualización reactiva en tiempo real. |
 
 ---
@@ -215,11 +216,12 @@ El servidor expone los siguientes endpoints limpios en el puerto `3001`:
   - Cuadrícula de tarjetas de puestos.
 * **[`src/js/app.js`](file:///home/carlos-lima/Documentos/mesh-panel/src/js/app.js)**:
   - Conexión reactiva vía `EventSource` (`/events`) con reconexión automática.
-  - Llamadas a la API para cambio de modo y emisión de Wake-on-LAN.
+  - Llamadas a la API para cambio de modo, emisión de Wake-on-LAN y apagado remoto.
 * **[`src/js/renderer.js`](file:///home/carlos-lima/Documentos/mesh-panel/src/js/renderer.js)**:
   - Renderizado dinámico de tarjetas con colores semafóricos (`VERDE`, `GRIS`, `AMARILLO`, `NARANJA`).
   - Muestra telemetría física (puerto del switch, estado de enlace, red asignada).
-  - Pinta el botón de acción interactivo `⚡ Encender (WoL)` cuando el equipo está en estado `GRIS`.
+  - Pinta el botón de acción interactivo `⚡ WoL` cuando el equipo está en estado `GRIS`.
+  - Pinta el botón de acción interactivo `🛑 Apagar` cuando el equipo está en estado `VERDE`.
 
 ---
 
@@ -240,6 +242,13 @@ curl -s -X POST http://localhost:3001/api/laboratorio/modo \
 ### Despertar un puesto por Wake-on-LAN:
 ```bash
 curl -s -X POST http://localhost:3001/api/power/wake \
+  -H "Content-Type: application/json" \
+  -d '{"node_id": "node//..."}' | python3 -m json.tool
+```
+
+### Apagar un puesto de forma remota:
+```bash
+curl -s -X POST http://localhost:3001/api/power/off \
   -H "Content-Type: application/json" \
   -d '{"node_id": "node//..."}' | python3 -m json.tool
 ```
