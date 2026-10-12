@@ -1,0 +1,53 @@
+@startuml diagrama-objetos
+
+object "labInformatica : Laboratorio" as lab {
+    nombre = "Laboratorio Central"
+    modo = CLASE
+}
+
+object "distribucionActiva : Distribucion" as dist {
+    nombre = "Disposición Ordinaria"
+    activa = true
+}
+
+object "puesto_01 : Puesto" as puesto {
+    etiqueta = "MESA-01"
+    fila = 1
+    columna = 1
+}
+
+object "pc_01 : Host" as host {
+    nombre = "PC-LAB-01"
+    mac = "00:1A:2B:3C:4D:01"
+    ip = "192.168.1.101"
+}
+
+object "redDocente : Red" as red {
+    nombre = "Red Docencia"
+    esAislada = false
+}
+
+object "estOperativo : Estado" as estado {
+    nombre = "OPERATIVO"
+    color = "VERDE"
+    diagnostico = "PC encendido y comunicando"
+}
+
+object "actApagar : Accion" as accion {
+    tipo = "POWER_OFF"
+    descripcion = "Apagar equipo remotamente"
+}
+
+lab o-- red
+lab *-- dist
+lab *-- puesto
+
+dist o-- puesto
+
+puesto o-- host
+host --> red
+
+host *-- estado
+estado ..> accion
+
+@enduml

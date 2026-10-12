@@ -238,6 +238,9 @@ El servidor expone los siguientes endpoints limpios en el puerto `3001`:
 | `GET` | `/api/laboratorio` | **~14 ms** | Devuelve el snapshot del agregador `laboratorio` con métricas, redes y puestos clasificados. |
 | `POST` | `/api/laboratorio/modo` | **~15 ms** | Alterna el modo del aula (`{"modo": "CLASE"}` o `{"modo": "PRACTICA"}`) y emite SSE. |
 | `GET` | `/api/distribuciones` | **~14 ms** | Consulta la lista de planos espaciales disponibles y la distribución activa. |
+| `POST` | `/api/distribuciones` | **~15 ms** | Registra una nueva distribución espacial completa (`{"id", "nombre", "filas", "columnas", "puestos"}`). |
+| `PUT` | `/api/distribuciones` | **~15 ms** | Actualiza una distribución espacial existente y sus puestos asociados. |
+| `DELETE` | `/api/distribuciones` | **~15 ms** | Elimina una distribución del catálogo (evitando eliminar la única existente). |
 | `POST` | `/api/distribuciones/activar` | **~15 ms** | Cambia el plano de aula activo (`{"id": "..."}`) y difunde el nuevo layout vía SSE. |
 | `POST` | `/api/distribuciones/mover` | **~15 ms** | Reubica o intercambia un puesto de mesa (`{"host_id": "...", "slot": N}`) y difunde vía SSE. |
 | `POST` | `/api/power/wake` | **~250 ms** | Envía Magic Packet Wake-on-LAN al host especificado (`{"node_id": "..."}`). |
@@ -326,12 +329,15 @@ Esta línea de trabajo consolida un salto arquitectónico clave en el dominio de
    - `Distribucion` 1 $\rightarrow$ N `Puesto`: Cada plano se compone de puestos físicos o casillas (`fila`, `columna`, `etiqueta`).
    - `Puesto` 1 $\rightarrow$ 0..1 `Host`: Modela de forma natural mesas vacías (sin PC asignado) o puestos reservados.
    - **Invariantes garantizados**: La entidad `Distribucion` valida en memoria que no existan dos puestos con la misma coordenada física ni un mismo `Host` asignado simultáneamente a múltiples mesas.
-3. **Desacoplamiento de Estados Polimórficos (`domain/estado/`)**:
-   - Se reemplazó el `if/else` monolítico en `Host` por clases de estado aisladas (`EstadoOperativo`, `EstadoStandby`, `EstadoFalloLogico`, `EstadoRedAislada`, `EstadoDesconectado`).
-   - Cada clase de estado prescribe su propia semántica, diagnóstico y qué `Accion` operativa permite.
+3. **Desacoplamiento de Estados mediante Interfaz de Contrato (`domain/estado/`)**:
+   - Se formalizó el contrato de interfaz `Estado` (cumpliendo el patrón State de GoF e ISP).
+   - Las clases de estado (`EstadoOperativo`, `EstadoStandby`, `EstadoFalloLogico`, `EstadoRedAislada`, `EstadoDesconectado`) implementan directamente el contrato sin acoplamiento jerárquico (`extends Estado`).
+   - Cada estado prescribe su propia semántica, diagnóstico y qué `Accion` operativa permite.
    - La evaluación determinista se delega en el servicio puro `EvaluadorEstado`.
-4. **Capa HTTP Modular (`interfaces/http/`)**:
-   - Se reemplazó el servidor monolítico `daemon.js` por un enrutador nativo desacoplado (`Router.js`), un emisor de eventos reactivo (`SseBroadcaster.js`), un mapa de rutas explícito (`routes.js`) y controladores específicos (`LaboratorioController`, `DistribucionController`, `PowerController`, `SwitchController`).
+4. **Catálogo Dinámico de Distribuciones (CRUD Completo)**:
+   - Soporte para creación (`POST /api/distribuciones`), edición/reconfiguración (`PUT /api/distribuciones`), clonación y eliminación (`DELETE /api/distribuciones`), persistiendo en el catálogo de memoria de `LaboratorioService` a través de los ciclos de telemetría.
+5. **Capa HTTP Modular (`interfaces/http/`)**:
+   - Servidor nativo con `Router.js` (soporte completo GET, POST, PUT, DELETE, CORS), emisor SSE `SseBroadcaster.js`, mapa de rutas `routes.js` y controladores modulares.
 
 ### 11.2 Capacidades Habilitadas en Producción
 * **Selector Dinámico de Planos**: El operador o docente puede conmutar entre la disposición ordinaria de 56 puestos y la disposición de examen en $< 15\text{ ms}$ vía `POST /api/distribuciones/activar`.

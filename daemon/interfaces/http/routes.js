@@ -17,6 +17,11 @@ function registrarRutas({
   router.post('/api/laboratorio/modo', (req, res) => laboratorioController.cambiarModo(req, res));
 
   router.get('/api/distribuciones', (req, res) => distribucionController.listar(req, res));
+  router.post('/api/distribuciones', (req, res) => distribucionController.crear(req, res));
+  router.put('/api/distribuciones', (req, res) => distribucionController.actualizar(req, res));
+  router.post('/api/distribuciones/actualizar', (req, res) => distribucionController.actualizar(req, res));
+  router.delete('/api/distribuciones', (req, res) => distribucionController.eliminar(req, res));
+  router.post('/api/distribuciones/eliminar', (req, res) => distribucionController.eliminar(req, res));
   router.post('/api/distribuciones/activar', (req, res) => distribucionController.activar(req, res));
   router.post('/api/distribuciones/mover', (req, res) => distribucionController.mover(req, res));
 

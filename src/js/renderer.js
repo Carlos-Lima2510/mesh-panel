@@ -1,10 +1,3 @@
-/**
- * DashboardRenderer
- * Renderizado de la distribución del laboratorio (56 puestos físicos en 2 hileras de 5 columnas)
- * con tarjetas de tamaño estrictamente idéntico tanto para puestos activos como vacíos.
- * Soporta modo interactivo de reorganización (Drag & Drop y Clic para Intercambiar).
- */
-
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str
@@ -38,43 +31,37 @@ export class DashboardRenderer {
     this.resetBtn = document.getElementById('btn-reset-filters');
 
     this.slotElements = new Map();
-    this.emptyStateEl = null;
+    this.currentDistribucionId = null;
 
-    // Estado para modo de reorganización
     this.editMode = false;
     this.selectedSlotForMove = null;
     this.currentSlotToHost = new Map();
     this.onMoveHost = null;
 
-    // Crear la estructura física de 56 escritorios
     this.inicializarEstructuraMapa();
   }
 
-  /**
-   * Genera las 6 filas con el pasillo central y los 56 escritorios de tamaño uniforme.
-   */
   inicializarEstructuraMapa() {
-    if (!this.classroomGrid || this.classroomGrid.children.length > 0) return;
+    if (!this.classroomGrid) return;
+    this.classroomGrid.innerHTML = '';
+    this.slotElements.clear();
 
     CLASSROOM_ROWS.forEach(rowData => {
       const rowEl = document.createElement('div');
       rowEl.className = 'classroom-row';
 
-      // Etiqueta de Fila (F1, F2...)
       const labelEl = document.createElement('div');
       labelEl.className = 'row-label';
       labelEl.textContent = rowData.label;
       rowEl.appendChild(labelEl);
 
-      // Bloque Izquierdo (5 columnas exactas)
       const leftBlock = document.createElement('div');
       leftBlock.className = 'row-block';
       rowData.left.forEach(slotNum => {
-        const slotCard = this._crearSlotCard(slotNum);
+        const slotCard = this._crearSlotCard(`puesto-${slotNum}`, slotNum);
         leftBlock.appendChild(slotCard);
-        this.slotElements.set(slotNum, slotCard);
+        this.slotElements.set(`puesto-${slotNum}`, slotCard);
       });
-      // Rellenar huecos libres en fila 6 para mantener las 5 columnas idénticas
       for (let i = rowData.left.length; i < 5; i++) {
         const ghost = document.createElement('div');
         ghost.className = 'card-compact card-ghost';
@@ -82,20 +69,17 @@ export class DashboardRenderer {
       }
       rowEl.appendChild(leftBlock);
 
-      // Pasillo Central
       const aisleEl = document.createElement('div');
       aisleEl.className = 'aisle-divider';
       rowEl.appendChild(aisleEl);
 
-      // Bloque Derecho (5 columnas exactas)
       const rightBlock = document.createElement('div');
       rightBlock.className = 'row-block';
       rowData.right.forEach(slotNum => {
-        const slotCard = this._crearSlotCard(slotNum);
+        const slotCard = this._crearSlotCard(`puesto-${slotNum}`, slotNum);
         rightBlock.appendChild(slotCard);
-        this.slotElements.set(slotNum, slotCard);
+        this.slotElements.set(`puesto-${slotNum}`, slotCard);
       });
-      // Rellenar huecos libres en fila 6
       for (let i = rowData.right.length; i < 5; i++) {
         const ghost = document.createElement('div');
         ghost.className = 'card-compact card-ghost';
@@ -107,27 +91,84 @@ export class DashboardRenderer {
     });
   }
 
-  /**
-   * Crea un contenedor de escritorio con soporte de Drag & Drop y Clic para mover.
-   */
-  _crearSlotCard(slotNum) {
+  reconstruirEstructura(dist) {
+    if (!this.classroomGrid) return;
+    this.classroomGrid.innerHTML = '';
+    this.slotElements.clear();
+
+    const headersEl = document.getElementById('classroom-headers');
+    const isClassicAula = !dist || dist.id === 'dist-aula-56';
+
+    if (isClassicAula) {
+      if (headersEl) headersEl.style.display = 'grid';
+      this.inicializarEstructuraMapa();
+      return;
+    }
+
+    if (headersEl) headersEl.style.display = 'none';
+
+    const filas = dist.filas || 6;
+    const columnas = dist.columnas || 10;
+    const puestosPorCoord = new Map();
+
+    if (Array.isArray(dist.puestos)) {
+      dist.puestos.forEach(p => {
+        puestosPorCoord.set(`${p.fila},${p.columna}`, p);
+      });
+    }
+
+    for (let f = 1; f <= filas; f++) {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'classroom-row';
+
+      const labelEl = document.createElement('div');
+      labelEl.className = 'row-label';
+      labelEl.textContent = `F${f}`;
+      rowEl.appendChild(labelEl);
+
+      const blockEl = document.createElement('div');
+      blockEl.className = 'row-block';
+      blockEl.style.display = 'grid';
+      blockEl.style.gridTemplateColumns = `repeat(${columnas}, minmax(130px, 1fr))`;
+      blockEl.style.gap = '8px';
+
+      for (let c = 1; c <= columnas; c++) {
+        const puesto = puestosPorCoord.get(`${f},${c}`);
+        if (puesto) {
+          const numSlot = parseInt(puesto.id.replace('puesto-', ''), 10) || `${f}-${c}`;
+          const slotCard = this._crearSlotCard(puesto.id, numSlot);
+          blockEl.appendChild(slotCard);
+          this.slotElements.set(puesto.id, slotCard);
+        } else {
+          const ghost = document.createElement('div');
+          ghost.className = 'card-compact card-ghost';
+          blockEl.appendChild(ghost);
+        }
+      }
+
+      rowEl.appendChild(blockEl);
+      this.classroomGrid.appendChild(rowEl);
+    }
+  }
+
+  _crearSlotCard(slotKey, displayNum = null) {
     const slotCard = document.createElement('div');
     slotCard.className = 'card-compact card-empty';
-    slotCard.dataset.slot = slotNum;
+    slotCard.dataset.slot = slotKey;
+    slotCard.dataset.num = displayNum || slotKey;
 
-    // Soporte Drag & Drop HTML5 nativo
     slotCard.addEventListener('dragstart', (e) => {
       if (!this.editMode) {
         e.preventDefault();
         return;
       }
-      const host = this.currentSlotToHost.get(slotNum);
+      const host = this.currentSlotToHost.get(slotKey);
       if (!host) {
         e.preventDefault();
         return;
       }
       slotCard.classList.add('is-dragging');
-      e.dataTransfer.setData('text/plain', JSON.stringify({ hostId: host.node_id, fromSlot: slotNum }));
+      e.dataTransfer.setData('text/plain', JSON.stringify({ hostId: host.node_id, fromSlot: slotKey }));
       e.dataTransfer.effectAllowed = 'move';
     });
 
@@ -155,23 +196,22 @@ export class DashboardRenderer {
         const raw = e.dataTransfer.getData('text/plain');
         if (!raw) return;
         const data = JSON.parse(raw);
-        if (data && data.hostId && data.fromSlot !== slotNum) {
+        if (data && data.hostId && data.fromSlot !== slotKey) {
           if (typeof this.onMoveHost === 'function') {
-            this.onMoveHost(data.hostId, slotNum);
+            this.onMoveHost(data.hostId, slotKey);
           }
         }
       } catch (_) {}
     });
 
-    // Soporte Clic para Intercambiar / Mover
     slotCard.addEventListener('click', (e) => {
       if (e.target.closest('.btn-action')) return;
       if (!this.editMode) return;
 
       if (!this.selectedSlotForMove) {
-        const host = this.currentSlotToHost.get(slotNum);
+        const host = this.currentSlotToHost.get(slotKey);
         if (host) {
-          this.selectedSlotForMove = { hostId: host.node_id, slotNum };
+          this.selectedSlotForMove = { hostId: host.node_id, slotKey };
           slotCard.classList.add('slot-selected-move');
         }
       } else {
@@ -179,8 +219,8 @@ export class DashboardRenderer {
         this.selectedSlotForMove = null;
         document.querySelectorAll('.slot-selected-move').forEach(el => el.classList.remove('slot-selected-move'));
 
-        if (prev.slotNum !== slotNum && typeof this.onMoveHost === 'function') {
-          this.onMoveHost(prev.hostId, slotNum);
+        if (prev.slotKey !== slotKey && typeof this.onMoveHost === 'function') {
+          this.onMoveHost(prev.hostId, slotKey);
         }
       }
     });
@@ -188,55 +228,48 @@ export class DashboardRenderer {
     return slotCard;
   }
 
-  /**
-   * Resuelve el slot físico (1 a 56) de cada host.
-   */
   construirSlotMap(puestosMap) {
     const slotToHost = new Map();
     const unassigned = [];
 
     puestosMap.forEach(p => {
-      let slot = null;
-      if (typeof p.slot === 'number' && p.slot >= 1 && p.slot <= 56) {
-        slot = p.slot;
-      } else if (p.puesto_id && /^puesto-0*(\d+)$/i.test(p.puesto_id)) {
-        slot = parseInt(p.puesto_id.replace(/^puesto-0*/i, ''), 10);
-      } else if (typeof p.posicion === 'number' && p.posicion >= 1 && p.posicion <= 56) {
-        slot = p.posicion;
-      } else if (p.boca_switch && /^port0*([1-9]|[1-4][0-9]|5[0-6])$/i.test(p.boca_switch)) {
-        slot = parseInt(p.boca_switch.replace(/^port0*/i, ''), 10);
-      } else if (p.nombre) {
-        const match = p.nombre.match(/(?:pc|puesto|host|uea|c)?[-_\s]?0*([1-9]|[1-4][0-9]|5[0-6])$/i);
-        if (match) {
-          slot = parseInt(match[1], 10);
+      let assignedKey = null;
+
+      if (p.puesto_id && this.slotElements.has(p.puesto_id)) {
+        assignedKey = p.puesto_id;
+      } else if (typeof p.slot === 'number') {
+        const candidate = `puesto-${p.slot}`;
+        if (this.slotElements.has(candidate)) {
+          assignedKey = candidate;
         }
       }
 
-      if (slot && slot >= 1 && slot <= 56 && !slotToHost.has(slot)) {
-        slotToHost.set(slot, p);
+      if (!assignedKey && p.boca_switch) {
+        const slotMatch = p.boca_switch.match(/port0*(\d+)/i);
+        if (slotMatch) {
+          const num = parseInt(slotMatch[1], 10);
+          const candidate = `puesto-${num}`;
+          if (this.slotElements.has(candidate)) assignedKey = candidate;
+        }
+      }
+
+      if (assignedKey && !slotToHost.has(assignedKey)) {
+        slotToHost.set(assignedKey, p);
       } else {
         unassigned.push(p);
       }
     });
 
-    // Puestos sin número explícito se asignan a slots libres
-    let nextFreeSlot = 1;
-    unassigned.forEach(p => {
-      while (nextFreeSlot <= 56 && slotToHost.has(nextFreeSlot)) {
-        nextFreeSlot++;
+    for (const key of this.slotElements.keys()) {
+      if (unassigned.length === 0) break;
+      if (!slotToHost.has(key)) {
+        slotToHost.set(key, unassigned.shift());
       }
-      if (nextFreeSlot <= 56) {
-        slotToHost.set(nextFreeSlot, p);
-        nextFreeSlot++;
-      }
-    });
+    }
 
     return slotToHost;
   }
 
-  /**
-   * Comprueba si un puesto cumple los filtros activos.
-   */
   matches(puesto, filter = 'ALL', query = '') {
     if (!puesto) return false;
 
@@ -267,10 +300,7 @@ export class DashboardRenderer {
     );
   }
 
-  /**
-   * HTML de tarjeta de puesto activo (geometría y filas idénticas a la vacía).
-   */
-  generarCompactCardHtml(p, slotNum) {
+  generarCompactCardHtml(p, slotDisplay) {
     const estadoLabels = {
       VERDE: 'Operativo',
       AMARILLO: 'DHCP/Práct.',
@@ -283,7 +313,7 @@ export class DashboardRenderer {
       : (p.boca_switch || 'N/A');
     const ipStr = p.telemetria?.ip_reportada || 'Sin IP';
     const osOnline = p.telemetria?.os_online ? 'ON' : 'OFF';
-    const slotStr = String(slotNum).padStart(2, '0');
+    const slotStr = typeof slotDisplay === 'number' ? String(slotDisplay).padStart(2, '0') : String(slotDisplay);
 
     let bottomActionHtml = '';
     if (this.editMode) {
@@ -321,11 +351,8 @@ export class DashboardRenderer {
     `;
   }
 
-  /**
-   * HTML de puesto libre/vacío (geometría y filas idénticas a la activa).
-   */
-  generarEmptySlotHtml(slotNum) {
-    const slotStr = String(slotNum).padStart(2, '0');
+  generarEmptySlotHtml(slotDisplay) {
+    const slotStr = typeof slotDisplay === 'number' ? String(slotDisplay).padStart(2, '0') : String(slotDisplay);
     const bottomHint = this.editMode
       ? `<div class="drag-handle-hint">Soltar aquí</div>`
       : `<div class="diag-compact" title="Puesto disponible">Disponible</div>`;
@@ -340,7 +367,7 @@ export class DashboardRenderer {
           <span class="badge EMPTY">Libre</span>
         </div>
         <div class="card-body">
-          <div class="row"><span>Switch:</span><span>port${slotNum}</span></div>
+          <div class="row"><span>Switch:</span><span>${slotStr}</span></div>
           <div class="row"><span>IP:</span><span>Sin asignar</span></div>
           <div class="row"><span>Mesh:</span><span>OFF</span></div>
         </div>
@@ -351,13 +378,17 @@ export class DashboardRenderer {
     `;
   }
 
-  /**
-   * Renderiza el laboratorio con tamaño estrictamente idéntico para todos los escritorios.
-   */
   render(puestosMap, metricas = null, options = {}) {
     const filter = options.filter || 'ALL';
     const query = options.query || '';
     const hasFilter = filter !== 'ALL' || Boolean(query && query.trim());
+    const distribucion = options.distribucion || null;
+    const distId = distribucion ? distribucion.id : 'dist-aula-56';
+
+    if (this.currentDistribucionId !== distId) {
+      this.reconstruirEstructura(distribucion);
+      this.currentDistribucionId = distId;
+    }
 
     if (options.editMode !== undefined) {
       this.editMode = Boolean(options.editMode);
@@ -373,7 +404,6 @@ export class DashboardRenderer {
     const slotToHost = this.construirSlotMap(puestosMap);
     this.currentSlotToHost = slotToHost;
 
-    // Contabilizar métricas locales
     puestosMap.forEach(p => {
       if (p.estado === 'VERDE') totalV++;
       else if (p.estado === 'AMARILLO') totalA++;
@@ -385,14 +415,10 @@ export class DashboardRenderer {
       }
     });
 
-    // Renderizar los 56 escritorios
-    for (let slotNum = 1; slotNum <= 56; slotNum++) {
-      const slotCard = this.slotElements.get(slotNum);
-      if (!slotCard) continue;
+    for (const [key, slotCard] of this.slotElements.entries()) {
+      const host = slotToHost.get(key);
+      const displayNum = slotCard.dataset.num || key;
 
-      const host = slotToHost.get(slotNum);
-
-      // Activar arrastre si estamos en modo edición
       slotCard.setAttribute('draggable', (this.editMode && Boolean(host)) ? 'true' : 'false');
       if (this.editMode) {
         slotCard.classList.add('in-edit-mode');
@@ -403,7 +429,7 @@ export class DashboardRenderer {
       if (host) {
         const isMatch = this.matches(host, filter, query);
         slotCard.className = `card-compact ${host.estado}${this.editMode ? ' in-edit-mode' : ''}`;
-        slotCard.innerHTML = this.generarCompactCardHtml(host, slotNum);
+        slotCard.innerHTML = this.generarCompactCardHtml(host, displayNum);
 
         if (hasFilter) {
           if (isMatch) {
@@ -418,7 +444,7 @@ export class DashboardRenderer {
         }
       } else {
         slotCard.className = `card-compact card-empty${this.editMode ? ' in-edit-mode' : ''}`;
-        slotCard.innerHTML = this.generarEmptySlotHtml(slotNum);
+        slotCard.innerHTML = this.generarEmptySlotHtml(displayNum);
         if (hasFilter) {
           slotCard.classList.add('dimmed');
           slotCard.classList.remove('match-highlight');
@@ -428,16 +454,15 @@ export class DashboardRenderer {
       }
     }
 
-    // Actualizar contadores
+    const totalDesks = this.slotElements.size;
     if (this.counterEl) {
-      this.counterEl.innerHTML = `Mostrando <strong>${visibleCount}</strong> de <strong>${totalCount}</strong> puestos (Total aula: 56)`;
+      this.counterEl.innerHTML = `Mostrando <strong>${visibleCount}</strong> de <strong>${totalCount}</strong> puestos (Capacidad plano: ${totalDesks})`;
     }
 
     if (this.resetBtn) {
       this.resetBtn.style.display = hasFilter ? 'inline-block' : 'none';
     }
 
-    // Actualizar KPIs
     if (metricas) {
       if (this.kpiT) this.kpiT.textContent = metricas.total || totalCount;
       if (this.kpiV) this.kpiV.textContent = metricas.verde;

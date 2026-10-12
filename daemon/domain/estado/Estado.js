@@ -1,39 +1,21 @@
-const Accion = require('../Accion');
-
 class Estado {
-  constructor({ color, categoria, diagnostico }) {
+  constructor() {
     if (new.target === Estado) {
-      throw new TypeError('Estado es una clase abstracta y no puede instanciarse directamente.');
+      throw new TypeError('Estado es una interfaz de contrato y no puede instanciarse directamente.');
     }
-    this.color = color;
-    this.categoria = categoria;
-    this.diagnostico = diagnostico;
   }
 
-  obtenerAccion() {
-    return Accion.ninguna();
-  }
-
-  esOperativo() {
-    return false;
-  }
-
-  permiteAccionRemota() {
-    return this.obtenerAccion().ejecutable;
-  }
-
-  toJSON() {
-    const accion = this.obtenerAccion();
-    return {
-      color: this.color,
-      categoria: this.categoria,
-      diagnostico: this.diagnostico,
-      accion: {
-        tipo: accion.tipo,
-        descripcion: accion.descripcion,
-        ejecutable: accion.ejecutable
-      }
-    };
+  static esInstancia(obj) {
+    return Boolean(
+      obj &&
+      typeof obj.color === 'string' &&
+      typeof obj.categoria === 'string' &&
+      typeof obj.diagnostico === 'string' &&
+      typeof obj.obtenerAccion === 'function' &&
+      typeof obj.esOperativo === 'function' &&
+      typeof obj.permiteAccionRemota === 'function' &&
+      typeof obj.toJSON === 'function'
+    );
   }
 }
 

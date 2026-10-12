@@ -11,13 +11,21 @@ class Router {
     this.rutas.push({ method: 'POST', path, handler });
   }
 
+  put(path, handler) {
+    this.rutas.push({ method: 'PUT', path, handler });
+  }
+
+  delete(path, handler) {
+    this.rutas.push({ method: 'DELETE', path, handler });
+  }
+
   options(path, handler) {
     this.rutas.push({ method: 'OPTIONS', path, handler });
   }
 
   async handle(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
 
     res.json = (data, status = 200) => {
@@ -42,7 +50,7 @@ class Router {
       return res.error('Ruta no encontrada', 404);
     }
 
-    if (req.method === 'POST') {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
       try {
         req.body = await this._parseBody(req);
       } catch (err) {

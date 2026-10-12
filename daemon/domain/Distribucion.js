@@ -17,6 +17,76 @@ class Distribucion {
     }
   }
 
+  static desdeJSON(datos = {}) {
+    if (!datos.id || !datos.nombre) {
+      throw new Error('Una Distribución requiere obligatoriamente un id y un nombre.');
+    }
+    const dist = new Distribucion({
+      id: datos.id,
+      nombre: datos.nombre,
+      filas: datos.filas || 6,
+      columnas: datos.columnas || 10,
+      activa: Boolean(datos.activa)
+    });
+
+    if (Array.isArray(datos.puestos)) {
+      for (const p of datos.puestos) {
+        dist.crearPuesto({
+          id: p.id,
+          etiqueta: p.etiqueta || null,
+          fila: p.fila,
+          columna: p.columna
+        });
+      }
+    }
+
+    return dist;
+  }
+
+  actualizarMetadatos({ nombre, filas, columnas }) {
+    if (nombre) this.nombre = nombre;
+    if (filas !== undefined) this.filas = filas;
+    if (columnas !== undefined) this.columnas = columnas;
+  }
+
+  limpiarPuestos() {
+    this.puestos.clear();
+  }
+
+  reemplazarPuestos(nuevosPuestos = []) {
+    this.limpiarPuestos();
+    for (const p of nuevosPuestos) {
+      if (p instanceof Puesto) {
+        this.agregarPuesto(p);
+      } else {
+        this.crearPuesto(p);
+      }
+    }
+    const val = this.validarIntegridad();
+    if (!val.valida) {
+      throw new Error(`Error en los puestos: ${val.motivo}`);
+    }
+  }
+
+  clonar(nuevoId, nuevoNombre) {
+    const copia = new Distribucion({
+      id: nuevoId,
+      nombre: nuevoNombre,
+      filas: this.filas,
+      columnas: this.columnas,
+      activa: false
+    });
+    for (const p of this.puestos.values()) {
+      copia.crearPuesto({
+        id: p.id,
+        etiqueta: p.etiqueta,
+        fila: p.fila,
+        columna: p.columna
+      });
+    }
+    return copia;
+  }
+
   agregarPuesto(puesto) {
     if (this.puestos.has(puesto.id)) {
       throw new Error(`Ya existe un puesto con el ID '${puesto.id}' en la distribución '${this.nombre}'.`);

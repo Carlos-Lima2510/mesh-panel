@@ -43,10 +43,31 @@ class Laboratorio {
   }
 
   agregarDistribucion(distribucion) {
-    this.distribuciones.push(distribucion);
+    const idx = this.distribuciones.findIndex(d => d.id === distribucion.id);
+    if (idx !== -1) {
+      this.distribuciones[idx] = distribucion;
+    } else {
+      this.distribuciones.push(distribucion);
+    }
     if (this.distribuciones.length === 1 || distribucion.activa) {
       this.establecerDistribucionActiva(distribucion.id);
     }
+  }
+
+  actualizarDistribucion(id, datos = {}) {
+    const dist = this.obtenerDistribucion(id);
+    if (!dist) {
+      throw new Error(`La distribución '${id}' no existe en este laboratorio.`);
+    }
+    dist.actualizarMetadatos({
+      nombre: datos.nombre,
+      filas: datos.filas,
+      columnas: datos.columnas
+    });
+    if (Array.isArray(datos.puestos)) {
+      dist.reemplazarPuestos(datos.puestos);
+    }
+    return dist;
   }
 
   eliminarDistribucion(id) {

@@ -1,13 +1,10 @@
-const Estado = require('./Estado');
 const Accion = require('../Accion');
 
-class EstadoOperativo extends Estado {
+class EstadoOperativo {
   constructor(diagnostico = 'Puesto 100% operativo (MeshAgent conectado al servidor).') {
-    super({
-      color: 'VERDE',
-      categoria: 'OPERATIVO',
-      diagnostico
-    });
+    this.color = 'VERDE';
+    this.categoria = 'OPERATIVO';
+    this.diagnostico = diagnostico;
   }
 
   obtenerAccion() {
@@ -16,6 +13,24 @@ class EstadoOperativo extends Estado {
 
   esOperativo() {
     return true;
+  }
+
+  permiteAccionRemota() {
+    return this.obtenerAccion().ejecutable;
+  }
+
+  toJSON() {
+    const accion = this.obtenerAccion();
+    return {
+      color: this.color,
+      categoria: this.categoria,
+      diagnostico: this.diagnostico,
+      accion: {
+        tipo: accion.tipo,
+        descripcion: accion.descripcion,
+        ejecutable: accion.ejecutable
+      }
+    };
   }
 }
 
