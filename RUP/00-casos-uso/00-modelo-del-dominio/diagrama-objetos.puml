@@ -5,11 +5,6 @@ object "labInformatica : Laboratorio" as lab {
     modo = CLASE
 }
 
-object "distribucionActiva : Distribucion" as dist {
-    nombre = "Disposición Ordinaria"
-    activa = true
-}
-
 object "puesto_01 : Puesto" as puesto {
     etiqueta = "MESA-01"
     fila = 1
@@ -22,9 +17,14 @@ object "pc_01 : Host" as host {
     ip = "192.168.1.101"
 }
 
-object "redDocente : Red" as red {
+object "redDocente : Red" as redDocente {
     nombre = "Red Docencia"
     esAislada = false
+}
+
+object "redAislada : Red" as redAislada {
+    nombre = "Red Prácticas"
+    esAislada = true
 }
 
 object "estOperativo : Estado" as estado {
@@ -38,14 +38,12 @@ object "actApagar : Accion" as accion {
     descripcion = "Apagar equipo remotamente"
 }
 
-lab o-- red
-lab *-- dist
 lab *-- puesto
-
-dist o-- puesto
+lab o-- redDocente
+lab o-- redAislada
 
 puesto o-- host
-host --> red
+puesto --> redDocente
 
 host *-- estado
 estado ..> accion

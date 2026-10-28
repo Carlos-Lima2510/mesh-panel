@@ -1,54 +1,45 @@
 @startuml diagrama-clases
 
 class Laboratorio {
-    nombre : String
+    nombre
     modo : ModoOperativo
 }
 
-class Distribucion {
-    nombre : String
-    activa : Boolean
-}
-
 class Puesto {
-    etiqueta : String
-    fila : Integer
-    columna : Integer
+    etiqueta
+    fila
+    columna
 }
 
 class Host {
-    nombre : String
-    mac : String
-    ip : String
+    nombre
+    mac
+    ip
 }
 
 class Red {
-    nombre : String
-    esAislada : Boolean
+    nombre
+    esAislada
 }
 
 class Estado {
-    nombre : String
-    color : String
-    diagnostico : String
+    nombre
+    color
+    diagnostico
 }
 
 class Accion {
-    tipo : String
-    descripcion : String
+    tipo
+    descripcion
 }
 
-Laboratorio o-- Red : "dispone de"
-Laboratorio *-- Distribucion : "almacena"
-Laboratorio *-- Puesto : "posee físicamente"
+Laboratorio "1" *-- "1..*" Puesto : "posee físicamente"
+Laboratorio "1" o-- "2" Red : "ofrece acceso a"
 
-Distribucion o-- Puesto : "organiza"
+Puesto "1" o-- "0..1" Host : "aloja"
+Puesto "0..*" --> "0..1" Red : "conecta con"
 
-Puesto o-- Host : "aloja"
-
-Host --> Red : "conecta con"
-
-Host *-- Estado : "se encuentra en"
+Host "1" *-- "1" Estado : "se encuentra en"
 Estado ..> Accion : "habilita"
 
 @enduml
