@@ -9,7 +9,6 @@ const LaboratorioService = require('./application/LaboratorioService');
 
 const SseBroadcaster = require('./interfaces/http/SseBroadcaster');
 const LaboratorioController = require('./interfaces/http/controllers/LaboratorioController');
-const DistribucionController = require('./interfaces/http/controllers/DistribucionController');
 const PowerController = require('./interfaces/http/controllers/PowerController');
 const SwitchController = require('./interfaces/http/controllers/SwitchController');
 const registrarRutas = require('./interfaces/http/routes');
@@ -36,11 +35,6 @@ const laboratorioController = new LaboratorioController({
   sseBroadcaster
 });
 
-const distribucionController = new DistribucionController({
-  laboratorioService,
-  sseBroadcaster
-});
-
 const powerController = new PowerController({
   laboratorioService
 });
@@ -54,7 +48,6 @@ const switchController = new SwitchController({
 
 const router = registrarRutas({
   laboratorioController,
-  distribucionController,
   powerController,
   switchController
 });
@@ -69,16 +62,18 @@ const pollTimer = setInterval(async () => {
     } catch (_) {}
   }
 }, 5000);
-if (pollTimer.unref) pollTimer.unref();
 
-server.listen(config.port, '0.0.0.0', async () => {
-  console.log(`[+] Servidor Daemon escuchando en http://0.0.0.0:${config.port}`);
-  console.log(`[+] Modo de red: ${config.switchMode.toUpperCase()}`);
-
-  try {
-    const inicial = await laboratorioService.obtenerLaboratorio({ forzar: true });
-    console.log(`[+] [ARRANQUE] Consulta inicial completada: ${inicial.hosts.length} hosts en ${inicial.nombre}.`);
-  } catch (err) {
-    console.warn(`[!] [ARRANQUE] Consulta inicial fallida (${err.message}). A la espera de peticiones.`);
-  }
+const PORT = config.port || 3001;
+server.listen(PORT, () => {
+  console.log(`[*] Daemon de telemetría y observabilidad escuchando en http://0.0.0.0:${PORT}`);
 });
+
+function apagarGracefully() {
+  clearInterval(pollTimer);
+  server.close(() => {
+    process.exit(0);
+  });
+}
+
+process.on('SIGINT', apagarGracefully);
+process.on('SIGTERM', apagarGracefully);

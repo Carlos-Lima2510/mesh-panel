@@ -1,13 +1,10 @@
-const Distribucion = require('./Distribucion');
-
 class Laboratorio {
   constructor({ nombre = 'Laboratorio General', modo = 'CLASE' } = {}) {
     this.nombre = nombre;
     this.modo = modo;
     this.redes = [];
     this.hosts = [];
-    this.distribuciones = [];
-    this.distribucionActivaId = null;
+    this.puestos = new Map();
   }
 
   establecerModo(modo) {
@@ -34,6 +31,10 @@ class Laboratorio {
     return this.redes.find(r => r.contieneIp(ip)) || null;
   }
 
+  obtenerRed(id) {
+    return this.redes.find(r => r.id === id) || null;
+  }
+
   agregarHost(host) {
     this.hosts.push(host);
   }
@@ -42,65 +43,114 @@ class Laboratorio {
     return this.hosts.find(h => h.id === id);
   }
 
-  agregarDistribucion(distribucion) {
-    const idx = this.distribuciones.findIndex(d => d.id === distribucion.id);
-    if (idx !== -1) {
-      this.distribuciones[idx] = distribucion;
-    } else {
-      this.distribuciones.push(distribucion);
+  agregarPuesto(puesto) {
+    if (!puesto || !puesto.id) {
+      throw new Error('Debe proporcionar un Puesto válido con identificador.');
     }
-    if (this.distribuciones.length === 1 || distribucion.activa) {
-      this.establecerDistribucionActiva(distribucion.id);
-    }
-  }
 
-  actualizarDistribucion(id, datos = {}) {
-    const dist = this.obtenerDistribucion(id);
-    if (!dist) {
-      throw new Error(`La distribución '${id}' no existe en este laboratorio.`);
-    }
-    dist.actualizarMetadatos({
-      nombre: datos.nombre,
-      filas: datos.filas,
-      columnas: datos.columnas
-    });
-    if (Array.isArray(datos.puestos)) {
-      dist.reemplazarPuestos(datos.puestos);
-    }
-    return dist;
-  }
-
-  eliminarDistribucion(id) {
-    const idx = this.distribuciones.findIndex(d => d.id === id);
-    if (idx !== -1) {
-      const eliminada = this.distribuciones.splice(idx, 1)[0];
-      if (this.distribucionActivaId === id) {
-        this.distribucionActivaId = this.distribuciones.length > 0 ? this.distribuciones[0].id : null;
+    // Invariante: no pueden solaparse dos puestos en la misma coordenada
+    for (const pExistente of this.puestos.values()) {
+      if (pExistente.id !== puesto.id &&
+          pExistente.fila === puesto.fila &&
+          pExistente.columna === puesto.columna) {
+        throw new Error(
+          `Conflicto de posición: las coordenadas (${puesto.fila}, ${puesto.columna}) ya están asignadas a '${pExistente.id}'.`
+        );
       }
-      return eliminada;
+    }
+
+    this.puestos.set(puesto.id, puesto);
+  }
+
+  obtenerPuesto(id) {
+    return this.puestos.get(id) || null;
+  }
+
+  listarPuestos() {
+    return Array.from(this.puestos.values());
+  }
+
+  obtenerPuestoDeHost(hostId) {
+    for (const puesto of this.puestos.values()) {
+      const h = puesto.obtenerHost();
+      if (h && (h.id === hostId || h.node_id === hostId)) {
+        return puesto;
+      }
     }
     return null;
   }
 
-  obtenerDistribucion(id) {
-    return this.distribuciones.find(d => d.id === id) || null;
-  }
-
-  establecerDistribucionActiva(id) {
-    const encontrada = this.obtenerDistribucion(id);
-    if (!encontrada) {
-      throw new Error(`La distribución '${id}' no existe en este laboratorio.`);
+  alojarHostEnPuesto(host, idPuesto) {
+    const puesto = this.obtenerPuesto(idPuesto);
+    if (!puesto) {
+      throw new Error(`El puesto '${idPuesto}' no existe en este laboratorio.`);
     }
 
-    this.distribucionActivaId = id;
-    for (const dist of this.distribuciones) {
-      dist.activa = (dist.id === id);
+    const puestoPrevio = this.obtenerPuestoDeHost(host.id);
+    if (puestoPrevio && puestoPrevio.id !== idPuesto) {
+      puestoPrevio.desocupar();
     }
+
+    puesto.alojarHost(host);
   }
 
-  obtenerDistribucionActiva() {
-    if (!this.distribucionActivaId) return null;
-    return this.obtenerDistribucion(this.distribucionActivaId);
+  moverHost(hostId, idPuestoDestino) {
+    const puestoDestino = this.obtenerPuesto(idPuestoDestino);
+    if (!puestoDestino) {
+      throw new Error(`El puesto destino '${idPuestoDestino}' no existe.`);
+    }
+
+    const puestoOrigen = this.obtenerPuestoDeHost(hostId);
+    const host = this.obtenerHost(hostId) || (puestoOrigen ? puestoOrigen.obtenerHost() : null);
+
+    if (!host) {
+      throw new Error(`Host '${hostId}' no encontrado.`);
+    }
+
+    const hostEnDestino = puestoDestino.obtenerHost();
+
+    if (hostEnDestino && puestoOrigen) {
+      // Intercambio automático
+      puestoOrigen.desocupar();
+      puestoDestino.desocupar();
+
+      puestoDestino.alojarHost(host);
+      puestoOrigen.alojarHost(hostEnDestino);
+
+      host.puestoId = puestoDestino.id;
+      hostEnDestino.puestoId = puestoOrigen.id;
+    } else {
+      if (puestoOrigen) {
+        puestoOrigen.desocupar();
+      }
+      puestoDestino.alojarHost(host);
+      host.puestoId = puestoDestino.id;
+    }
+
+    return this;
+  }
+
+  intercambiarPuestos(idPuestoA, idPuestoB) {
+    const puestoA = this.obtenerPuesto(idPuestoA);
+    const puestoB = this.obtenerPuesto(idPuestoB);
+
+    if (!puestoA || !puestoB) {
+      throw new Error('Ambos puestos deben existir para realizar el intercambio.');
+    }
+
+    const hostA = puestoA.desocupar();
+    const hostB = puestoB.desocupar();
+
+    if (hostA) {
+      puestoB.alojarHost(hostA);
+      hostA.puestoId = puestoB.id;
+    }
+    if (hostB) {
+      puestoA.alojarHost(hostB);
+      hostB.puestoId = puestoA.id;
+    }
+
+    return this;
   }
 
   obtenerMetricas() {
@@ -124,15 +174,13 @@ class Laboratorio {
   }
 
   toJSON() {
-    const distActiva = this.obtenerDistribucionActiva();
     return {
       nombre: this.nombre,
       modo: this.modo,
       metricas: this.obtenerMetricas(),
       redes: this.redes.map(r => r.toJSON()),
       hosts: this.hosts.map(h => h.toJSON()),
-      distribuciones: this.distribuciones.map(d => d.toJSON()),
-      distribucion_activa: distActiva ? distActiva.toJSON() : null
+      puestos: this.listarPuestos().map(p => p.toJSON())
     };
   }
 }

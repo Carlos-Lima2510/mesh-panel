@@ -24,6 +24,22 @@ class LaboratorioController {
     return res.json({ success: true, laboratorio: datos });
   }
 
+  async moverPuesto(req, res) {
+    try {
+      const { host_id, puesto_id, slot } = req.body || {};
+      const destino = puesto_id || (slot ? `puesto-${slot}` : null);
+      if (!host_id || !destino) {
+        return res.status(400).json({ success: false, error: 'Se requiere host_id y puesto_id.' });
+      }
+      const lab = this.service.moverPuesto(host_id, destino);
+      const datos = lab.toJSON();
+      this.broadcaster.difundir('INIT', { laboratorio: datos });
+      return res.json({ success: true, laboratorio: datos });
+    } catch (err) {
+      return res.status(400).json({ success: false, error: err.message });
+    }
+  }
+
   async flujoEventos(req, res) {
     let datosIniciales = null;
     try {

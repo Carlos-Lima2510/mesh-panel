@@ -10,9 +10,9 @@
 
 <body>
   <header>
-    <div>
+    <div class="header-brand">
       <h2>Telemetría del Laboratorio</h2>
-      <div id="conn-status" class="status-badge" style="margin-top: 6px;">
+      <div id="conn-status" class="status-badge">
         <span class="pulse"></span> <span>Consultas a demanda</span>
       </div>
     </div>
@@ -27,43 +27,10 @@
         </button>
       </div>
 
-      <div class="distribution-selector">
-        <label for="select-distribucion" class="dist-label">📐 Plano:</label>
-        <select id="select-distribucion" class="select-distribucion" aria-label="Seleccionar plano de distribución">
-          <option value="dist-aula-56">Disposición Aula (56)</option>
-          <option value="dist-examen">Disposición Examen (28)</option>
-        </select>
-        <button id="btn-add-distribucion" class="btn-dist-action" type="button" title="Crear nueva distribución espacial">➕</button>
-        <button id="btn-del-distribucion" class="btn-dist-action" type="button" title="Eliminar distribución seleccionada">🗑️</button>
-      </div>
-
-      <button id="btn-toggle-edit" class="btn-edit-layout" type="button" title="Activar modo para arrastrar y reorganizar puestos">
-        <span id="btn-edit-icon">✏️</span>
-        <span id="btn-edit-text">Reorganizar</span>
-      </button>
-
       <button id="btn-scan" class="btn-scan" type="button">
         <span id="btn-scan-icon">🔄</span>
         <span id="btn-scan-text">Consultar Estado Puestos</span>
       </button>
-
-      <div class="kpi-box" id="kpi-box" role="group" aria-label="Filtro rápido por estado">
-        <button type="button" class="kpi active" data-filter="ALL" id="kpi-filter-all" title="Mostrar todos los puestos">
-          <span class="dot" style="background: var(--text);"></span> Todos: <span id="kT">0</span>
-        </button>
-        <button type="button" class="kpi" data-filter="VERDE" id="kpi-filter-verde" title="Filtrar por puestos operativos">
-          <span class="dot" style="background: var(--verde);"></span> Operativos: <span id="kV">0</span>
-        </button>
-        <button type="button" class="kpi" data-filter="AMARILLO" id="kpi-filter-amarillo" title="Filtrar por fallo DHCP o red aislada">
-          <span class="dot" style="background: var(--amarillo);"></span> Fallo DHCP / Práctica: <span id="kA">0</span>
-        </button>
-        <button type="button" class="kpi" data-filter="GRIS" id="kpi-filter-gris" title="Filtrar por puestos apagados">
-          <span class="dot" style="background: var(--gris);"></span> Apagados: <span id="kG">0</span>
-        </button>
-        <button type="button" class="kpi" data-filter="NARANJA" id="kpi-filter-naranja" title="Filtrar por cables desconectados">
-          <span class="dot" style="background: var(--naranja);"></span> Desconectados: <span id="kN">0</span>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -74,7 +41,7 @@
         type="search"
         id="search-input"
         class="search-input"
-        placeholder="Buscar por puesto, IP, MAC o boca switch (ej. PC-01, P12)..."
+        placeholder="Buscar por puesto, IP, MAC o boca switch (ej. UEA-C236, port1)..."
         autocomplete="off"
         spellcheck="false"
         aria-label="Buscar puestos"
@@ -82,77 +49,25 @@
       <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda" style="display: none;">&times;</button>
     </div>
 
-    <div class="filter-status-box">
-      <span id="filter-counter" class="filter-counter">Mostrando <strong>0</strong> de <strong>0</strong> puestos</span>
-      <button id="btn-reset-filters" class="btn-reset-filters" type="button" style="display: none;">
-        ✕ Restablecer filtros
-      </button>
+    <div class="classroom-summary">
+      <span class="summary-tag">40 Puestos Fijos</span>
+      <span class="summary-tag">2 Hileras &times; 4 Columnas</span>
     </div>
   </section>
 
-  <!-- BANNER MODO REORGANIZACIÓN ESPACIAL -->
-  <div id="edit-mode-banner" class="edit-mode-banner" style="display: none;">
-    <div class="edit-banner-content">
-      <span>✏️ <strong>Modo Reorganización Activo:</strong> Arrastra un puesto o haz clic sobre un equipo y luego en otra mesa para moverlo o intercambiarlo.</span>
-    </div>
-    <button id="btn-done-edit" type="button" class="btn-done-edit">Guardar y Finalizar</button>
-  </div>
-
-  <!-- DISTRIBUCIÓN DIRECTA DEL AULA: 56 PUESTOS (2 HILERAS DE 5 COLUMNAS Y PASILLO CENTRAL) -->
+  <!-- DISTRIBUCIÓN FIJA DEL AULA: 40 PUESTOS (2 HILERAS DE 4 COLUMNAS X 5 FILAS Y PASILLO CENTRAL) -->
   <main class="classroom-container">
     <div class="classroom-headers" id="classroom-headers">
-      <div></div>
-      <div class="col-header">Hilera Izquierda (Puestos 1 - 28)</div>
+      <div class="corner-header">Fila</div>
+      <div class="col-header">Hilera Izquierda (4 columnas)</div>
       <div class="aisle-header">Pasillo</div>
-      <div class="col-header">Hilera Derecha (Puestos 29 - 56)</div>
+      <div class="col-header">Hilera Derecha (4 columnas)</div>
     </div>
 
     <div class="classroom-grid" id="classroom-grid">
-      <!-- Filas de escritorios con tarjetas de tamaño idéntico -->
+      <!-- 5 filas generadas dinámicamente -->
     </div>
   </main>
-
-  <!-- MODAL CREACIÓN NUEVA DISTRIBUCIÓN -->
-  <div id="modal-distribucion" class="modal-backdrop" style="display: none;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>➕ Nueva Disposición Espacial</h3>
-        <button type="button" id="btn-close-modal-dist" class="modal-close">&times;</button>
-      </div>
-      <form id="form-nueva-distribucion">
-        <div class="form-group">
-          <label for="dist-nombre">Nombre de la Distribución:</label>
-          <input type="text" id="dist-nombre" placeholder="ej. Laboratorio Redes (24 Puestos)" required autocomplete="off">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="dist-filas">Filas:</label>
-            <input type="number" id="dist-filas" min="1" max="10" value="4" required>
-          </div>
-          <div class="form-group">
-            <label for="dist-columnas">Columnas:</label>
-            <input type="number" id="dist-columnas" min="1" max="12" value="6" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="dist-tipo-puestos">Estrategia de Puestos:</label>
-          <select id="dist-tipo-puestos">
-            <option value="completa">Cuadrícula Completa (Todas las mesas activas)</option>
-            <option value="pasillo">Con Pasillo Central (2 bloques de puestos)</option>
-            <option value="alternos">Puestos Alternos (Disposición Examen)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="dist-id">Identificador único (automático o personalizado):</label>
-          <input type="text" id="dist-id" placeholder="dist-mi-aula" autocomplete="off">
-        </div>
-        <div class="modal-actions">
-          <button type="button" id="btn-cancel-modal-dist" class="btn-secondary">Cancelar</button>
-          <button type="submit" class="btn-primary">Crear y Activar</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <script type="module" src="js/app.js"></script>
 </body>

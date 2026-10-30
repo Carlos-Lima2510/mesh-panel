@@ -13,14 +13,13 @@ const {
 } = require('../daemon/domain/estado');
 const Host = require('../daemon/domain/Host');
 const Puesto = require('../daemon/domain/Puesto');
-const Distribucion = require('../daemon/domain/Distribucion');
 const Laboratorio = require('../daemon/domain/Laboratorio');
 const LaboratorioService = require('../daemon/application/LaboratorioService');
 const SseBroadcaster = require('../daemon/interfaces/http/SseBroadcaster');
 const LaboratorioController = require('../daemon/interfaces/http/controllers/LaboratorioController');
-const DistribucionController = require('../daemon/interfaces/http/controllers/DistribucionController');
 const registrarRutas = require('../daemon/interfaces/http/routes');
 
+// 1. Verificación de jerarquía de estados y polimorfismo
 assert.throws(() => new Estado(), TypeError);
 
 const estVerde = EvaluadorEstado.evaluar({
@@ -68,6 +67,8 @@ assert.strictEqual(estAislada.categoria, 'RED_AISLADA');
 assert.strictEqual(estAislada.obtenerAccion().tipo, 'NINGUNA');
 
 const redDocente = new Red({ id: 'r-doc', nombre: 'Red Docente', subred: '192.168.1.', esAislada: false });
+const redAislada = new Red({ id: 'r-aisl', nombre: 'Red Prácticas', subred: '10.0.99.', esAislada: true });
+
 const estDhcp = EvaluadorEstado.evaluar({
   enlaceFisico: { port: 4, link: 'UP', speed: 1000 },
   osOnline: false,
@@ -80,6 +81,7 @@ assert.strictEqual(estDhcp.color, 'AMARILLO');
 assert.strictEqual(estDhcp.categoria, 'FALLO_LOGICO');
 assert.strictEqual(estDhcp.obtenerAccion().tipo, 'REMEDIAR_DHCP');
 
+// 2. Verificación de Host
 const host1 = new Host({
   id: 'node-pc-01',
   nombre: 'UEA-C236',
@@ -103,7 +105,10 @@ assert.strictEqual(jsonHost.estado, 'VERDE');
 assert.strictEqual(jsonHost.accion.tipo, 'POWER_OFF');
 assert.strictEqual(jsonHost.accion.ejecutable, true);
 
-const puestoA = new Puesto({ id: 'puesto-1', etiqueta: 'Mesa 01', fila: 1, columna: 1 });
+// 3. Verificación de Puesto (conectarRed, alojarHost, etc.)
+const puestoA = new Puesto({ id: 'puesto-1', etiqueta: 'Puesto 01', fila: 1, columna: 1 });
+puestoA.conectarRed(redDocente);
+assert.strictEqual(puestoA.obtenerRed().id, 'r-doc');
 assert.strictEqual(puestoA.estaOcupado(), false);
 assert.strictEqual(puestoA.obtenerHost(), null);
 
@@ -115,80 +120,67 @@ const desalojado = puestoA.desocupar();
 assert.strictEqual(desalojado.id, 'node-pc-01');
 assert.strictEqual(puestoA.estaOcupado(), false);
 
-const dist = new Distribucion({
-  id: 'dist-lab-1',
-  nombre: 'Disposición Clásica 2026',
-  filas: 2,
-  columnas: 2
-});
+// 4. Verificación de Laboratorio (posee directamente Puestos y Redes)
+const lab = new Laboratorio({ nombre: 'Laboratorio de Telemática' });
+lab.agregarRed(redDocente);
+lab.agregarRed(redAislada);
 
-const p1 = dist.crearPuesto({ id: 'p-1', fila: 1, columna: 1 });
-const p2 = dist.crearPuesto({ id: 'p-2', fila: 1, columna: 2 });
-const p3 = dist.crearPuesto({ id: 'p-3', fila: 2, columna: 1 });
+const p1 = new Puesto({ id: 'p-1', fila: 1, columna: 1 });
+const p2 = new Puesto({ id: 'p-2', fila: 1, columna: 2 });
+const p3 = new Puesto({ id: 'p-3', fila: 2, columna: 1 });
 
+lab.agregarPuesto(p1);
+lab.agregarPuesto(p2);
+lab.agregarPuesto(p3);
+
+// Invariante de solape de coordenadas
 assert.throws(() => {
-  dist.crearPuesto({ id: 'p-colision', fila: 1, columna: 1 });
+  lab.agregarPuesto(new Puesto({ id: 'p-colision', fila: 1, columna: 1 }));
 }, /Conflicto de posición/);
 
 const host2 = new Host({ id: 'node-pc-02', nombre: 'UEA-C403' });
+lab.agregarHost(host1);
+lab.agregarHost(host2);
 
-dist.ubicarHost(host1, 'p-1');
-dist.ubicarHost(host2, 'p-2');
+lab.alojarHostEnPuesto(host1, 'p-1');
+lab.alojarHostEnPuesto(host2, 'p-2');
 
-assert.strictEqual(dist.obtenerPuestoDeHost('node-pc-01').id, 'p-1');
-assert.strictEqual(dist.obtenerPuestoDeHost('node-pc-02').id, 'p-2');
+assert.strictEqual(lab.obtenerPuestoDeHost('node-pc-01').id, 'p-1');
+assert.strictEqual(lab.obtenerPuestoDeHost('node-pc-02').id, 'p-2');
 
-dist.moverHost('node-pc-01', 'p-3');
+lab.moverHost('node-pc-01', 'p-3');
 assert.strictEqual(p1.estaOcupado(), false);
 assert.strictEqual(p3.estaOcupado(), true);
-assert.strictEqual(dist.obtenerPuestoDeHost('node-pc-01').id, 'p-3');
+assert.strictEqual(lab.obtenerPuestoDeHost('node-pc-01').id, 'p-3');
 
-dist.intercambiarPuestos('p-2', 'p-3');
+lab.intercambiarPuestos('p-2', 'p-3');
 assert.strictEqual(p2.obtenerHost().nombre, 'UEA-C236');
 assert.strictEqual(p3.obtenerHost().nombre, 'UEA-C403');
 
-const copiaClon = dist.clonar('dist-lab-clon', 'Copia Clonada');
-assert.strictEqual(copiaClon.id, 'dist-lab-clon');
-assert.strictEqual(copiaClon.puestos.size, 3);
-
-const integridad = dist.validarIntegridad();
-assert.strictEqual(integridad.valida, true);
-
-const lab = new Laboratorio({ nombre: 'Laboratorio de Telemática' });
-lab.agregarRed(redDocente);
-
-const redAislada = new Red({ id: 'r-aisl', nombre: 'Red Prácticas', subred: '10.0.99.', esAislada: true });
-lab.agregarRed(redAislada);
-
+// 5. Verificación de modo del laboratorio y métricas
 const hostCableQuitado = new Host({
   id: 'node-pc-down',
   nombre: 'UEA-C999',
   enlaceFisico: { port: 9, link: 'DOWN', speed: 0 }
 });
 hostCableQuitado.evaluarEstado({ osOnline: false, modoLaboratorio: lab.modo });
-
-lab.agregarHost(host1);
 lab.agregarHost(hostCableQuitado);
 
-lab.agregarDistribucion(dist);
-assert.strictEqual(lab.obtenerDistribucionActiva().id, 'dist-lab-1');
-
 let metricas = lab.obtenerMetricas();
-assert.strictEqual(metricas.total, 2);
+assert.strictEqual(metricas.total, 3);
 assert.strictEqual(metricas.verde, 1);
-assert.strictEqual(metricas.naranja, 1);
-assert.strictEqual(metricas.amarillo, 0);
+assert.strictEqual(metricas.naranja, 2);
 
 lab.establecerModo('PRACTICA');
-
 assert.strictEqual(hostCableQuitado.color, 'AMARILLO');
 assert.strictEqual(hostCableQuitado.categoria, 'RED_AISLADA');
 
 metricas = lab.obtenerMetricas();
 assert.strictEqual(metricas.verde, 1);
 assert.strictEqual(metricas.naranja, 0);
-assert.strictEqual(metricas.amarillo, 1);
+assert.strictEqual(metricas.amarillo, 2);
 
+// 6. Verificación de LaboratorioService y mapa fijo de 40 puestos
 const mockMeshAdapter = {
   listarDispositivos: async () => [
     { id: 'dev-1', name: 'UEA-C226', ip: '192.168.122.10', conn: 1 },
@@ -213,47 +205,37 @@ const mockNetworkProvider = {
 
   const labObtenido = await service.obtenerLaboratorio({ forzar: true });
   assert.strictEqual(labObtenido.hosts.length, 2);
-  assert.strictEqual(labObtenido.distribuciones.length, 2);
 
-  const distActiva = labObtenido.obtenerDistribucionActiva();
-  assert.strictEqual(distActiva.nombre, 'Disposición Aula (56 Puestos)');
-  assert.strictEqual(distActiva.puestos.size, 56);
+  // Verificamos que el aula fija tiene exactamente 40 puestos (5 filas x 2 hileras de 4 cols)
+  const puestosAula = labObtenido.listarPuestos();
+  assert.strictEqual(puestosAula.length, 40);
 
+  const puesto1 = labObtenido.obtenerPuesto('puesto-1');
+  assert.strictEqual(puesto1.fila, 1);
+  assert.strictEqual(puesto1.columna, 1);
+  assert.strictEqual(puesto1.hilera, 'IZQUIERDA');
+
+  const puesto5 = labObtenido.obtenerPuesto('puesto-5');
+  assert.strictEqual(puesto5.fila, 1);
+  assert.strictEqual(puesto5.columna, 5);
+  assert.strictEqual(puesto5.hilera, 'DERECHA');
+
+  const puesto40 = labObtenido.obtenerPuesto('puesto-40');
+  assert.strictEqual(puesto40.fila, 5);
+  assert.strictEqual(puesto40.columna, 8);
+  assert.strictEqual(puesto40.hilera, 'DERECHA');
+
+  // Movimiento de puesto en el aula fija
   service.moverPuesto('dev-1', 'puesto-2');
-  const puesto2 = distActiva.obtenerPuesto('puesto-2');
+  const puesto2 = labObtenido.obtenerPuesto('puesto-2');
   assert.strictEqual(puesto2.obtenerHost().nombre, 'UEA-C226');
 
-  const nuevaDist = service.crearDistribucion({
-    id: 'dist-personalizada-3',
-    nombre: 'Seminario Reducido',
-    filas: 2,
-    columnas: 2,
-    puestos: [
-      { id: 'puesto-1', etiqueta: 'Mesa 1', fila: 1, columna: 1 },
-      { id: 'puesto-2', etiqueta: 'Mesa 2', fila: 1, columna: 2 }
-    ]
-  });
-  assert.strictEqual(nuevaDist.id, 'dist-personalizada-3');
-
-  const labConNueva = await service.obtenerLaboratorio({ forzar: true });
-  assert.strictEqual(labConNueva.distribuciones.length, 3);
-  assert.strictEqual(labConNueva.obtenerDistribucion('dist-personalizada-3').nombre, 'Seminario Reducido');
-
-  service.actualizarDistribucion('dist-personalizada-3', {
-    nombre: 'Seminario Reducido Actualizado'
-  });
-  assert.strictEqual(service.distribuciones.get('dist-personalizada-3').nombre, 'Seminario Reducido Actualizado');
-
-  service.eliminarDistribucion('dist-personalizada-3');
-  assert.strictEqual(service.distribuciones.has('dist-personalizada-3'), false);
-
+  // 7. Verificación de controladores HTTP y endpoints
   const sseBroadcaster = new SseBroadcaster();
   const labCtrl = new LaboratorioController({ laboratorioService: service, sseBroadcaster });
-  const distCtrl = new DistribucionController({ laboratorioService: service, sseBroadcaster });
 
   const router = registrarRutas({
     laboratorioController: labCtrl,
-    distribucionController: distCtrl,
     powerController: {},
     switchController: {}
   });
@@ -266,43 +248,29 @@ const mockNetworkProvider = {
     end: (str) => { responseBody = str; }
   };
 
+  // GET /api/laboratorio
   await router.handle({ method: 'GET', url: '/api/laboratorio', on: () => {} }, mockRes);
   const responseData = JSON.parse(responseBody);
   assert.strictEqual(responseData.success, true);
   assert.strictEqual(responseData.laboratorio.hosts.length, 2);
+  assert.strictEqual(responseData.laboratorio.puestos.length, 40);
 
-  const reqCrear = {
+  // POST /api/puestos/mover
+  const reqMover = {
     method: 'POST',
-    url: '/api/distribuciones',
+    url: '/api/puestos/mover',
     on: (evt, cb) => {
       if (evt === 'data') cb(Buffer.from(JSON.stringify({
-        id: 'dist-api-test',
-        nombre: 'Distribución creada por API',
-        filas: 3,
-        columnas: 3,
-        puestos: [{ id: 'p-1', fila: 1, columna: 1 }]
+        host_id: 'dev-1',
+        puesto_id: 'puesto-10'
       })));
       if (evt === 'end') cb();
     }
   };
-  await router.handle(reqCrear, mockRes);
-  assert.strictEqual(responseStatus, 201);
-  const respCrear = JSON.parse(responseBody);
-  assert.strictEqual(respCrear.success, true);
-  assert.strictEqual(respCrear.distribucion.id, 'dist-api-test');
-
-  const reqEliminar = {
-    method: 'DELETE',
-    url: '/api/distribuciones',
-    on: (evt, cb) => {
-      if (evt === 'data') cb(Buffer.from(JSON.stringify({ id: 'dist-api-test' })));
-      if (evt === 'end') cb();
-    }
-  };
-  await router.handle(reqEliminar, mockRes);
-  const respEliminar = JSON.parse(responseBody);
-  assert.strictEqual(respEliminar.success, true);
-  assert.strictEqual(respEliminar.id_eliminado, 'dist-api-test');
+  await router.handle(reqMover, mockRes);
+  const respMover = JSON.parse(responseBody);
+  assert.strictEqual(respMover.success, true);
+  assert.strictEqual(respMover.laboratorio.puestos.find(p => p.id === 'puesto-10').host.nombre, 'UEA-C226');
 
   console.log('✔ Todas las pruebas unitarias y de integración pasaron con éxito.');
   process.exit(0);

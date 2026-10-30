@@ -1,5 +1,5 @@
 class Puesto {
-  constructor({ id, etiqueta = null, fila = 1, columna = 1, host = null }) {
+  constructor({ id, etiqueta = null, fila = 1, columna = 1, hilera = null, red = null, host = null }) {
     if (!id) {
       throw new Error('Un Puesto requiere obligatoriamente un identificador.');
     }
@@ -7,7 +7,21 @@ class Puesto {
     this.etiqueta = etiqueta || `Puesto ${id}`;
     this.fila = fila;
     this.columna = columna;
+    this.hilera = hilera || (columna <= 4 ? 'IZQUIERDA' : 'DERECHA');
+    this.red = red;
     this.host = host;
+  }
+
+  conectarRed(red) {
+    this.red = red;
+  }
+
+  desconectarRed() {
+    this.red = null;
+  }
+
+  obtenerRed() {
+    return this.red;
   }
 
   alojarHost(host) {
@@ -37,6 +51,8 @@ class Puesto {
       etiqueta: this.etiqueta,
       fila: this.fila,
       columna: this.columna,
+      hilera: this.hilera,
+      red: this.red ? this.red.toJSON() : null,
       ocupado: this.estaOcupado(),
       host: this.host ? this.host.toJSON() : null
     };

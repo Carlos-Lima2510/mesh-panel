@@ -1,69 +1,46 @@
 const Laboratorio = require('../domain/Laboratorio');
 const Host = require('../domain/Host');
 const Red = require('../domain/Red');
-const Distribucion = require('../domain/Distribucion');
+const Puesto = require('../domain/Puesto');
 
-function crearDistribucionAula56(id = 'dist-aula-56', nombre = 'Disposición Aula (56 Puestos)') {
-  const dist = new Distribucion({
-    id,
-    nombre,
-    filas: 6,
-    columnas: 10,
-    activa: true
-  });
-
-  const CLASSROOM_ROWS = [
-    { fila: 1, left: [1, 2, 3, 4, 5], right: [6, 7, 8, 9, 10] },
-    { fila: 2, left: [11, 12, 13, 14, 15], right: [16, 17, 18, 19, 20] },
-    { fila: 3, left: [21, 22, 23, 24, 25], right: [26, 27, 28, 29, 30] },
-    { fila: 4, left: [31, 32, 33, 34, 35], right: [36, 37, 38, 39, 40] },
-    { fila: 5, left: [41, 42, 43, 44, 45], right: [46, 47, 48, 49, 50] },
-    { fila: 6, left: [51, 52, 53], right: [54, 55, 56] }
+/**
+ * Crea el mapa fijo del aula: 2 hileras de 4 columnas x 5 filas (40 puestos en total)
+ * con pasillo central.
+ */
+function crearPuestosFijosAula(redPorDefecto = null) {
+  const puestos = [];
+  const FILAS_CONFIG = [
+    { fila: 1, left: [1, 2, 3, 4], right: [5, 6, 7, 8] },
+    { fila: 2, left: [9, 10, 11, 12], right: [13, 14, 15, 16] },
+    { fila: 3, left: [17, 18, 19, 20], right: [21, 22, 23, 24] },
+    { fila: 4, left: [25, 26, 27, 28], right: [29, 30, 31, 32] },
+    { fila: 5, left: [33, 34, 35, 36], right: [37, 38, 39, 40] }
   ];
 
-  CLASSROOM_ROWS.forEach(r => {
+  FILAS_CONFIG.forEach(r => {
     r.left.forEach((slotNum, i) => {
-      dist.crearPuesto({
+      puestos.push(new Puesto({
         id: `puesto-${slotNum}`,
         etiqueta: `Puesto ${String(slotNum).padStart(2, '0')}`,
         fila: r.fila,
-        columna: i + 1
-      });
+        columna: i + 1,
+        hilera: 'IZQUIERDA',
+        red: redPorDefecto
+      }));
     });
     r.right.forEach((slotNum, i) => {
-      dist.crearPuesto({
+      puestos.push(new Puesto({
         id: `puesto-${slotNum}`,
         etiqueta: `Puesto ${String(slotNum).padStart(2, '0')}`,
         fila: r.fila,
-        columna: i + 6
-      });
+        columna: i + 5,
+        hilera: 'DERECHA',
+        red: redPorDefecto
+      }));
     });
   });
 
-  return dist;
-}
-
-function crearDistribucionExamen(id = 'dist-examen', nombre = 'Disposición Examen (Puestos Alternos)') {
-  const dist = new Distribucion({
-    id,
-    nombre,
-    filas: 6,
-    columnas: 10,
-    activa: false
-  });
-
-  for (let slot = 1; slot <= 56; slot += 2) {
-    const fila = Math.floor((slot - 1) / 10) + 1;
-    const columna = ((slot - 1) % 10) + 1;
-    dist.crearPuesto({
-      id: `puesto-${slot}`,
-      etiqueta: `Examen ${String(slot).padStart(2, '0')}`,
-      fila,
-      columna
-    });
-  }
-
-  return dist;
+  return puestos;
 }
 
 class LaboratorioService {
@@ -100,14 +77,7 @@ class LaboratorioService {
     ];
 
     this.modoActual = 'CLASE';
-    this.distribucionActivaId = 'dist-aula-56';
     this.asignacionPuestos = new Map();
-
-    this.distribuciones = new Map();
-    const distAula = crearDistribucionAula56();
-    const distExamen = crearDistribucionExamen();
-    this.distribuciones.set(distAula.id, distAula);
-    this.distribuciones.set(distExamen.id, distExamen);
   }
 
   establecerModo(modo) {
@@ -161,23 +131,10 @@ class LaboratorioService {
       laboratorio.agregarRed(r);
     }
 
-    for (const dist of this.distribuciones.values()) {
-      for (const p of dist.listarPuestos()) {
-        p.desocupar();
-      }
-      dist.activa = (dist.id === this.distribucionActivaId);
-      laboratorio.agregarDistribucion(dist);
+    const puestosFijos = crearPuestosFijosAula(this.redesPorDefecto[0]);
+    for (const p of puestosFijos) {
+      laboratorio.agregarPuesto(p);
     }
-
-    try {
-      laboratorio.establecerDistribucionActiva(this.distribucionActivaId);
-    } catch (_) {
-      const primera = this.distribuciones.keys().next().value;
-      this.distribucionActivaId = primera;
-      laboratorio.establecerDistribucionActiva(primera);
-    }
-
-    const distActiva = laboratorio.obtenerDistribucionActiva();
 
     for (const dev of rawDevices) {
       const nodeId = dev._id || dev.id;
@@ -216,34 +173,33 @@ class LaboratorioService {
 
       laboratorio.agregarHost(host);
 
-      if (distActiva) {
-        let idPuesto = this.asignacionPuestos.get(nodeId);
-        if (!idPuesto) {
-          const slotMatch = bocaAsignada.match(/port0*(\d+)/i) || nombre.match(/(?:pc|puesto|host|uea|c)?[-_\s]?0*([1-9]|[1-4][0-9]|5[0-6])$/i);
-          const slotNum = slotMatch ? parseInt(slotMatch[1], 10) : null;
-          if (slotNum && slotNum >= 1 && slotNum <= 56) {
-            idPuesto = `puesto-${slotNum}`;
+      // Asignación a puesto fijo
+      let idPuesto = this.asignacionPuestos.get(nodeId);
+      if (!idPuesto) {
+        const slotMatch = bocaAsignada.match(/port0*(\d+)/i) || nombre.match(/(?:pc|puesto|host|uea|c)?[-_\s]?0*([1-9]|[1-3][0-9]|40)$/i);
+        const slotNum = slotMatch ? parseInt(slotMatch[1], 10) : null;
+        if (slotNum && slotNum >= 1 && slotNum <= 40) {
+          idPuesto = `puesto-${slotNum}`;
+        }
+      }
+
+      let puestoDestino = idPuesto ? laboratorio.obtenerPuesto(idPuesto) : null;
+      if (!puestoDestino || puestoDestino.estaOcupado()) {
+        for (const p of laboratorio.listarPuestos()) {
+          if (!p.estaOcupado()) {
+            puestoDestino = p;
+            idPuesto = p.id;
+            break;
           }
         }
+      }
 
-        let puestoDestino = idPuesto ? distActiva.obtenerPuesto(idPuesto) : null;
-        if (!puestoDestino || puestoDestino.estaOcupado()) {
-          for (const p of distActiva.listarPuestos()) {
-            if (!p.estaOcupado()) {
-              puestoDestino = p;
-              idPuesto = p.id;
-              break;
-            }
-          }
-        }
-
-        if (puestoDestino) {
-          puestoDestino.alojarHost(host);
-          host.puestoId = puestoDestino.id;
-          const numSlot = parseInt(puestoDestino.id.replace('puesto-', ''), 10);
-          if (!isNaN(numSlot)) host.slot = numSlot;
-          this.asignacionPuestos.set(nodeId, puestoDestino.id);
-        }
+      if (puestoDestino) {
+        puestoDestino.alojarHost(host);
+        host.puestoId = puestoDestino.id;
+        const numSlot = parseInt(puestoDestino.id.replace('puesto-', ''), 10);
+        if (!isNaN(numSlot)) host.slot = numSlot;
+        this.asignacionPuestos.set(nodeId, puestoDestino.id);
       }
     }
 
@@ -266,95 +222,15 @@ class LaboratorioService {
     return await this.networkProvider.obtenerTodosLosPuertos();
   }
 
-  activarDistribucion(id) {
-    if (!this.distribuciones.has(id)) {
-      throw new Error(`La distribución '${id}' no existe.`);
-    }
-    this.distribucionActivaId = id;
-    if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.establecerDistribucionActiva(id);
-      return this.ultimoLaboratorio;
-    }
-    return this.obtenerLaboratorio({ forzar: true });
-  }
-
-  crearDistribucion(datos) {
-    if (!datos.id || !datos.nombre) {
-      throw new Error('Se requiere id y nombre para registrar una distribución.');
-    }
-    if (this.distribuciones.has(datos.id)) {
-      throw new Error(`Ya existe una distribución con el identificador '${datos.id}'.`);
-    }
-
-    const nueva = Distribucion.desdeJSON(datos);
-    const integridad = nueva.validarIntegridad();
-    if (!integridad.valida) {
-      throw new Error(`Distribución inválida: ${integridad.motivo}`);
-    }
-
-    this.distribuciones.set(nueva.id, nueva);
-    if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.agregarDistribucion(nueva);
-    }
-    return nueva;
-  }
-
-  actualizarDistribucion(id, datos = {}) {
-    const dist = this.distribuciones.get(id);
-    if (!dist) {
-      throw new Error(`Distribución '${id}' no encontrada.`);
-    }
-
-    dist.actualizarMetadatos({
-      nombre: datos.nombre,
-      filas: datos.filas,
-      columnas: datos.columnas
-    });
-
-    if (Array.isArray(datos.puestos)) {
-      dist.reemplazarPuestos(datos.puestos);
-    }
-
-    const integridad = dist.validarIntegridad();
-    if (!integridad.valida) {
-      throw new Error(`Distribución inválida tras actualizar: ${integridad.motivo}`);
-    }
-
-    if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.actualizarDistribucion(id, datos);
-    }
-    return dist;
-  }
-
-  eliminarDistribucion(id) {
-    if (this.distribuciones.size <= 1) {
-      throw new Error('No es posible eliminar la única distribución existente.');
-    }
-    if (!this.distribuciones.has(id)) {
-      throw new Error(`Distribución '${id}' no encontrada.`);
-    }
-
-    const eliminada = this.distribuciones.get(id);
-    this.distribuciones.delete(id);
-
-    if (this.distribucionActivaId === id) {
-      const siguienteId = this.distribuciones.keys().next().value;
-      this.activarDistribucion(siguienteId);
-    }
-
-    if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.eliminarDistribucion(id);
-    }
-    return eliminada;
-  }
-
   moverPuesto(hostId, idPuestoDestino) {
     if (!this.ultimoLaboratorio) {
       throw new Error('Laboratorio no inicializado aún.');
     }
-    const dist = this.ultimoLaboratorio.obtenerDistribucionActiva();
-    if (!dist) {
-      throw new Error('No hay una distribución activa en el laboratorio.');
+
+    const idPuestoNorm = idPuestoDestino.startsWith('puesto-') ? idPuestoDestino : `puesto-${idPuestoDestino}`;
+    const puestoDestino = this.ultimoLaboratorio.obtenerPuesto(idPuestoNorm);
+    if (!puestoDestino) {
+      throw new Error(`Puesto destino '${idPuestoNorm}' no existe en el aula.`);
     }
 
     const host = this.ultimoLaboratorio.obtenerHost(hostId);
@@ -362,28 +238,14 @@ class LaboratorioService {
       throw new Error(`Host '${hostId}' no encontrado.`);
     }
 
-    const idPuestoNorm = idPuestoDestino.startsWith('puesto-') ? idPuestoDestino : `puesto-${idPuestoDestino}`;
-    const puestoDestino = dist.obtenerPuesto(idPuestoNorm);
-    if (!puestoDestino) {
-      throw new Error(`Puesto destino '${idPuestoNorm}' no existe en la distribución actual.`);
-    }
-
-    const puestoActual = dist.obtenerPuestoDeHost(hostId);
+    const puestoActual = this.ultimoLaboratorio.obtenerPuestoDeHost(hostId);
     const hostEnDestino = puestoDestino.obtenerHost();
 
+    this.ultimoLaboratorio.moverHost(hostId, idPuestoNorm);
+
+    this.asignacionPuestos.set(hostId, idPuestoNorm);
     if (hostEnDestino && puestoActual) {
-      dist.intercambiarPuestos(puestoActual.id, idPuestoNorm);
-      host.puestoId = idPuestoNorm;
-      host.slot = parseInt(idPuestoNorm.replace('puesto-', ''), 10) || null;
-      hostEnDestino.puestoId = puestoActual.id;
-      hostEnDestino.slot = parseInt(puestoActual.id.replace('puesto-', ''), 10) || null;
-      this.asignacionPuestos.set(hostId, idPuestoNorm);
       this.asignacionPuestos.set(hostEnDestino.id, puestoActual.id);
-    } else {
-      dist.moverHost(hostId, idPuestoNorm);
-      host.puestoId = idPuestoNorm;
-      host.slot = parseInt(idPuestoNorm.replace('puesto-', ''), 10) || null;
-      this.asignacionPuestos.set(hostId, idPuestoNorm);
     }
 
     return this.ultimoLaboratorio;
@@ -393,11 +255,21 @@ class LaboratorioService {
     if (!this.ultimoLaboratorio) {
       throw new Error('Laboratorio no inicializado aún.');
     }
-    const dist = this.ultimoLaboratorio.obtenerDistribucionActiva();
-    if (!dist) {
-      throw new Error('No hay una distribución activa en el laboratorio.');
+    const idANorm = idPuestoA.startsWith('puesto-') ? idPuestoA : `puesto-${idPuestoA}`;
+    const idBNorm = idPuestoB.startsWith('puesto-') ? idPuestoB : `puesto-${idPuestoB}`;
+
+    this.ultimoLaboratorio.intercambiarPuestos(idANorm, idBNorm);
+
+    const puestoA = this.ultimoLaboratorio.obtenerPuesto(idANorm);
+    const puestoB = this.ultimoLaboratorio.obtenerPuesto(idBNorm);
+
+    if (puestoA && puestoA.obtenerHost()) {
+      this.asignacionPuestos.set(puestoA.obtenerHost().id, idANorm);
     }
-    dist.intercambiarPuestos(idPuestoA, idPuestoB);
+    if (puestoB && puestoB.obtenerHost()) {
+      this.asignacionPuestos.set(puestoB.obtenerHost().id, idBNorm);
+    }
+
     return this.ultimoLaboratorio;
   }
 }

@@ -2,7 +2,6 @@ const Router = require('./Router');
 
 function registrarRutas({
   laboratorioController,
-  distribucionController,
   powerController,
   switchController
 }) {
@@ -16,14 +15,9 @@ function registrarRutas({
   router.post('/api/refresh', (req, res) => laboratorioController.escanear(req, res));
   router.post('/api/laboratorio/modo', (req, res) => laboratorioController.cambiarModo(req, res));
 
-  router.get('/api/distribuciones', (req, res) => distribucionController.listar(req, res));
-  router.post('/api/distribuciones', (req, res) => distribucionController.crear(req, res));
-  router.put('/api/distribuciones', (req, res) => distribucionController.actualizar(req, res));
-  router.post('/api/distribuciones/actualizar', (req, res) => distribucionController.actualizar(req, res));
-  router.delete('/api/distribuciones', (req, res) => distribucionController.eliminar(req, res));
-  router.post('/api/distribuciones/eliminar', (req, res) => distribucionController.eliminar(req, res));
-  router.post('/api/distribuciones/activar', (req, res) => distribucionController.activar(req, res));
-  router.post('/api/distribuciones/mover', (req, res) => distribucionController.mover(req, res));
+  router.post('/api/puestos/mover', (req, res) => laboratorioController.moverPuesto(req, res));
+  // Alias de compatibilidad hacia atrás
+  router.post('/api/distribuciones/mover', (req, res) => laboratorioController.moverPuesto(req, res));
 
   router.post('/api/power/wake', (req, res) => powerController.wake(req, res));
   router.post('/api/power/off', (req, res) => powerController.powerOff(req, res));
