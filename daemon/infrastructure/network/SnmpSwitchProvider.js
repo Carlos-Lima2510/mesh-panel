@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+const snmp = require('net-snmp');
 const NetworkProvider = require('./NetworkProvider');
 
 class SnmpSwitchProvider extends NetworkProvider {
@@ -10,13 +10,65 @@ class SnmpSwitchProvider extends NetworkProvider {
     this.cache = null;
     this.lastFetch = 0;
     this.indicesANombreCache = null;
+    this.session = null;
   }
 
-  _ejecutarComando(cmd) {
+  _obtenerSesion() {
+    if (!this.session) {
+      let targetHost = this.host;
+      let targetPort = 161;
+      if (this.host.includes(':')) {
+        const parts = this.host.split(':');
+        targetHost = parts[0];
+        targetPort = parseInt(parts[1], 10) || 161;
+      }
+
+      this.session = snmp.createSession(targetHost, this.community, {
+        port: targetPort,
+        retries: 1,
+        timeout: 1000,
+        backoff: 1.0,
+        transport: 'udp4',
+        version: snmp.Version2c
+      });
+
+      this.session.on('error', () => {
+        this._cerrarSesion();
+      });
+    }
+    return this.session;
+  }
+
+  _cerrarSesion() {
+    if (this.session) {
+      try {
+        this.session.close();
+      } catch (_) {}
+      this.session = null;
+    }
+  }
+
+  _consultarSubtree(oid) {
     return new Promise((resolve) => {
-      exec(cmd, { timeout: 2000 }, (error, stdout) => {
-        if (error) return resolve('');
-        resolve(stdout.trim());
+      let session;
+      try {
+        session = this._obtenerSesion();
+      } catch (err) {
+        return resolve({ error: err, varbinds: [] });
+      }
+
+      const varbinds = [];
+      session.subtree(oid, 20, (chunk) => {
+        for (const vb of chunk) {
+          if (!snmp.isVarbindError(vb)) {
+            varbinds.push(vb);
+          }
+        }
+      }, (error) => {
+        if (error) {
+          return resolve({ error, varbinds: [] });
+        }
+        resolve({ error: null, varbinds });
       });
     });
   }
@@ -27,38 +79,42 @@ class SnmpSwitchProvider extends NetworkProvider {
       return this.cache;
     }
 
-    let salidaNombres = '';
+    // 1. Obtener nombres de las bocas (ifDescr: 1.3.6.1.2.1.2.2.1.2) - Caché estática
     if (!this.indicesANombreCache) {
-      salidaNombres = await this._ejecutarComando(`snmpwalk -v2c -c ${this.community} -t 1 -r 1 -Oqn ${this.host} 1.3.6.1.2.1.2.2.1.2`);
-      if (salidaNombres) {
+      const resNombres = await this._consultarSubtree('1.3.6.1.2.1.2.2.1.2');
+      if (!resNombres.error && resNombres.varbinds.length > 0) {
         const mapaNombres = new Map();
-        salidaNombres.split('\n').forEach(linea => {
-          const match = linea.match(/\.1\.3\.6\.1\.2\.1\.2\.2\.1\.2\.(\d+)\s+"?([^"\s]+)"?/);
-          if (match) mapaNombres.set(match[1], match[2]);
-        });
+        for (const vb of resNombres.varbinds) {
+          const match = vb.oid.match(/\.1\.3\.6\.1\.2\.1\.2\.2\.1\.2\.(\d+)$/) || vb.oid.match(/\.(\d+)$/);
+          const indice = match ? match[1] : vb.oid.split('.').pop();
+          const nombre = (Buffer.isBuffer(vb.value) ? vb.value.toString('utf8') : String(vb.value))
+            .trim()
+            .replace(/^"|"$/g, '');
+          mapaNombres.set(indice, nombre);
+        }
         if (mapaNombres.size > 0) {
           this.indicesANombreCache = mapaNombres;
         }
       }
     }
 
-    const salidaEstados = await this._ejecutarComando(`snmpwalk -v2c -c ${this.community} -t 1 -r 1 -Oqn ${this.host} 1.3.6.1.2.1.2.2.1.8`);
+    // 2. Obtener estado operacional de las interfaces (ifOperStatus: 1.3.6.1.2.1.2.2.1.8)
+    const resEstados = await this._consultarSubtree('1.3.6.1.2.1.2.2.1.8');
 
-    if (!salidaEstados) {
+    if (resEstados.error || resEstados.varbinds.length === 0) {
       return this.cache || new Map();
     }
 
     const indicesANombre = this.indicesANombreCache || new Map();
-
     const indicesAEstado = new Map();
-    salidaEstados.split('\n').forEach(linea => {
-      const match = linea.match(/\.1\.3\.6\.1\.2\.1\.2\.2\.1\.8\.(\d+)\s+([a-zA-Z0-9]+)/);
-      if (match) {
-        const val = match[2].toLowerCase();
-        const isUp = (val === '1' || val === 'up');
-        indicesAEstado.set(match[1], isUp ? 'UP' : 'DOWN');
-      }
-    });
+
+    for (const vb of resEstados.varbinds) {
+      const match = vb.oid.match(/\.1\.3\.6\.1\.2\.1\.2\.2\.1\.8\.(\d+)$/) || vb.oid.match(/\.(\d+)$/);
+      const indice = match ? match[1] : vb.oid.split('.').pop();
+      const val = vb.value;
+      const isUp = (val === 1 || String(val).toLowerCase() === 'up');
+      indicesAEstado.set(indice, isUp ? 'UP' : 'DOWN');
+    }
 
     const resultado = new Map();
     for (const [indice, nombreBoca] of indicesANombre.entries()) {

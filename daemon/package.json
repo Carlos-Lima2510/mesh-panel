@@ -1,0 +1,13 @@
+{
+  "name": "mesh-panel-daemon",
+  "version": "1.0.0",
+  "description": "Daemon de telemetría y observabilidad en tiempo real",
+  "main": "daemon.js",
+  "scripts": {
+    "start": "node daemon.js",
+    "test": "node ../scripts/test-domain.js"
+  },
+  "dependencies": {
+    "net-snmp": "^3.29.2"
+  }
+}

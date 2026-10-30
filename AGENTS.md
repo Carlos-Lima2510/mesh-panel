@@ -139,7 +139,7 @@ daemon/
 │   │   └── MeshCentralAdapter.js   # CLI Wrapper (meshctrl listdevices, wake)
 │   └── network/
 │       ├── NetworkProvider.js      # Interfaz abstracta de red
-│       ├── SnmpSwitchProvider.js   # SNMP v2c MIB-II real (snmpwalk)
+│       ├── SnmpSwitchProvider.js   # SNMP v2c MIB-II real (librería nativa net-snmp)
 │       └── SimulatedSwitchProvider.js # Proveedor simulado para tests/dev
 ├── application/             # Capa de casos de uso y orquestación
 │   └── LaboratorioService.js       # Orquesta polling, caché, layouts y deduplicación

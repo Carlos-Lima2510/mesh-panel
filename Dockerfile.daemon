@@ -4,8 +4,8 @@ RUN apk add --no-cache bash curl net-snmp-tools
 
 WORKDIR /app
 
-# Instalar dependencias globales necesarias por meshctrl.js
-RUN npm install -g minimist ws
+# Instalar dependencias globales necesarias por meshctrl.js y net-snmp
+RUN npm install -g minimist ws net-snmp
 
 # Descargar meshctrl.js y crear el binario ejecutable 'meshctrl' en el PATH
 RUN curl -fsSL https://raw.githubusercontent.com/Ylianst/MeshCentral/master/meshctrl.js -o /usr/local/bin/meshctrl.js \
