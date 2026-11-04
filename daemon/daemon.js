@@ -1,74 +1,79 @@
+const http = require('http');
 const config = require('./config');
-const ClassifierService = require('./services/classifier.service');
-const InventoryStore = require('./services/inventory.store');
-const MeshStreamService = require('./services/mesh-stream.service');
-const SseServer = require('./sse.server');
 
-const classifier = new ClassifierService(config.network.dhcpSubnet);
-const store = new InventoryStore();
+const MeshCentralAdapter = require('./infrastructure/meshcentral/MeshCentralAdapter');
+const SnmpSwitchProvider = require('./infrastructure/network/SnmpSwitchProvider');
+const SimulatedSwitchProvider = require('./infrastructure/network/SimulatedSwitchProvider');
 
-const sseServer = new SseServer(
-  config.server.port,
-  config.server.heartbeatIntervalMs,
-  () => store.getAll()
-);
+const LaboratorioService = require('./application/LaboratorioService');
 
-function handleMeshEvent(evt) {
-  if (!evt || !evt.action) return;
+const SseBroadcaster = require('./interfaces/http/SseBroadcaster');
+const LaboratorioController = require('./interfaces/http/controllers/LaboratorioController');
+const PowerController = require('./interfaces/http/controllers/PowerController');
+const SwitchController = require('./interfaces/http/controllers/SwitchController');
+const registrarRutas = require('./interfaces/http/routes');
 
-  const nodeId = evt.nodeid;
-  const current = store.get(nodeId) || { nombre: 'Puesto-' + (nodeId ? nodeId.substring(7, 13) : 'X'), telemetria: {} };
+const meshAdapter = new MeshCentralAdapter({
+  url: config.meshUrl,
+  user: config.meshUser,
+  pass: config.meshPass
+});
 
-  if (evt.action === 'changenode' && evt.node) {
-    const n = evt.node;
-    const conn = current.telemetria.conn ?? 0;
-    const ip = n.ip || current.telemetria.ip_reportada;
-    const evaluation = classifier.evaluate(conn, ip);
+const networkProvider = config.switchMode === 'simulado'
+  ? new SimulatedSwitchProvider()
+  : new SnmpSwitchProvider({ host: config.switchHost, community: config.switchCommunity });
 
-    const updated = {
-      node_id: evt.nodeid,
-      nombre: n.name || n.rname || current.nombre,
-      grupo: n.meshid || current.grupo || 'General',
-      ...evaluation
-    };
+const laboratorioService = new LaboratorioService({
+  meshCentralAdapter: meshAdapter,
+  networkProvider: networkProvider
+});
 
-    store.set(evt.nodeid, updated);
-    sseServer.broadcastUpdate(updated);
+const sseBroadcaster = new SseBroadcaster();
+
+const laboratorioController = new LaboratorioController({
+  laboratorioService,
+  sseBroadcaster
+});
+
+const powerController = new PowerController({
+  laboratorioService
+});
+
+const switchController = new SwitchController({
+  laboratorioService,
+  networkProvider,
+  switchMode: config.switchMode,
+  sseBroadcaster
+});
+
+const router = registrarRutas({
+  laboratorioController,
+  powerController,
+  switchController
+});
+
+const server = http.createServer((req, res) => router.handle(req, res));
+
+const pollTimer = setInterval(async () => {
+  if (sseBroadcaster.tieneClientes()) {
+    try {
+      const lab = await laboratorioService.obtenerLaboratorio({ forzar: true });
+      sseBroadcaster.difundir('INIT', { laboratorio: lab.toJSON() });
+    } catch (_) {}
   }
+}, 5000);
 
-  if (evt.action === 'nodeconnect') {
-    const conn = evt.conn ?? 0;
-    const ip = current.telemetria.ip_reportada || null;
-    const evaluation = classifier.evaluate(conn, ip);
+const PORT = config.port || 3001;
+server.listen(PORT, () => {
+  console.log(`[*] Daemon de telemetría y observabilidad escuchando en http://0.0.0.0:${PORT}`);
+});
 
-    const updated = {
-      node_id: nodeId,
-      nombre: current.nombre,
-      grupo: current.grupo || 'General',
-      ...evaluation
-    };
-
-    store.set(nodeId, updated);
-    sseServer.broadcastUpdate(updated);
-  }
+function apagarGracefully() {
+  clearInterval(pollTimer);
+  server.close(() => {
+    process.exit(0);
+  });
 }
 
-const meshStream = new MeshStreamService(config, handleMeshEvent);
-
-(async () => {
-  sseServer.start();
-
-  const devices = await meshStream.fetchInitialSnapshot();
-  devices.forEach(dev => {
-    const evaluation = classifier.evaluate(dev.conn || 0, dev.ip || null);
-    store.set(dev._id, {
-      node_id: dev._id,
-      nombre: dev.name || 'Sin Nombre',
-      grupo: dev.groupname || 'General',
-      ...evaluation
-    });
-  });
-
-  console.log(`[+] [COLD START] Snapshot consolidado: ${store.count()} puestos en memoria.`);
-  meshStream.startEventStream();
-})();
+process.on('SIGINT', apagarGracefully);
+process.on('SIGTERM', apagarGracefully);
