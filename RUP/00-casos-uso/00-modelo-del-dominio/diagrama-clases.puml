@@ -9,6 +9,7 @@ class Puesto {
     etiqueta
     fila
     columna
+    toma
 }
 
 class Host {
@@ -37,7 +38,7 @@ Laboratorio "1" *-- "1..*" Puesto : "posee físicamente"
 Laboratorio "1" o-- "2" Red : "ofrece acceso a"
 
 Puesto "1" o-- "0..1" Host : "aloja"
-Puesto "0..*" --> "0..1" Red : "conecta con"
+Puesto "0..*" ..> "0..1" Red : "conecta con"
 
 Host "1" *-- "1" Estado : "se encuentra en"
 Estado ..> Accion : "habilita"
