@@ -1,0 +1,24 @@
+@startuml diagrama-estados-laboratorio
+
+[*] --> EN_CLASE 
+
+state EN_CLASE {
+    EN_CLASE : Contexto: Sesión lectiva ordinaria
+    EN_CLASE : Política de red: Todos los puestos en red docente
+    EN_CLASE : Interpretación de enlace DOWN: Alerta (Cable desconectado o sin luz)
+}
+
+state EN_PRACTICA {
+    EN_PRACTICA : Contexto: Sesión de prácticas en red aislada
+    EN_PRACTICA : Política de red: Puestos conectados al switch secundario
+    EN_PRACTICA : Interpretación de enlace DOWN: Esperado (Trabajando en red aislada)
+}
+
+EN_CLASE --> EN_PRACTICA : Iniciar práctica
+
+EN_PRACTICA --> EN_CLASE : Finalizar práctica
+
+EN_CLASE --> [*] : Cierre de monitorización
+EN_PRACTICA --> [*] : Cierre de monitorización
+
+@enduml

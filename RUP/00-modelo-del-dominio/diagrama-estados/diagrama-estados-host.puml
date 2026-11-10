@@ -1,0 +1,32 @@
+@startuml diagrama-estados-host
+
+[*] -down-> DESCONOCIDO
+
+state DESCONOCIDO : Esperando primera lectura
+
+state "Conectado a Red Docente" as CONECTADO {
+    state APAGADO : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
+    state OPERATIVO : • PC encendido y comunicando (1 Gbps)\n
+    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)\n• Habilita: Restaurar conexión
+
+    APAGADO -right-> OPERATIVO : Encender [agente conecta]
+    APAGADO -right-> DESCONFIGURADO : Encender [sin agente / IP errónea]
+
+    OPERATIVO -down-> DESCONFIGURADO : Pérdida de IP / agente
+    OPERATIVO -left-> APAGADO : Apagado manual
+    DESCONFIGURADO -up-> OPERATIVO : Conexión restaurada
+    DESCONFIGURADO -left-> APAGADO : Apagado manual
+}
+
+state DESCONECTADO : • Sin enlace en switch docente\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
+
+DESCONOCIDO -down-> CONECTADO : Detectado con enlace físico
+DESCONOCIDO -left-> DESCONECTADO : Detectado sin enlace
+
+CONECTADO -left-> DESCONECTADO : Pérdida de enlace físico
+DESCONECTADO -right-> CONECTADO : Reconectar cable
+
+CONECTADO -down-> [*] : Retirar del puesto
+DESCONECTADO -down-> [*] : Retirar del puesto
+
+@enduml

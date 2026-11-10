@@ -1,0 +1,50 @@
+@startuml diagrama-clases
+
+hide empty members
+
+class Laboratorio {
+    nombre
+    modo
+}
+
+class Puesto {
+    etiqueta
+    fila
+    columna
+    toma
+}
+
+class Host {
+    nombre
+    mac
+    ip
+}
+
+class Red {
+    nombre
+    esAislada
+}
+
+enum ModoOperativo {
+    CLASE
+    PRACTICA
+}
+
+enum Estado {
+    OPERATIVO
+    STANDBY
+    FALLO_LOGICO
+    RED_AISLADA
+    DESCONECTADO
+}
+
+Laboratorio..ModoOperativo
+Host..Estado
+
+Laboratorio "1" *-- "1..*" Puesto : posee físicamente
+Laboratorio "1" o-- "1..*" Red : ofrece acceso a
+
+Puesto "1" o-- "0..1" Host : aloja
+Puesto "0..*" -- "0..1" Red : conecta con >
+
+@enduml

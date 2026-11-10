@@ -9,12 +9,14 @@ object "puesto_01 : Puesto" as puesto {
     etiqueta = "MESA-01"
     fila = 1
     columna = 1
+    toma = "ROS-01"
 }
 
 object "pc_01 : Host" as host {
     nombre = "PC-LAB-01"
     mac = "00:1A:2B:3C:4D:01"
     ip = "192.168.1.101"
+    estado = OPERATIVO
 }
 
 object "redDocente : Red" as redDocente {
@@ -27,25 +29,11 @@ object "redAislada : Red" as redAislada {
     esAislada = true
 }
 
-object "estOperativo : Estado" as estado {
-    nombre = "OPERATIVO"
-    color = "VERDE"
-    diagnostico = "PC encendido y comunicando"
-}
-
-object "actApagar : Accion" as accion {
-    tipo = "POWER_OFF"
-    descripcion = "Apagar equipo remotamente"
-}
-
 lab *-- puesto
 lab o-- redDocente
 lab o-- redAislada
 
 puesto o-- host
-puesto --> redDocente
-
-host *-- estado
-estado ..> accion
+puesto -- redDocente
 
 @enduml
