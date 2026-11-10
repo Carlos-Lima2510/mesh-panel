@@ -14,7 +14,7 @@
 Modela las entidades conceptuales del laboratorio docente, asegurando puestos físicos fijos, desacoplamiento de red en desconexión y navegación transitiva `Laboratorio -> Puesto -> Host`.
 
 <div align="center">
-  <img src="../../../images/00-casos-uso/00-modelo-del-dominio/diagrama-clases.svg" alt="Diagrama de Clases" />
+  <img src="../../images/00-modelo-del-dominio/diagrama-clases.svg" alt="Diagrama de Clases" />
   <p><em>Fuente: <a href="diagrama-clases.puml">diagrama-clases.puml</a></em></p>
 </div>
 
@@ -25,7 +25,7 @@ Modela las entidades conceptuales del laboratorio docente, asegurando puestos f�
 Instancia canónica 1:1 que valida el modelo con exactamente un objeto por clase, reflejando valores representativos de los atributos del sistema.
 
 <div align="center">
-  <img src="../../../images/00-casos-uso/00-modelo-del-dominio/diagrama-objetos.svg" alt="Diagrama de Objetos" />
+  <img src="../../images/00-modelo-del-dominio/diagrama-objetos.svg" alt="Diagrama de Objetos" />
   <p><em>Fuente: <a href="diagrama-objetos.puml">diagrama-objetos.puml</a></em></p>
 </div>
 
@@ -36,7 +36,7 @@ Instancia canónica 1:1 que valida el modelo con exactamente un objeto por clase
 Modela el ciclo de vida telemático del equipo informático, estructurado bajo el superestado `Conectado a Red Docente` para evitar solapamiento de transiciones físicas y lógicas.
 
 <div align="center">
-  <img src="../../../images/00-casos-uso/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg" alt="Diagrama de Estados del Host" />
+  <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg" alt="Diagrama de Estados del Host" />
   <p><em>Fuente: <a href="diagrama-estados/diagrama-estados-host.puml">diagrama-estados/diagrama-estados-host.puml</a></em></p>
 </div>
 
@@ -47,6 +47,6 @@ Modela el ciclo de vida telemático del equipo informático, estructurado bajo e
 Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`ModoClase`) y sesión de redes en switch secundario (`ModoPractica`).
 
 <div align="center">
-  <img src="../../../images/00-casos-uso/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg" alt="Diagrama de Estados del Laboratorio" />
+  <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg" alt="Diagrama de Estados del Laboratorio" />
   <p><em>Fuente: <a href="diagrama-estados/diagrama-estados-laboratorio.puml">diagrama-estados/diagrama-estados-laboratorio.puml</a></em></p>
 </div>
