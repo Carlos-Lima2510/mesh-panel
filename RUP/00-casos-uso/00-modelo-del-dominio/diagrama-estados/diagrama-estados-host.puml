@@ -1,31 +1,32 @@
 @startuml diagrama-estados-host
 
-[*] -down-> Desconocido : Inicio de monitorización
+[*] -down-> DESCONOCIDO
 
-state Desconocido : Esperando primera lectura telemática
+state DESCONOCIDO : Esperando primera lectura
 
-state "Conectado a Red Docente" as Conectado {
-    state Apagado : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
-    state Operativo : • PC encendido y comunicando (1 Gbps)\n• Habilita: Apagar
-    state Desconfigurado : • PC encendido con fallo de IP/agente (1 Gbps)\n• Habilita: Restaurar conexión
+state "Conectado a Red Docente" as CONECTADO {
+    state APAGADO : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
+    state OPERATIVO : • PC encendido y comunicando (1 Gbps)\n
+    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)\n• Habilita: Restaurar conexión
 
-    Apagado -right-> Operativo : Encender
-    Operativo -left-> Apagado : Apagar
+    APAGADO -right-> OPERATIVO : Encender [agente conecta]
+    APAGADO -right-> DESCONFIGURADO : Encender [sin agente / IP errónea]
 
-    Operativo -down-> Desconfigurado : Pérdida de IP / agente
-    Desconfigurado -up-> Operativo : Conexión restaurada
-    Desconfigurado -left-> Apagado : Apagado forzado
+    OPERATIVO -down-> DESCONFIGURADO : Pérdida de IP / agente
+    OPERATIVO -left-> APAGADO : Apagado manual
+    DESCONFIGURADO -up-> OPERATIVO : Conexión restaurada
+    DESCONFIGURADO -left-> APAGADO : Apagado manual
 }
 
-state Desconectado : • Sin enlace en switch docente\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
+state DESCONECTADO : • Sin enlace en switch docente\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
 
-Desconocido -down-> Conectado : Detectado con enlace físico
-Desconocido -left-> Desconectado : Detectado sin enlace
+DESCONOCIDO -down-> CONECTADO : Detectado con enlace físico
+DESCONOCIDO -left-> DESCONECTADO : Detectado sin enlace
 
-Conectado -left-> Desconectado : Pérdida de enlace físico
-Desconectado -right-> Conectado : Reconectar cable
+CONECTADO -left-> DESCONECTADO : Pérdida de enlace físico
+DESCONECTADO -right-> CONECTADO : Reconectar cable
 
-Conectado -down-> [*] : Retirar del puesto
-Desconectado -down-> [*] : Retirar del puesto
+CONECTADO -down-> [*] : Retirar del puesto
+DESCONECTADO -down-> [*] : Retirar del puesto
 
 @enduml

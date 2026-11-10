@@ -1,8 +1,10 @@
 @startuml diagrama-clases
 
+hide empty members
+
 class Laboratorio {
     nombre
-    modo : ModoOperativo
+    modo
 }
 
 class Puesto {
@@ -23,24 +25,26 @@ class Red {
     esAislada
 }
 
-class Estado {
-    nombre
-    color
-    diagnostico
+enum ModoOperativo {
+    CLASE
+    PRACTICA
 }
 
-class Accion {
-    tipo
-    descripcion
+enum Estado {
+    OPERATIVO
+    STANDBY
+    FALLO_LOGICO
+    RED_AISLADA
+    DESCONECTADO
 }
 
-Laboratorio "1" *-- "1..*" Puesto : "posee físicamente"
-Laboratorio "1" o-- "2" Red : "ofrece acceso a"
+Laboratorio..ModoOperativo
+Host..Estado
 
-Puesto "1" o-- "0..1" Host : "aloja"
-Puesto "0..*" ..> "0..1" Red : "conecta con"
+Laboratorio "1" *-- "1..*" Puesto : posee físicamente
+Laboratorio "1" o-- "1..*" Red : ofrece acceso a
 
-Host "1" *-- "1" Estado : "se encuentra en"
-Estado ..> Accion : "habilita"
+Puesto "1" o-- "0..1" Host : aloja
+Puesto "0..*" -- "0..1" Red : conecta con >
 
 @enduml

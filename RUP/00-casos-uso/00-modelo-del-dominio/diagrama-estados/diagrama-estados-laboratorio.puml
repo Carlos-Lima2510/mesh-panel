@@ -1,24 +1,24 @@
 @startuml diagrama-estados-laboratorio
 
-[*] --> ModoClase : Inicialización del laboratorio
+[*] --> EN_CLASE 
 
-state ModoClase {
-    ModoClase : Contexto: Sesión lectiva ordinaria
-    ModoClase : Política de red: Todos los puestos en red docente
-    ModoClase : Interpretación de enlace DOWN: Alerta (Cable desconectado o sin luz)
+state EN_CLASE {
+    EN_CLASE : Contexto: Sesión lectiva ordinaria
+    EN_CLASE : Política de red: Todos los puestos en red docente
+    EN_CLASE : Interpretación de enlace DOWN: Alerta (Cable desconectado o sin luz)
 }
 
-state ModoPractica {
-    ModoPractica : Contexto: Sesión de prácticas en red aislada
-    ModoPractica : Política de red: Puestos conectados al switch secundario
-    ModoPractica : Interpretación de enlace DOWN: Esperado (Trabajando en red aislada)
+state EN_PRACTICA {
+    EN_PRACTICA : Contexto: Sesión de prácticas en red aislada
+    EN_PRACTICA : Política de red: Puestos conectados al switch secundario
+    EN_PRACTICA : Interpretación de enlace DOWN: Esperado (Trabajando en red aislada)
 }
 
-ModoClase --> ModoPractica : Iniciar sesión de prácticas
+EN_CLASE --> EN_PRACTICA : Iniciar práctica
 
-ModoPractica --> ModoClase : Finalizar sesión de prácticas
+EN_PRACTICA --> EN_CLASE : Finalizar práctica
 
-ModoClase --> [*] : Cierre de monitorización
-ModoPractica --> [*] : Cierre de monitorización
+EN_CLASE --> [*] : Cierre de monitorización
+EN_PRACTICA --> [*] : Cierre de monitorización
 
 @enduml
