@@ -3,8 +3,8 @@
 ## Información del artefacto
 * **Proyecto:** OpSys - Plataforma de Supervisión y Configuración de un Laboratorio Docente Compartido 
 * **Fase RUP:** Inicio (Inception)
-* **Versión:** 1.0
-* **Fecha:** 2026-10-12
+* **Versión:** 1.1
+* **Fecha:** 2026-11-10
 * **Autor:** Equipo de desarrollo
 
 ---
