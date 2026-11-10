@@ -76,6 +76,9 @@ El artefacto **Modelo de Dominio** reside en `RUP/00-modelo-del-dominio/` y capt
 ### 2.3 Estructura de Artefactos
 
 * **README de Artefacto:** `RUP/00-modelo-del-dominio/README.md`
+* **Decisiones Arquitectónicas (ADR en `docs/`):**
+  * `docs/ADR-001-acotamiento-acciones-trazabilidad.md`
+  * `docs/ADR-002-acotamiento-control-energia-hardware.md`
 * **Fuentes PlantUML:**
   * `RUP/00-modelo-del-dominio/diagrama-clases.puml`
   * `RUP/00-modelo-del-dominio/diagrama-objetos.puml`

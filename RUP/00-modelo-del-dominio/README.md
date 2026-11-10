@@ -50,3 +50,10 @@ Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`
   <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg" alt="Diagrama de Estados del Laboratorio" />
   <p><em>Fuente: <a href="diagrama-estados/diagrama-estados-laboratorio.puml">diagrama-estados/diagrama-estados-laboratorio.puml</a></em></p>
 </div>
+
+---
+
+## 5. Decisiones Arquitectónicas y de Dominio (ADR)
+
+* **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../docs/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justificación del acotamiento del rol Administrador, la retirada de la clase Acción y el patrón transaccional alternativo para auditoría.
+* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Exclusión Tecnológica](../../docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justificación del retiro de apagado remoto por limitación de hardware Dell OptiPlex (sin Intel AMT), bifurcación de encendido y exclusión de Switch/Toma.
