@@ -9,48 +9,37 @@
 
 ## 1. Contexto y Problema
 
-En las primeras versiones del Modelo del Dominio (`diagrama-clases.puml`), se incluyó una clase `Accion` conectada mediante dependencia con `Estado`:
+En las versiones preliminares del Modelo del Dominio (`diagrama-clases.puml`), se incluyó una clase `Accion` asociada por dependencia a `Estado`:
 ```plantuml
 Host "1" *-- "1" Estado : "se encuentra en"
 Estado ..> Accion : "habilita"
 ```
 
-El propósito de esta relación en el código backend (`daemon/domain/Accion.js`) era indicarle dinámicamente a la interfaz web si debía pintar el botón interactivo de encendido (`⚡ WoL`) o apagado (`🛑 Apagar`).
+Dicha clase encapsulaba atributos como `tipo` y `descripcion` con el fin de trasladar al frontend qué botón interactivo presentar (`WoL` o `Apagar`).
 
-Sin embargo, al contrastar esta estructura contra los criterios formales de **Ingeniería del Software 1 (Cátedra Masías / RUP / Larman)** documentados en `~/practices/`:
-1. **Olor a diseño de software / UI:** En un modelo conceptual puro, modelar una clase solo para resolver qué botón presentar en pantalla traslada detalles de la Vista y del patrón *Command* al dominio.
-2. **Alternativa analizada:** Para que `Accion` fuera una clase legítima del dominio según la **Heurística 2 («El Trípode de las Transacciones»)**, el sistema debería registrar un hecho histórico inmutable (`AccionEjecutada` o `RegistroOperativo`) asociando fecha, hora, resultado y autoría (`Administrador`).
-
----
-
-## 2. Requisitos Reales del Cliente y Decisión de Acotamiento
-
-Tras evaluar los requisitos y el alcance real acordado con el cliente:
-1. **Un solo operador:** El laboratorio opera con un único usuario administrador del aula.
-2. **Sin requisito de auditoría:** El cliente no ha solicitado en ningún momento trazabilidad histórica ni auditoría de quién o cuándo se ejecutan los encendidos/apagados.
-3. **Principio YAGNI y Criterio Masías:**
-   > *«No inventes conceptos o clases si el cliente no los nombra ni los exige.»* — Apuntes IdSw1.
-
-### Decisión Adoptada:
-* **Excluir `Administrador` del Modelo del Dominio:** Actúa estrictamente como **Actor externo** en la frontera del sistema para la fase siguiente (`01-requisitos`).
-* **Retirar la clase `Accion` del Diagrama de Clases Estructural:** Las acciones operativas (`Encender WoL`) no son entidades estáticas; son los **eventos y transiciones** del comportamiento dinámico, ya capturados formalmente en el **Diagrama de Estados del Host** (`diagrama-estados-host.puml`) y en los **Casos de Uso**.
-* **Modelar el estado del Host como un enumerado conceptual:**
-  ```plantuml
-  enum EstadoHost {
-      OPERATIVO
-      STANDBY
-      FALLO_LOGICO
-      RED_AISLADA
-      DESCONECTADO
-  }
-  Host .. EstadoHost
-  ```
+Sin embargo, desde la perspectiva del análisis conceptual en RUP:
+1. **Acoplamiento de Vista en el Dominio:** Modelar una clase con la única finalidad de gobernar la presentación de controles en la interfaz de usuario traslada responsabilidades de la Vista y del patrón *Command* al modelo del dominio.
+2. **Reificación Transaccional:** Una acción únicamente se modela como clase conceptual de negocio cuando el sistema requiere persistir una transacción histórica inmutable (auditoría de eventos con marca temporal, resultado y autoría).
 
 ---
 
-## 3. Arquitectura Alternativa Documentada (Para Futuras Ampliaciones)
+## 2. Decisión de Negocio y Delimitación de Alcance
 
-Si en una iteración posterior el cliente requiriese auditoría forense o multi-usuario (ej. registro de qué profesor ordenó una acción sobre las máquinas durante una prueba evaluada), el modelo se extendería de forma natural bajo el patrón transaccional canónico de `~/practices/`:
+Conforme al alcance acordado para el sistema:
+1. **Operador Único:** La plataforma opera bajo la administración de un único responsable de aula.
+2. **Ausencia de Auditoría de Acciones:** El sistema no requiere persistencia de logs de autoría ni trazabilidad histórica de órdenes ejecutadas.
+3. **Principio YAGNI (*You Aren't Gonna Need It*):** Se descarta la incorporación de conceptos que no correspondan a requerimientos funcionales expresos.
+
+### Decisiones Adoptadas:
+* **Exclusión de `Administrador` del Modelo de Clases:** El Administrador actúa como **Actor externo** en la frontera del sistema dentro del catálogo de Casos de Uso.
+* **Retiro de la Clase `Accion` del Diagrama de Clases:** Las operaciones operativas (`Encender WoL`) constituyen **eventos y transiciones** del comportamiento dinámico en el Diagrama de Estados del Host y servicios en los Casos de Uso.
+* **Representación del Estado mediante Enumerado Conceptual:** El ciclo de vida del equipo se expresa mediante el enumerado `EstadoHost` (`OPERATIVO`, `STANDBY`, `FALLO_LOGICO`, `RED_AISLADA`, `DESCONECTADO`), asociado conceptualmente a `Host`.
+
+---
+
+## 3. Arquitectura Alternativa (Extensión para Trazabilidad)
+
+En caso de que futuros requerimientos demanden auditoría multi-usuario, el modelo se expande de forma aditiva mediante el patrón estándar de entidades transaccionales:
 
 ```mermaid
 classDiagram
@@ -69,7 +58,8 @@ classDiagram
         mac
         ip
     }
-    enum EstadoHost {
+    class EstadoHost {
+        <<enumeration>>
         OPERATIVO
         STANDBY
         FALLO_LOGICO
@@ -82,17 +72,16 @@ classDiagram
     Host .. EstadoHost
 ```
 
-### Características de la Extensión:
-* **Trípode completo:** Sujeto (`Administrador`) $\to$ Hecho (`AccionEjecutada`) $\to$ Objeto (`Host`).
-* **Multiplicidad Test del Dedo:** 
-  - `Administrador "1" -- "0..*" AccionEjecutada`
-  - `Host "1" -- "0..*" AccionEjecutada`
-* **Inmutabilidad:** Cada acción ejecutada almacena `fechaHora`, `tipo` (`WAKE_ON_LAN`, `REINICIO`, etc.) y `resultado` (`EXITO`, `TIMEOUT`, `ERROR`).
+### Características del Patrón Transaccional:
+* **Trípode Transaccional:** Emisor (`Administrador`) $\to$ Hecho consumado (`AccionEjecutada`) $\to$ Objeto afectado (`Host`).
+* **Multiplicidades:** `Administrador "1" -- "0..*" AccionEjecutada` y `Host "1" -- "0..*" AccionEjecutada`.
+* **Inmutabilidad:** La transacción persiste `fechaHora`, `tipo` y `resultado`, garantizando la auditoría histórica sin sobrecargar la entidad `Host`.
 
 ---
 
-## 4. Argumentación para Defensa Técnica / Tribunal
+## 4. Justificación Metodológica
 
-Si un revisor cuestiona la ausencia de la clase `Administrador` o de clases para los botones de acción en el Diagrama de Clases:
-
-> *«El Modelo del Dominio se acotó estrictamente al problema real del cliente bajo el principio YAGNI y las directrices de RUP. Dado que el sistema cuenta con un único administrador y no existe requerimiento de auditoría histórica, el Administrador se modeló como Actor en los Casos de Uso, evitando introducir entidades artificiales en el dominio. Asimismo, las operaciones operativas se confinaron a su lugar metodológico natural: los eventos del Diagrama de Estados del Host y la especificación de Casos de Uso, preservando un Diagrama de Clases limpio, cohesivo y libre de acoplamiento con la interfaz de usuario.»*
+El acotamiento preserva una separación nítida entre disciplinas de RUP:
+* El **Diagrama de Clases** describe conceptos estáticos del negocio (`Laboratorio`, `Puesto`, `Host`, `Red`).
+* El **Diagrama de Estados** modela las transiciones y eventos del ciclo de vida del equipo informático.
+* Los **Casos de Uso** definen las operaciones invocables por los actores en la interfaz de supervisión.

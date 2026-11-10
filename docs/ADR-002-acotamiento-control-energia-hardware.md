@@ -69,7 +69,7 @@ Se confirmó que el soporte para ejecutar acciones sobre múltiples o todos los 
 
 ## 6. Cuadro Resumen de Decisiones de la Sesión
 
-| Tema Abordado | Decisión Inicial / Olor Detectado | Decisión Final Acotada | Justificación Metodológica |
+| Tema Abordado | Alternativa Analizada | Decisión Final Acotada | Justificación Metodológica |
 | :--- | :--- | :--- | :--- |
 | **Rol Administrador** | ¿Incluir clase `Administrador`? | **Excluido** del Diagrama de Clases | Un solo usuario, sin requisito de auditoría (YAGNI). Vive como Actor en Casos de Uso. |
 | **Clase Acción** | `Estado ..> Accion` | **Eliminada** del Diagrama de Clases | Era un detalle de UI/botón. Las acciones son eventos en Estados y Casos de Uso. |
