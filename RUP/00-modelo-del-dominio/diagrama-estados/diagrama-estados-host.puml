@@ -7,7 +7,7 @@ state DESCONOCIDO : Esperando primera lectura
 state "Conectado a Red de la Universidad" as CONECTADO {
     state APAGADO : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
     state OPERATIVO : • PC encendido y comunicando (1 Gbps)\n
-    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)\n• Habilita: Restaurar conexión
+    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)
 
     APAGADO -right-> OPERATIVO : Encender [agente conecta]
     APAGADO -right-> DESCONFIGURADO : Encender [sin agente / IP errónea]

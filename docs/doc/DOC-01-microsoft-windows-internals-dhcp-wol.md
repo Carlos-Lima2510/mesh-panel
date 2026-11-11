@@ -124,7 +124,55 @@ Para que el panel OpSys pueda emitir *Magic Packets* Wake-on-LAN y encender con 
 
 ---
 
-## 5. Resumen de Decisiones de Arquitectura Derivadas
+## 5. Especificación del Script de Inicio GPO con Patrón de Rollback
+
+Para garantizar que un reinicio a mitad de práctica con el Cable 2 conectado no sabotee la configuración del alumno, y a su vez resolver la paradoja del huevo y la gallina al reconectar el Cable 1, se diseña el siguiente algoritmo transaccional ejecutado en el arranque bajo contexto `NT AUTHORITY\SYSTEM`:
+
+```powershell
+<#
+.SYNOPSIS
+    Script de Inicio GPO para Autorreparación de Red con Rollback Contextual.
+.DESCRIPTION
+    Ejecutado al arrancar Windows en contexto SYSTEM antes del logon de usuario.
+    Comprueba si existe respuesta DHCP oficial en la red universitaria. Si hay
+    respuesta institucional, consolida DHCP; si nadie responde (Cable 2 en prácticas),
+    revierte la configuración estática previa del alumno.
+#>
+
+try {
+    # 1. Snapshot de la configuración previa antes de actuar
+    $adapter = Get-NetAdapter -Name "Ethernet" -ErrorAction Stop
+    $ipActual = (Get-NetIPAddress -InterfaceIndex $adapter.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue).IPAddress
+    $gatewayActual = (Get-NetRoute -InterfaceIndex $adapter.InterfaceIndex -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue).NextHop
+
+    # 2. Prueba activa DHCP por difusión Capa 2 (RFC 2131)
+    Set-NetIPInterface -InterfaceIndex $adapter.InterfaceIndex -Dhcp Enabled -ErrorAction SilentlyContinue
+    ipconfig /renew "Ethernet" | Out-Null
+    Start-Sleep -Seconds 3
+
+    # 3. Comprobación del resultado de la concesión
+    $nuevaIP = (Get-NetIPAddress -InterfaceIndex $adapter.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue).IPAddress
+
+    # 4. Decisión determinista
+    if ($nuevaIP -like "10.*") {
+        # Confirmado Cable 1 (Universidad): Red docente funcional
+        Set-DnsClientServerAddress -InterfaceIndex $adapter.InterfaceIndex -ResetServerAddresses
+        Write-Host "Red universitaria confirmada. DHCP consolidado."
+    }
+    elseif ($nuevaIP -like "169.254.*" -and $ipActual -notlike "169.254.*" -and $ipActual -ne $null) {
+        # Confirmado Cable 2 (Prácticas aisladas): Rollback a la configuración del alumno
+        New-NetIPAddress -InterfaceIndex $adapter.InterfaceIndex -IPAddress $ipActual -PrefixLength 24 -DefaultGateway $gatewayActual -ErrorAction SilentlyContinue | Out-Null
+        Write-Host "Red aislada de prácticas detectada. Configuración previa preservada."
+    }
+}
+catch {
+    Write-Warning "Fallo durante la ejecución del script de red: $_"
+}
+```
+
+---
+
+## 6. Resumen de Decisiones de Arquitectura Derivadas
 
 | Hallazgo en Documentación Microsoft | Impacto en el Dominio OpSys | Decisión de Diseño Adoptada |
 | :--- | :--- | :--- |
@@ -132,3 +180,5 @@ Para que el panel OpSys pueda emitir *Magic Packets* Wake-on-LAN y encender con 
 | **Dependencia de IP en PowerShell / WinRM** | No se pueden enviar scripts remotos de corrección a máquinas con la red rota. | Se ratifica la arquitectura **Zero-Touch**: cero agentes y cero scripts locales en los puestos. |
 | **Desarme de WoL bajo *Fast Startup* ($S4$)** | Si el arranque rápido está activo, los Dell OptiPlex no responden al *Magic Packet*. | Documentar formalmente como requisito de despliegue la clave `HiberbootEnabled = 0` para garantizar la fiabilidad del encendido masivo. |
 | **Asimetría de Estados ACPI ($S5$ vs. $S0$)** | El sistema operativo pierde el control de la red al apagarse el equipo. | Respaldo total a [ADR-002](../adr/ADR-002-acotamiento-control-energia-hardware.md): encendido por hardware de Capa 2 y retiro de la orden de apagado remoto. |
+| **Imposibilidad de Remediación On-Demand** | El panel no puede alcanzar por red a hosts con la IP rota (*Fate Sharing*). | Respaldo a [ADR-003](../adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md): autorreparación delegada al ciclo de arranque (Startup GPO) con patrón Rollback. |
+

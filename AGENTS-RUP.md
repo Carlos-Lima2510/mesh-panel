@@ -79,6 +79,7 @@ El artefacto **Modelo de Dominio** reside en `RUP/00-modelo-del-dominio/` y capt
 * **Decisiones Arquitectónicas (ADR y Literatura en `docs/`):**
   * `docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md`
   * `docs/adr/ADR-002-acotamiento-control-energia-hardware.md`
+  * `docs/adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md`
   * `docs/matriz-documental-general.md`
   * `docs/matrices-documentales/matriz-referencias-apagado.md`
   * `docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md`
