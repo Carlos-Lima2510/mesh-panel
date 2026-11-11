@@ -19,8 +19,8 @@ object "pc_01 : Host" as host {
     estado = OPERATIVO
 }
 
-object "redDocente : Red" as redDocente {
-    nombre = "Red Docencia"
+object "redUniversidad : Red" as redUniversidad {
+    nombre = "Red Universidad"
     esAislada = false
 }
 
@@ -30,10 +30,10 @@ object "redAislada : Red" as redAislada {
 }
 
 lab *-- puesto
-lab o-- redDocente
+lab o-- redUniversidad
 lab o-- redAislada
 
 puesto o-- host
-puesto -- redDocente
+puesto -- redUniversidad
 
 @enduml

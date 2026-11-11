@@ -76,9 +76,14 @@ El artefacto **Modelo de Dominio** reside en `RUP/00-modelo-del-dominio/` y capt
 ### 2.3 Estructura de Artefactos
 
 * **README de Artefacto:** `RUP/00-modelo-del-dominio/README.md`
-* **Decisiones Arquitectónicas (ADR en `docs/`):**
-  * `docs/ADR-001-acotamiento-acciones-trazabilidad.md`
-  * `docs/ADR-002-acotamiento-control-energia-hardware.md`
+* **Decisiones Arquitectónicas (ADR y Literatura en `docs/`):**
+  * `docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md`
+  * `docs/adr/ADR-002-acotamiento-control-energia-hardware.md`
+  * `docs/adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md`
+  * `docs/matriz-documental-general.md`
+  * `docs/matrices-documentales/matriz-referencias-apagado.md`
+  * `docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md`
+  * `docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md`
 * **Fuentes PlantUML:**
   * `RUP/00-modelo-del-dominio/diagrama-clases.puml`
   * `RUP/00-modelo-del-dominio/diagrama-objetos.puml`

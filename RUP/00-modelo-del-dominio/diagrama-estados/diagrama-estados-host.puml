@@ -4,10 +4,10 @@
 
 state DESCONOCIDO : Esperando primera lectura
 
-state "Conectado a Red Docente" as CONECTADO {
+state "Conectado a Red de la Universidad" as CONECTADO {
     state APAGADO : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
     state OPERATIVO : • PC encendido y comunicando (1 Gbps)\n
-    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)\n• Habilita: Restaurar conexión
+    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)
 
     APAGADO -right-> OPERATIVO : Encender [agente conecta]
     APAGADO -right-> DESCONFIGURADO : Encender [sin agente / IP errónea]
@@ -18,7 +18,7 @@ state "Conectado a Red Docente" as CONECTADO {
     DESCONFIGURADO -left-> APAGADO : Apagado manual
 }
 
-state DESCONECTADO : • Sin enlace en switch docente\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
+state DESCONECTADO : • Sin enlace en switch de la universidad\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
 
 DESCONOCIDO -down-> CONECTADO : Detectado con enlace físico
 DESCONOCIDO -left-> DESCONECTADO : Detectado sin enlace

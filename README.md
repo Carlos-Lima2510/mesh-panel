@@ -39,8 +39,13 @@ Página concentradora de los artefactos RUP de OpSys: desde aquí se llega a cad
 
 Las justificaciones de diseño, delimitación de alcance y acotamientos metodológicos se registran en [`docs/`](docs/):
 
-* **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](docs/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justifica el retiro de la clase `Accion` del modelo de clases (desacoplamiento de UI), el acotamiento del rol `Administrador` (confinado a Actor de Casos de Uso por YAGNI) y el patrón transaccional alternativo en caso de requerir auditoría.
-* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Exclusión Tecnológica](docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justifica el retiro del apagado remoto del panel por imposibilidad física de garantizarlo sin Intel AMT (Dell SKU 631-ADPL), la persistencia de Windows y bifurcación condicional de encendido, y la exclusión de entidades tecnológicas (`Switch` y `Toma`).
+* **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justifica el retiro de la clase `Accion` del modelo de clases (desacoplamiento de UI), el acotamiento del rol `Administrador` (confinado a Actor de Casos de Uso por YAGNI) y el patrón transaccional alternativo en caso de requerir auditoría.
+* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Exclusión Tecnológica](docs/adr/ADR-002-acotamiento-control-energia-hardware.md)**: Justifica el retiro del apagado remoto del panel por imposibilidad física de garantizarlo sin Intel AMT (Dell SKU 631-ADPL), la persistencia de Windows y bifurcación condicional de encendido, y la exclusión de entidades tecnológicas (`Switch` y `Toma`).
+* **[ADR-003: Arquitectura de Remediación de Red (GPO Startup con Rollback vs. Bajo Demanda) y Exclusión del Switch](docs/adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md)**: Justifica la inviabilidad de remediación remota bajo demanda por destino compartido (*fate sharing*), el descarte de scripts de apagado ante apagados forzados en torre, la adopción del script de inicio con rollback transaccional para proteger prácticas de alumnos, y la exclusión definitiva del `Switch` del dominio.
+* **[Matriz Documental General del Proyecto](docs/matriz-documental-general.md)**: Marco general de revisión sistemática y base documental de literatura técnica (2016-2026) que fundamenta la arquitectura de OpSys.
+  * **[Matriz Específica: Control de Energía y Apagado](docs/matrices-documentales/matriz-referencias-apagado.md)**: Evaluación sistemática de literatura sobre mecanismos de control energético con agente, fuera de banda (Intel AMT) y sin agente.
+  * **[Matriz Específica: Plataforma Microsoft y Windows Internals](docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md)**: Evaluación de diagnósticos DHCP y comportamiento de WoL / Fast Startup en Windows 10/11.
+  * **[Dossier Técnico: Plataforma Microsoft Learn](docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md)**: Análisis técnico exhaustivo de eventos del sistema, comandos PowerShell y gestión de energía NDIS.
 
 ---
 
@@ -55,9 +60,17 @@ mesh-panel/
 │   │   ├── diagrama-objetos.puml       # Instancia canónica de validación
 │   │   └── diagrama-estados/           # Autómatas de estados (Host y Laboratorio)
 │   └── 01-requisitos/                  # Casos de uso y actores (Próxima fase)
-├── docs/                               # Decisiones Arquitectónicas (ADR)
-│   ├── ADR-001-acotamiento-acciones-trazabilidad.md
-│   └── ADR-002-acotamiento-control-energia-hardware.md
+├── docs/                               # Documentación de Arquitectura, Matrices y Manuales
+│   ├── adr/                            # Registros de Decisiones Arquitectónicas (ADR)
+│   │   ├── ADR-001-acotamiento-acciones-trazabilidad.md
+│   │   ├── ADR-002-acotamiento-control-energia-hardware.md
+│   │   └── ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md
+│   ├── doc/                            # Dossiers técnicos y manuales de fabricante (DOC)
+│   │   └── DOC-01-microsoft-windows-internals-dhcp-wol.md
+│   ├── matriz-documental-general.md    # Matriz documental general del proyecto
+│   └── matrices-documentales/          # Matrices documentales específicas
+│       ├── matriz-referencias-apagado.md
+│       └── matriz-referencias-plataforma-microsoft.md
 ├── images/                             # Estructura espejo de gráficos vectoriales SVG
 │   ├── 00-modelo-del-dominio/          # SVGs compilados del Modelo de Dominio
 │   └── 01-requisitos/                  # SVGs de la fase de requisitos
