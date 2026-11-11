@@ -44,7 +44,7 @@ La investigación científica establece de forma canónica que el control energ�
 * **Coprocesamiento Dedicado en la NIC:** En investigaciones experimentales avanzadas sobre control energético de PCs, como la arquitectura *Somniloquy* desarrollada por Agarwal et al. [6] (Microsoft Research / USENIX NSDI), se demostró que para procesar comandos de red con el host apagado o inaccesible es físicamente necesario **añadir un coprocesador secundario embebido en la propia tarjeta de red**.
 
 ### Dictamen Técnico para OpSys:
-Dado que el lote Dell OptiPlex (SKU 631-ADPL) tiene los fusibles FPF quemados de fábrica en modo `DISABLE`, no dispone de procesador Intel AMT ni hardware secundario tipo *Somniloquy*. **La vía fuera de banda queda formal y físicamente descartada** [5], [6].
+Dado que el lote Dell OptiPlex (SKU 631-ADPL) tiene los fusibles FPF quemados de fábrica en modo `DISABLE` [8], [9], no dispone de procesador Intel AMT ni hardware secundario tipo *Somniloquy* [6]. **La vía fuera de banda queda formal y físicamente descartada** [5], [6], [8], [9].
 
 ---
 
@@ -113,7 +113,7 @@ El soporte para operaciones masivas sobre múltiples máquinas (ej. encender tod
 
 | Enfoque | Requisito Técnico (Literatura) | Situación en el Laboratorio | Dictamen de Diseño |
 | :--- | :--- | :--- | :---: |
-| **Fuera de Banda (OOB)** | Chipset Intel AMT / Coprocesador en NIC [5], [6] | Dell SKU 631-ADPL con fusibles FPF quemados en `DISABLE` | **Descartada** (Inviable físicamente) |
+| **Fuera de Banda (OOB)** | Chipset Intel AMT / Coprocesador en NIC [5], [6], [8], [9] | Dell SKU 631-ADPL con fusibles FPF quemados en `DISABLE` | **Descartada** (Inviable físicamente) |
 | **Lógica por Red (In-Band)** | Agente local en SO y red TCP/IP funcional [1], [3], [4] | Violación de *Zero-Touch* y fallo por *fate sharing* en prácticas | **Descartada** (Inviable operativamente) |
 | **Corte Eléctrico Externo** | Smart PDUs o relés conmutados por toma [7] | Mobiliario docente convencional sin regletas gestionables | **Descartada** (Requiere inversión física externa) |
 | **Observabilidad + WoL** | MIB-II SNMP en switch (L1) + Magic Packet (L2) [1], [2] | Soportado nativamente por la infraestructura y las NICs Dell | **Aprobada** (Arquitectura de OpSys) |
@@ -129,3 +129,5 @@ El soporte para operaciones masivas sobre múltiples máquinas (ej. encender tod
 * **[5]** J. Wijekoon, M. Wijesundara, T. Dassanayaka, D. Samarathunga, R. Dissanayaka, and D. Perera, "The Advanced Remote PC Management Suite," in *Proc. 2011 6th International Conference on Industrial and Information Systems (ICIIS)*, Kandy, Sri Lanka, 2011, pp. 410–413, doi: [10.1109/ICIINFS.2011.6038103](https://doi.org/10.1109/ICIINFS.2011.6038103).
 * **[6]** Y. Agarwal, S. Hodges, J. Scott, R. Chandra, P. Bahl, and R. Gupta, "Somniloquy: Augmenting Network Interfaces to Reduce PC Energy Usage," in *Proc. 6th USENIX Symposium on Networked Systems Design and Implementation (NSDI '09)*, Boston, MA, 2009, pp. 365–380.
 * **[7]** S. Brienza and G. Anastasi, "A sensor-based power management system for sustainable computing in large environments," in *Proc. 2013 Sustainable Internet and ICT for Sustainability (SustainIT)*, Palermo, Italy, 2013, pp. 1–4, doi: [10.1109/SustainIT.2013.6685197](https://doi.org/10.1109/SustainIT.2013.6685197).
+* **[8]** X. Ruan, *Platform Embedded Security Technology Revealed: Safeguarding the Future of Computing with Intel Embedded Security and Management Features*. New York, NY: Apress / Springer, 2014, doi: [10.1007/978-1-4302-6572-6](https://doi.org/10.1007/978-1-4302-6572-6).
+* **[9]** Intel Corporation, "Intel CSME Security Advisory White Paper," Intel Technical Document, Dec. 2017. [En línea]. Disponible en: [https://www.intel.com/content/dam/www/public/us/en/security-advisory/documents/intel-csme-security-white-paper.pdf](https://www.intel.com/content/dam/www/public/us/en/security-advisory/documents/intel-csme-security-white-paper.pdf).
