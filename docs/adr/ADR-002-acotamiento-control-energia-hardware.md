@@ -4,7 +4,7 @@
 * **Fecha:** 2026-11-11
 * **Fase:** RUP Inicio (Inception) — Modelo del Dominio
 * **Estado:** Aprobado / Fundamentado Científicamente
-* **Documento complementario:** [Matriz de Extracción y Evaluación de Literatura Científica](matrices-documentales/matriz-referencias-apagado.md)
+* **Documento complementario:** [Matriz de Extracción y Evaluación de Literatura Científica](../matrices-documentales/matriz-referencias-apagado.md)
 
 ---
 

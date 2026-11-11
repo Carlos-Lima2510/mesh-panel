@@ -55,7 +55,9 @@ Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`
 
 ## 5. Decisiones Arquitectónicas y de Dominio (ADR)
 
-* **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../docs/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justificación del acotamiento del rol Administrador, la retirada de la clase Acción y el patrón transaccional alternativo para auditoría.
-* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Justificación Científica](../../docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justificación técnico-científica del retiro de apagado remoto por limitación física de hardware Dell OptiPlex (sin Intel AMT), asimetría de red y bifurcación de encendido.
+* **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justificación del acotamiento del rol Administrador, la retirada de la clase Acción y el patrón transaccional alternativo para auditoría.
+* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Justificación Científica](../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md)**: Justificación técnico-científica del retiro de apagado remoto por limitación física de hardware Dell OptiPlex (sin Intel AMT), asimetría de red y bifurcación de encendido.
 * **[Matriz Documental General del Proyecto](../../docs/matriz-documental-general.md)**: Marco general de revisión sistemática y base documental de literatura técnica (2016-2026).
   * **[Matriz Específica: Control de Energía y Apagado](../../docs/matrices-documentales/matriz-referencias-apagado.md)**: Evaluación sistemática de literatura sobre mecanismos de control energético con agente, fuera de banda y sin agente.
+  * **[Matriz Específica: Plataforma Microsoft y Windows Internals](../../docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md)**: Evaluación de diagnósticos DHCP y comportamiento de WoL / Fast Startup en Windows 10/11.
+  * **[Dossier Técnico: Plataforma Microsoft Learn](../../docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md)**: Análisis técnico exhaustivo de eventos del sistema, comandos PowerShell y gestión de energía NDIS.
