@@ -41,6 +41,8 @@ Las justificaciones de diseño, delimitación de alcance y acotamientos metodol�
 
 * **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](docs/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justifica el retiro de la clase `Accion` del modelo de clases (desacoplamiento de UI), el acotamiento del rol `Administrador` (confinado a Actor de Casos de Uso por YAGNI) y el patrón transaccional alternativo en caso de requerir auditoría.
 * **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Exclusión Tecnológica](docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justifica el retiro del apagado remoto del panel por imposibilidad física de garantizarlo sin Intel AMT (Dell SKU 631-ADPL), la persistencia de Windows y bifurcación condicional de encendido, y la exclusión de entidades tecnológicas (`Switch` y `Toma`).
+* **[Matriz Documental General del Proyecto](docs/matriz-documental-general.md)**: Marco general de revisión sistemática y base documental de literatura técnica (2016-2026) que fundamenta la arquitectura de OpSys.
+  * **[Matriz Específica: Control de Energía y Apagado](docs/matrices-documentales/matriz-referencias-apagado.md)**: Evaluación sistemática de literatura sobre mecanismos de control energético con agente, fuera de banda (Intel AMT) y sin agente.
 
 ---
 
@@ -55,9 +57,12 @@ mesh-panel/
 │   │   ├── diagrama-objetos.puml       # Instancia canónica de validación
 │   │   └── diagrama-estados/           # Autómatas de estados (Host y Laboratorio)
 │   └── 01-requisitos/                  # Casos de uso y actores (Próxima fase)
-├── docs/                               # Decisiones Arquitectónicas (ADR)
+├── docs/                               # Decisiones Arquitectónicas (ADR) y Literatura
 │   ├── ADR-001-acotamiento-acciones-trazabilidad.md
-│   └── ADR-002-acotamiento-control-energia-hardware.md
+│   ├── ADR-002-acotamiento-control-energia-hardware.md
+│   ├── matriz-documental-general.md    # Matriz documental general del proyecto
+│   └── matrices-documentales/          # Matrices documentales específicas
+│       └── matriz-referencias-apagado.md
 ├── images/                             # Estructura espejo de gráficos vectoriales SVG
 │   ├── 00-modelo-del-dominio/          # SVGs compilados del Modelo de Dominio
 │   └── 01-requisitos/                  # SVGs de la fase de requisitos

@@ -56,4 +56,6 @@ Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`
 ## 5. Decisiones Arquitectónicas y de Dominio (ADR)
 
 * **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../docs/ADR-001-acotamiento-acciones-trazabilidad.md)**: Justificación del acotamiento del rol Administrador, la retirada de la clase Acción y el patrón transaccional alternativo para auditoría.
-* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Exclusión Tecnológica](../../docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justificación del retiro de apagado remoto por limitación de hardware Dell OptiPlex (sin Intel AMT), bifurcación de encendido y exclusión de Switch/Toma.
+* **[ADR-002: Acotamiento de Control de Energía (WoL vs. Apagado), Realidad Hardware Dell y Justificación Científica](../../docs/ADR-002-acotamiento-control-energia-hardware.md)**: Justificación técnico-científica del retiro de apagado remoto por limitación física de hardware Dell OptiPlex (sin Intel AMT), asimetría de red y bifurcación de encendido.
+* **[Matriz Documental General del Proyecto](../../docs/matriz-documental-general.md)**: Marco general de revisión sistemática y base documental de literatura técnica (2016-2026).
+  * **[Matriz Específica: Control de Energía y Apagado](../../docs/matrices-documentales/matriz-referencias-apagado.md)**: Evaluación sistemática de literatura sobre mecanismos de control energético con agente, fuera de banda y sin agente.
