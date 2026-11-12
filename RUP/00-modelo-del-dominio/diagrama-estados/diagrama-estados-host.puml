@@ -1,32 +1,27 @@
 @startuml diagrama-estados-host
 
-[*] -down-> DESCONOCIDO
+state "Conectado a Red de la Universidad" as CONECTADO_UNIVERSIDAD {
+    state STANDBY : • Enlace físico UP (10/100 Mbps)\n• PC apagado en reposo (S5)\n• Habilita: Encender (WoL)
+    state OPERATIVO : • Enlace físico UP (1 Gbps)\n• PC encendido y comunicando (conn & 1)
+    state FALLO_LOGICO : • Enlace físico UP (1 Gbps)\n• agente caído o fallo DHCP
 
-state DESCONOCIDO : Esperando primera lectura
+    STANDBY -right-> OPERATIVO : Encender (WoL) [agente conecta]
+    STANDBY -right-> FALLO_LOGICO : Encender (WoL) [sin agente / IP errónea]
 
-state "Conectado a Red de la Universidad" as CONECTADO {
-    state APAGADO : • PC apagado en reposo (10/100 Mbps)\n• Habilita: Encender (WoL)
-    state OPERATIVO : • PC encendido y comunicando (1 Gbps)\n
-    state DESCONFIGURADO : • PC encendido con fallo de IP/agente (1 Gbps)
-
-    APAGADO -right-> OPERATIVO : Encender [agente conecta]
-    APAGADO -right-> DESCONFIGURADO : Encender [sin agente / IP errónea]
-
-    OPERATIVO -down-> DESCONFIGURADO : Pérdida de IP / agente
-    OPERATIVO -left-> APAGADO : Apagado manual
-    DESCONFIGURADO -up-> OPERATIVO : Conexión restaurada
-    DESCONFIGURADO -left-> APAGADO : Apagado manual
+    OPERATIVO -down-> FALLO_LOGICO : Pérdida de IP / agente
+    OPERATIVO -left-> STANDBY : Apagado manual
+    FALLO_LOGICO -up-> OPERATIVO : Conexión restaurada / DHCP renovado
+    FALLO_LOGICO -left-> STANDBY : Apagado manual
 }
 
-state DESCONECTADO : • Sin enlace en switch de la universidad\n• Causas: cable suelto, red de prácticas o corte de luz\n• Habilita: Inspeccionar puesto
+state DESCONECTADO : • Enlace físico DOWN en Modo Clase\n• Anomalía: cable suelto, roseta desenchufada o corte de luz\n• Requiere: Inspección física en el aula
 
-DESCONOCIDO -down-> CONECTADO : Detectado con enlace físico
-DESCONOCIDO -left-> DESCONECTADO : Detectado sin enlace
+[*] --> STANDBY 
 
-CONECTADO -left-> DESCONECTADO : Pérdida de enlace físico
-DESCONECTADO -right-> CONECTADO : Reconectar cable
+CONECTADO_UNIVERSIDAD -down-> DESCONECTADO : Desconexión física de la roseta
+DESCONECTADO -up-> CONECTADO_UNIVERSIDAD : Reconectar cable a la roseta
 
-CONECTADO -down-> [*] : Retirar del puesto
-DESCONECTADO -down-> [*] : Retirar del puesto
+CONECTADO_UNIVERSIDAD --> [*] : Retirar host del puesto
+DESCONECTADO --> [*] : Retirar host del puesto
 
 @enduml

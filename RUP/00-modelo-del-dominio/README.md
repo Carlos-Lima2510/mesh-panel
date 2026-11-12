@@ -33,7 +33,7 @@ Instancia canónica 1:1 que valida el modelo con exactamente un objeto por clase
 
 ## 3. Diagrama de Estados del Host
 
-Modela el ciclo de vida telemático del equipo informático, estructurado bajo el superestado `Conectado a Red Docente` para evitar solapamiento de transiciones físicas y lógicas.
+Modela el ciclo de vida operacional y telemático del equipo informático (`STANDBY`, `OPERATIVO`, `FALLO_LOGICO`, `DESCONECTADO`), estructurado bajo el superestado `Conectado a Red de la Universidad` para evitar solapamiento de transiciones físicas y lógicas.
 
 <div align="center">
   <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg" alt="Diagrama de Estados del Host" />
@@ -44,7 +44,7 @@ Modela el ciclo de vida telemático del equipo informático, estructurado bajo e
 
 ## 4. Diagrama de Estados del Laboratorio
 
-Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`ModoClase`) y sesión de redes en switch secundario (`ModoPractica`).
+Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`EN_CLASE`) y sesión de redes en switch secundario (`EN_PRACTICA`).
 
 <div align="center">
   <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg" alt="Diagrama de Estados del Laboratorio" />
