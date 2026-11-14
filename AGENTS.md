@@ -348,7 +348,16 @@ Esta línea de trabajo consolida un salto arquitectónico clave en el dominio de
 ### 11.3 Futuras Extensiones a Considerar para el TFG / Proyecto
 1. **Persistencia en Almacenamiento Externo**:
    - Guardar las distribuciones personalizadas creadas por los usuarios en un archivo JSON local persistente o base de datos ligera para que sobrevivan a reinicios completos del daemon.
-2. **Diseñador Visual de Aulas Arbitrarias**:
-   - Permitir a los administradores crear nuevas distribuciones desde cero mediante un lienzo interactivo en el navegador, definiendo el número de filas, columnas, pasillos y mesas en forma de U o islas.
-3. **Mapeo Automatizado Switch $\leftrightarrow$ Mesa**:
-   - Asistente de configuración que asocie automáticamente el puerto del switch con el número de puesto del aula física durante la instalación inicial del laboratorio.
+
+### 11.4 Modelo de Aula Híbrida y Disposición de Puestos en Cuadrícula (Formalizado en ADR-004)
+Aprobado con la dirección académica (superando la exclusión preliminar de `Switch` de ADR-003):
+1. **El Aula Híbrida por Subgrupos**: Soporte nativo para clases simultáneas donde un grupo (ej. 20 puestos) opera en la Red Docente y otro grupo (ej. 20 puestos) conmuta al Switch de Prácticas en red aislada.
+2. **Generador Espacial Parametrizable con Pasillo Central**:
+   - El plano se define por $N \text{ Filas} \times M \text{ Columnas}$ modelando el pasillo central que divide el aula en dos hileras (Izquierda y Derecha).
+   - Selección por lotes o individual para asignar el **Switch Objetivo** a cada puesto (`swDocente` vs. `swPracticas`).
+   - **Descarte de `Distribucion` como Entidad (YAGNI):** La cuadrícula es una función de presentación y configuración; la persistencia se realiza directamente sobre los atributos de `Puesto` (`fila`, `columna`, `switch_id`, `puertoSwitch`) sin sobreingeniería de tablas o entidades intermedias.
+3. **Mapeo Subyacente e Invariantes de Switch**:
+   - Cada puesto enlaza su roseta (`toma`) a una boca física (`puertoSwitch`).
+   - La entidad `Switch` garantiza transaccionalmente la capacidad máxima y la no-colisión de puertos físicos.
+4. **Evaluación de Estado Contextual por Puesto**:
+   - `EvaluadorEstado` sustituye la dependencia del flag global `laboratorio.modo` por el switch asignado a cada puesto (`puesto.switch`), evitando falsas alarmas de desconexión en puestos de prácticas.
