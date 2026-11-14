@@ -312,6 +312,10 @@ docker exec -it tfg-daemon snmpwalk -v 2c -c public virtual-switch:1616 1.3.6.1.
 3. **No reintroducir ICMP Pings**: La comprobación de enlace físico pertenece exclusivamente al Switch (`SNMP`), nunca a pings ICMP desde el daemon.
 4. **Priorizar Rendimiento No Bloqueante**: Las peticiones de lectura deben servirse desde el snapshot en memoria de `LaboratorioService`; nunca ejecutar procesos CLI síncronos en bucles por puesto.
 5. **Respetar el Contrato de la API**: Toda respuesta de estado debe ser consumida a través de la raíz `laboratorio` (`laboratorio.hosts`, `laboratorio.metricas`, `laboratorio.modo`).
+6. **Respetar el Mapeo Transitivo y la Persistencia Híbrida (ADR-004)**:
+   - El mapeo Host-Switch es siempre **transitivo a través del puesto físico**: $\text{Host} \rightarrow \text{Puesto} \rightarrow \text{Switch}$. Jamás asociar directamente `Host` con `Switch` en base de datos (evita violaciones de 3FN y anomalías de actualización al mover torres).
+   - **Persistencia en Base de Datos**: Exclusivamente para configuración e inventario estático (tablas `switches`, `puestos` con coordenadas de cuadrícula y `hosts`).
+   - **Memoria RAM**: Exclusivamente para telemetría viva (estados de enlace SNMP, presencia de agentes MeshCentral y diagnósticos de color). Jamás persistir estados volátiles en disco.
 
 ---
 

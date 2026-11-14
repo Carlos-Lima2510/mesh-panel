@@ -89,6 +89,62 @@ Se evalúa si la disposición del aula debe modelarse mediante una entidad adici
   * **Hilera Derecha:** Columnas $\lfloor C/2 \rfloor + 1 \dots C$.
 * La selección interactiva permite marcar un bloque de puestos y asignarle el switch destino (`swDocente` vs. `swPracticas`), mapeando automáticamente las bocas físicas (`puertoSwitch`).
 
+### 3.3. Mapeo Transitivo Host $\rightarrow$ Puesto $\rightarrow$ Switch y Normalización (3FN)
+En la realidad física del aula, un equipo informático (`Host`) no se conecta directamente al switch del rack; se coloca sobre una mesa (`Puesto`) que posee una roseta física (`toma`) parcheada a un puerto del conmutador (`Switch`).
+
+Por tanto, el modelo de datos y de dominio formaliza una **navegación transitiva estricta**:
+$$\text{Host} \xrightarrow{\text{aloja}} \text{Puesto} \xrightarrow{\text{conecta a}} \text{Switch}$$
+
+1. **Prevención de Anomalías de Actualización:** Si se reubica físicamente la torre de un PC a otra mesa del aula, la conexión de red y la boca del switch **no se mueven con la torre**, sino que permanecen fijadas a la roseta de la mesa. Establecer una relación directa `Host -- Switch` violaría la 3ª Forma Normal (3FN), generando redundancia y riesgos de inconsistencia ante traslados de hardware.
+2. **Esquema Relacional Canónico de Base de Datos:**
+   ```sql
+   -- 1. Conmutadores del aula (Inventario físico)
+   CREATE TABLE switches (
+       id VARCHAR(50) PRIMARY KEY,       -- 'sw-docente', 'sw-practicas'
+       nombre VARCHAR(100) NOT NULL,
+       tipo VARCHAR(20) NOT NULL,        -- 'GESTIONADO', 'NO_GESTIONADO'
+       total_puertos INT NOT NULL,
+       ip_gestion VARCHAR(45)            -- '10.0.0.2' o NULL
+   );
+
+   -- 2. Plazas físicas del aula (Geometría y Cableado estructurado)
+   CREATE TABLE puestos (
+       id VARCHAR(50) PRIMARY KEY,       -- 'MESA-01'
+       fila INT NOT NULL,
+       columna INT NOT NULL,
+       toma VARCHAR(50) NOT NULL,        -- 'ROS-01'
+       switch_id VARCHAR(50) NOT NULL REFERENCES switches(id),
+       puerto_switch INT NOT NULL,       -- Boca 1..48
+       CONSTRAINT uk_switch_puerto UNIQUE (switch_id, puerto_switch)
+   );
+
+   -- 3. Equipos informáticos (Workstations)
+   CREATE TABLE hosts (
+       id VARCHAR(50) PRIMARY KEY,       -- Node ID MeshCentral
+       nombre VARCHAR(100) NOT NULL,
+       mac VARCHAR(17),
+       ip VARCHAR(45),
+       puesto_id VARCHAR(50) UNIQUE REFERENCES puestos(id)
+   );
+   ```
+3. **Resolución de Topología mediante SQL:**
+   ```sql
+   SELECT h.nombre AS host, p.toma, s.nombre AS switch, p.puerto_switch
+   FROM hosts h
+   JOIN puestos p ON h.puesto_id = p.id
+   JOIN switches s ON p.switch_id = s.id;
+   ```
+
+### 3.4. Bifurcación Arquitectónica: Persistencia en BD vs. Telemetría en RAM
+Se formaliza la frontera estricta entre datos de inventario/configuración y datos de telemetría dinámica:
+
+| Dimensión | Datos de Configuración / Inventario | Datos de Telemetría Viva / Diagnóstico |
+| :--- | :--- | :--- |
+| **Naturaleza** | Estática / Semi-estática (cableado, coordenadas, switches, puestos). | Volátil / Tiempo Real (enlace físico, socket agente, estados). |
+| **Ubicación** | **Base de Datos Relacional / Archivo Persistente** | **Memoria RAM (Snapshot de Daemon / Sockets)** |
+| **Ciclo de Actualización** | En la instalación inicial o ante reconfiguraciones de aula. | Polling regular cada 5 segundos y streaming SSE en vivo. |
+| **Justificación de Ingeniería** | Garantizar que el plano y el cableado sobrevivan a reinicios del servidor. | Evitar saturación de disco (*I/O bottleneck*) por escrituras continuas de telemetría. |
+
 ---
 
 ## 4. Decisión Arquitectónica 3: Evaluación Contextual por Puesto (`EvaluadorEstado`)
