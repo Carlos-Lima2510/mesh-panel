@@ -1,22 +1,51 @@
 class Laboratorio {
-  constructor({ nombre = 'Laboratorio General', modo = 'CLASE' } = {}) {
+  constructor({
+    nombre = 'Laboratorio General',
+    modo = 'CLASE',
+    filas = 5,
+    columnas = 8,
+    columnasHilera = null
+  } = {}) {
     this.nombre = nombre;
     this.modo = modo;
+    this.filas = filas;
+    this.columnas = columnas;
+    this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
     this.redes = [];
     this.hosts = [];
     this.puestos = new Map();
+    this.switches = new Map();
+  }
+
+  agregarSwitch(unSwitch) {
+    if (!unSwitch || !unSwitch.id) {
+      throw new Error('Debe proporcionar un Switch válido con identificador.');
+    }
+    this.switches.set(unSwitch.id, unSwitch);
+    return this;
+  }
+
+  obtenerSwitch(id) {
+    return this.switches.get(id) || null;
+  }
+
+  listarSwitches() {
+    return Array.from(this.switches.values());
   }
 
   establecerModo(modo) {
     this.modo = modo === 'PRACTICA' ? 'PRACTICA' : 'CLASE';
     for (const host of this.hosts) {
       if (host.telemetria) {
+        const puesto = this.obtenerPuestoDeHost(host.id);
         host.evaluarEstado({
           osOnline: host.telemetria.os_online,
           amtOnline: host.telemetria.amt_online,
           pwr: host.telemetria.pwr,
           conn: host.telemetria.conn,
-          modoLaboratorio: this.modo
+          modoLaboratorio: this.modo,
+          puesto: puesto,
+          switchAsignado: puesto ? puesto.obtenerSwitch() : null
         });
       }
     }
@@ -177,7 +206,12 @@ class Laboratorio {
     return {
       nombre: this.nombre,
       modo: this.modo,
+      filas: this.filas,
+      columnas: this.columnas,
+      columnas_hilera: this.columnasHilera,
+      total_puestos: this.filas * this.columnas,
       metricas: this.obtenerMetricas(),
+      switches: this.listarSwitches().map(s => s.toJSON()),
       redes: this.redes.map(r => r.toJSON()),
       hosts: this.hosts.map(h => h.toJSON()),
       puestos: this.listarPuestos().map(p => p.toJSON())

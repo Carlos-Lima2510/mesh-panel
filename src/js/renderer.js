@@ -8,61 +8,80 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-const CLASSROOM_ROWS = [
-  { label: 'F1', left: [1, 2, 3, 4], right: [5, 6, 7, 8] },
-  { label: 'F2', left: [9, 10, 11, 12], right: [13, 14, 15, 16] },
-  { label: 'F3', left: [17, 18, 19, 20], right: [21, 22, 23, 24] },
-  { label: 'F4', left: [25, 26, 27, 28], right: [29, 30, 31, 32] },
-  { label: 'F5', left: [33, 34, 35, 36], right: [37, 38, 39, 40] }
-];
-
 export class DashboardRenderer {
   constructor(containerId = 'classroom-grid') {
     this.classroomGrid = document.getElementById(containerId);
     this.slotElements = new Map();
     this.currentSlotToHost = new Map();
+    this.filas = 5;
+    this.colsHilera = 4;
+    this.columnas = 8;
 
-    this.inicializarEstructuraMapa();
+    this.inicializarEstructuraMapa(this.filas, this.colsHilera);
   }
 
-  inicializarEstructuraMapa() {
+  inicializarEstructuraMapa(filas = 5, colsHilera = 4) {
     if (!this.classroomGrid) return;
+    this.filas = parseInt(filas, 10) || 5;
+    this.colsHilera = parseInt(colsHilera, 10) || 4;
+    this.columnas = this.colsHilera * 2;
     this.classroomGrid.innerHTML = '';
     this.slotElements.clear();
 
-    CLASSROOM_ROWS.forEach(rowData => {
+    const headerLeft = document.getElementById('header-left-col');
+    const headerRight = document.getElementById('header-right-col');
+    if (headerLeft) headerLeft.textContent = `Hilera Izquierda (${this.colsHilera} cols)`;
+    if (headerRight) headerRight.textContent = `Hilera Derecha (${this.colsHilera} cols)`;
+
+    let slotCounter = 1;
+
+    for (let f = 1; f <= this.filas; f++) {
       const rowEl = document.createElement('div');
       rowEl.className = 'classroom-row';
 
-      const labelEl = document.createElement('div');
-      labelEl.className = 'row-label';
-      labelEl.textContent = rowData.label;
-      rowEl.appendChild(labelEl);
+      // Etiqueta izquierda de fila
+      const labelLeft = document.createElement('div');
+      labelLeft.className = 'row-label';
+      labelLeft.textContent = `F${f}`;
+      rowEl.appendChild(labelLeft);
 
+      // Bloque de mesas izquierdo
       const leftBlock = document.createElement('div');
       leftBlock.className = 'row-block';
-      rowData.left.forEach(slotNum => {
-        const slotCard = this._crearSlotCard(`puesto-${slotNum}`, slotNum);
+      leftBlock.style.setProperty('--cols-hilera', this.colsHilera);
+      for (let c = 1; c <= this.colsHilera; c++) {
+        const slotCard = this._crearSlotCard(`puesto-${slotCounter}`, slotCounter);
         leftBlock.appendChild(slotCard);
-        this.slotElements.set(`puesto-${slotNum}`, slotCard);
-      });
+        this.slotElements.set(`puesto-${slotCounter}`, slotCard);
+        slotCounter++;
+      }
       rowEl.appendChild(leftBlock);
 
+      // Pasillo central (EN EL MEDIO SIEMPRE)
       const aisleEl = document.createElement('div');
       aisleEl.className = 'aisle-divider';
       rowEl.appendChild(aisleEl);
 
+      // Bloque de mesas derecho (exactamente el mismo número de columnas para simetría total)
       const rightBlock = document.createElement('div');
       rightBlock.className = 'row-block';
-      rowData.right.forEach(slotNum => {
-        const slotCard = this._crearSlotCard(`puesto-${slotNum}`, slotNum);
+      rightBlock.style.setProperty('--cols-hilera', this.colsHilera);
+      for (let c = 1; c <= this.colsHilera; c++) {
+        const slotCard = this._crearSlotCard(`puesto-${slotCounter}`, slotCounter);
         rightBlock.appendChild(slotCard);
-        this.slotElements.set(`puesto-${slotNum}`, slotCard);
-      });
+        this.slotElements.set(`puesto-${slotCounter}`, slotCard);
+        slotCounter++;
+      }
       rowEl.appendChild(rightBlock);
 
+      // Etiqueta derecha de fila (para centrado geométrico perfecto del pasillo en medio)
+      const labelRight = document.createElement('div');
+      labelRight.className = 'row-label';
+      labelRight.textContent = `F${f}`;
+      rowEl.appendChild(labelRight);
+
       this.classroomGrid.appendChild(rowEl);
-    });
+    }
   }
 
   _crearSlotCard(slotKey, displayNum = null) {
@@ -125,6 +144,7 @@ export class DashboardRenderer {
     const mac = (puesto.telemetria?.mac || '').toLowerCase();
     const boca = (puesto.boca_switch || '').toLowerCase();
     const port = puesto.telemetria?.switch?.port !== undefined ? String(puesto.telemetria.switch.port) : '';
+    const swAsignado = (puesto.telemetria?.switch_asignado || '').toLowerCase();
     const red = (puesto.red?.nombre || '').toLowerCase();
     const diag = (puesto.diagnostico || '').toLowerCase();
 
@@ -135,13 +155,27 @@ export class DashboardRenderer {
       boca.includes(q) ||
       port === q ||
       (`p${port}`).toLowerCase().includes(q) ||
+      swAsignado.includes(q) ||
       red.includes(q) ||
       diag.includes(q)
     );
   }
 
-  generarEmptySlotHtml(num) {
+  generarEmptySlotHtml(num, puestoFisico = null, switchesList = []) {
     const slotStr = String(num).padStart(2, '0');
+    const puestoId = puestoFisico?.id || `puesto-${num}`;
+    const swIdActual = puestoFisico?.switch_id || 'sw-docente';
+    const isSwPracticas = swIdActual === 'sw-practicas';
+    const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
+    const tomaStr = puestoFisico?.toma || `ROS-${slotStr}`;
+
+    const selectOptions = (Array.isArray(switchesList) && switchesList.length > 0)
+      ? switchesList.map(sw => `<option value="${escapeHtml(sw.id)}" ${sw.id === swIdActual ? 'selected' : ''}>${escapeHtml(sw.nombre || sw.id)}</option>`).join('')
+      : `
+        <option value="sw-docente" ${!isSwPracticas ? 'selected' : ''}>Sw. Docente</option>
+        <option value="sw-practicas" ${isSwPracticas ? 'selected' : ''}>Sw. Prácticas</option>
+      `;
+
     return `
       <div>
         <div class="card-top">
@@ -153,17 +187,22 @@ export class DashboardRenderer {
         </div>
         <div class="card-body">
           <div class="row"><span>IP:</span><span>---</span></div>
-          <div class="row"><span>Boca:</span><span>---</span></div>
-          <div class="row"><span>Red:</span><span>Red Docencia</span></div>
+          <div class="row"><span>Boca:</span><span>port${num}</span></div>
+          <div class="row row-switch">
+            <span>Switch:</span>
+            <select class="switch-select ${swBadgeClass}" onchange="window.cambiarSwitchPuesto('${escapeHtml(puestoId)}', this.value)" title="Asignar switch a ${escapeHtml(puestoId)}">
+              ${selectOptions}
+            </select>
+          </div>
         </div>
       </div>
       <div class="card-bottom">
-        <div class="diag-compact" title="Mesa disponible">Disponible</div>
+        <div class="diag-compact" title="Mesa disponible (${escapeHtml(tomaStr)})">Disponible</div>
       </div>
     `;
   }
 
-  generarCompactCardHtml(p, slotNum) {
+  generarCompactCardHtml(p, slotNum, puestoFisico = null, switchesList = []) {
     const slotStr = String(slotNum).padStart(2, '0');
     const sw = p.telemetria?.switch || {};
     const linkStr = sw.link ? sw.link.toUpperCase() : 'DOWN';
@@ -190,7 +229,17 @@ export class DashboardRenderer {
       bottomActionHtml = `<div class="diag-compact" title="${escapeHtml(diagText)}">${escapeHtml(diagText)}</div>`;
     }
 
-    const redNombre = p.red?.nombre || (p.red?.es_aislada ? 'Red Prácticas' : 'Red Docencia');
+    const puestoId = p.puesto_id || puestoFisico?.id || `puesto-${slotNum}`;
+    const swIdActual = puestoFisico?.switch_id || (p.telemetria?.switch_asignado?.toLowerCase().includes('práctica') ? 'sw-practicas' : 'sw-docente');
+    const isSwPracticas = swIdActual === 'sw-practicas' || (p.red?.es_aislada === true);
+    const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
+
+    const selectOptions = (Array.isArray(switchesList) && switchesList.length > 0)
+      ? switchesList.map(sw => `<option value="${escapeHtml(sw.id)}" ${sw.id === swIdActual ? 'selected' : ''}>${escapeHtml(sw.nombre || sw.id)}</option>`).join('')
+      : `
+        <option value="sw-docente" ${!isSwPracticas ? 'selected' : ''}>Sw. Docente</option>
+        <option value="sw-practicas" ${isSwPracticas ? 'selected' : ''}>Sw. Prácticas</option>
+      `;
 
     return `
       <div>
@@ -210,9 +259,11 @@ export class DashboardRenderer {
             <span>Boca:</span>
             <span title="${escapeHtml(portName)} (${linkStr})">${escapeHtml(portName)} (${linkStr})</span>
           </div>
-          <div class="row">
-            <span>Red:</span>
-            <span title="${escapeHtml(redNombre)}">${escapeHtml(redNombre)}</span>
+          <div class="row row-switch">
+            <span>Switch:</span>
+            <select class="switch-select ${swBadgeClass}" onchange="window.cambiarSwitchPuesto('${escapeHtml(puestoId)}', this.value)" title="Asignar switch a ${escapeHtml(puestoId)}">
+              ${selectOptions}
+            </select>
           </div>
         </div>
       </div>
@@ -225,6 +276,20 @@ export class DashboardRenderer {
   render(puestosMap, metricas = null, options = {}) {
     const query = options.query || '';
     const hasFilter = Boolean(query && query.trim());
+    const puestosFisicos = options.puestosFisicos || [];
+    const switchesList = options.switches || [];
+    const filas = parseInt(options.filas, 10) || this.filas || 5;
+    const colsHilera = parseInt(options.columnas_hilera || options.colsHilera, 10) ||
+      (options.columnas ? Math.ceil(parseInt(options.columnas, 10) / 2) : (this.colsHilera || 4));
+
+    if (filas !== this.filas || colsHilera !== this.colsHilera || this.slotElements.size !== (filas * colsHilera * 2)) {
+      this.inicializarEstructuraMapa(filas, colsHilera);
+    }
+
+    const puestosFisicosMap = new Map();
+    if (Array.isArray(puestosFisicos)) {
+      puestosFisicos.forEach(pf => puestosFisicosMap.set(pf.id, pf));
+    }
 
     const slotToHost = this.construirSlotMap(puestosMap);
     this.currentSlotToHost = slotToHost;
@@ -232,11 +297,12 @@ export class DashboardRenderer {
     for (const [key, slotCard] of this.slotElements.entries()) {
       const host = slotToHost.get(key);
       const displayNum = slotCard.dataset.num || key;
+      const puestoFisico = puestosFisicosMap.get(key);
 
       if (host) {
         const isMatch = this.matches(host, query);
         slotCard.className = `card-compact ${host.estado}`;
-        slotCard.innerHTML = this.generarCompactCardHtml(host, displayNum);
+        slotCard.innerHTML = this.generarCompactCardHtml(host, displayNum, puestoFisico, switchesList);
 
         if (hasFilter) {
           if (isMatch) {
@@ -251,7 +317,7 @@ export class DashboardRenderer {
         }
       } else {
         slotCard.className = 'card-compact card-empty';
-        slotCard.innerHTML = this.generarEmptySlotHtml(displayNum);
+        slotCard.innerHTML = this.generarEmptySlotHtml(displayNum, puestoFisico, switchesList);
         if (hasFilter) {
           slotCard.classList.add('dimmed');
           slotCard.classList.remove('match-highlight');

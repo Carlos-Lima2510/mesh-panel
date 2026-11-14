@@ -82,12 +82,15 @@ Se evalúa si la disposición del aula debe modelarse mediante una entidad adici
    La asignación del switch no requiere tablas intermedias de plantillas: cada puesto guarda su clave foránea al switch asignado (`puestos.switch_id`). Una reconfiguración de subgrupos se traduce en una actualización directa sobre la colección de puestos:
    $$\text{UPDATE puestos SET switch\_id = 'sw-practicas' WHERE fila IN (1, 2, 3);}$$
 
-### 3.2. Especificación de la Vista en Cuadrícula con Pasillo Central
-* La interfaz de usuario genera la cuadrícula física a partir de $F \text{ filas} \times C \text{ columnas}$ (ej. $5 \times 8 = 40$ puestos o $7 \times 8 = 56$ puestos).
-* El **pasillo central** se modela como una regla estructural de presentación que divide el espacio en dos hileras simétricas:
-  * **Hilera Izquierda:** Columnas $1 \dots \lfloor C/2 \rfloor$.
-  * **Hilera Derecha:** Columnas $\lfloor C/2 \rfloor + 1 \dots C$.
-* La selección interactiva permite marcar un bloque de puestos y asignarle el switch destino (`swDocente` vs. `swPracticas`), mapeando automáticamente las bocas físicas (`puertoSwitch`).
+### 3.2. Especificación de la Vista en Cuadrícula Dinámica y Asignación Granular de Switches
+* **Dimensionamiento Dinámico por el Administrador:** La interfaz y el backend no imponen un número rígido de puestos. El administrador del panel define en tiempo de ejecución las dimensiones de la cuadrícula: $F \text{ filas} \times C \text{ columnas}$ (ej. $5 \times 8 = 40$, $6 \times 10 = 60$, o cualquier valor configurado), desplegando inmediatamente el mapa de mesas físicas.
+* **El Pasillo Central como Regla Estructural de Presentación:** Divide dinámicamente la cuadrícula en dos hileras simétricas:
+  * **Hilera Izquierda:** Columnas $1 \dots \lceil C/2 \rceil$.
+  * **Hilera Derecha:** Columnas $\lceil C/2 \rceil + 1 \dots C$.
+* **Enlace Granular e Individual por Puesto (Rechazo de Modos/Presets Fijos):** No existen modos fijos ("modo híbrido 20/20" o "modo completo"). En su lugar:
+  * **Por puesto individual:** Cada puesto físico posee un selector interactivo que permite enlazarlo a demanda a cualquier conmutador del catálogo (`Switch Docente` vs `Switch Prácticas`).
+  * **Por rango/bloque:** El administrador puede aplicar asignaciones masivas a rangos arbitrarios de puestos, permitiendo cualquier proporción operativa requerida por la sesión docente (ej. $20-20$, $5-50$, $10-30$, etc.).
+  * Cada puesto preserva su mapeo físico de cableado (`puertoSwitch` y roseta `toma`).
 
 ### 3.3. Mapeo Transitivo Host $\rightarrow$ Puesto $\rightarrow$ Switch y Normalización (3FN)
 En la realidad física del aula, un equipo informático (`Host`) no se conecta directamente al switch del rack; se coloca sobre una mesa (`Puesto`) que posee una roseta física (`toma`) parcheada a un puerto del conmutador (`Switch`).
