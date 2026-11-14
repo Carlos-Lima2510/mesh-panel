@@ -22,7 +22,7 @@ Modela las entidades conceptuales del laboratorio docente, asegurando puestos f�
 
 ## 2. Diagrama de Objetos
 
-Instancia canónica 1:1 que valida el modelo con exactamente un objeto por clase, reflejando valores representativos de los atributos del sistema.
+Instancia canónica que valida el modelo reflejando la coexistencia de ambos switches (docente y prácticas), puestos asignados y valores representativos de los atributos del sistema.
 
 <div align="center">
   <img src="../../images/00-modelo-del-dominio/diagrama-objetos.svg" alt="Diagrama de Objetos" />

@@ -5,18 +5,48 @@ object "labInformatica : Laboratorio" as lab {
     modo = CLASE
 }
 
-object "puesto_01 : Puesto" as puesto {
+object "puesto_01 : Puesto" as puesto01 {
     etiqueta = "MESA-01"
     fila = 1
     columna = 1
     toma = "ROS-01"
+    puertoSwitch = 1
 }
 
-object "pc_01 : Host" as host {
+object "puesto_02 : Puesto" as puesto02 {
+    etiqueta = "MESA-02"
+    fila = 1
+    columna = 2
+    toma = "ROS-02"
+    puertoSwitch = 1
+}
+
+object "pc_01 : Host" as host01 {
     nombre = "PC-LAB-01"
     mac = "00:1A:2B:3C:4D:01"
-    ip = "192.168.1.101"
+    ip = "10.0.1.101"
     estado = OPERATIVO
+}
+
+object "pc_02 : Host" as host02 {
+    nombre = "PC-LAB-02"
+    mac = "00:1A:2B:3C:4D:02"
+    ip = "192.168.2.102"
+    estado = RED_AISLADA
+}
+
+object "swDocente : Switch" as swDocente {
+    nombre = "Switch Principal Docente"
+    tipo = GESTIONADO
+    totalPuertos = 48
+    ipGestion = "10.0.0.2"
+}
+
+object "swPracticas : Switch" as swPracticas {
+    nombre = "Switch Banco de Prácticas"
+    tipo = NO_GESTIONADO
+    totalPuertos = 24
+    ipGestion = null
 }
 
 object "redUniversidad : Red" as redUniversidad {
@@ -29,11 +59,22 @@ object "redAislada : Red" as redAislada {
     esAislada = true
 }
 
-lab *-- puesto
-lab o-- redUniversidad
-lab o-- redAislada
+' Contención física en el aula
+lab *-- puesto01
+lab *-- puesto02
+lab o-- swDocente
+lab o-- swPracticas
 
-puesto o-- host
-puesto -- redUniversidad
+' Conexiones de cableado a bocas de switch
+puesto01 -- swDocente
+puesto02 -- swPracticas
+
+' Alojamiento de hosts en mesas
+puesto01 o-- host01
+puesto02 o-- host02
+
+' Switches dando servicio a las redes
+swDocente -- redUniversidad
+swPracticas -- redAislada
 
 @enduml
