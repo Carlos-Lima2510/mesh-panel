@@ -4,7 +4,7 @@
 
 state EN_CLASE {
     EN_CLASE : Contexto: Sesión lectiva ordinaria
-    EN_CLASE : Política de red: Todos los puestos en red docente
+    EN_CLASE : Política de red: Todos los puestos en red de la universidad
     EN_CLASE : Interpretación de enlace DOWN: Alerta (Cable desconectado o sin luz)
 }
 
