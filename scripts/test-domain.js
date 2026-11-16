@@ -13,6 +13,7 @@ const {
 } = require('../daemon/domain/estado');
 const Host = require('../daemon/domain/Host');
 const Puesto = require('../daemon/domain/Puesto');
+const Switch = require('../daemon/domain/Switch');
 const Laboratorio = require('../daemon/domain/Laboratorio');
 const LaboratorioService = require('../daemon/application/LaboratorioService');
 const SseBroadcaster = require('../daemon/interfaces/http/SseBroadcaster');
@@ -255,22 +256,160 @@ const mockNetworkProvider = {
   assert.strictEqual(responseData.laboratorio.hosts.length, 2);
   assert.strictEqual(responseData.laboratorio.puestos.length, 40);
 
-  // POST /api/puestos/mover
-  const reqMover = {
+  // POST /api/puestos/asignar-switch
+  const reqAsignarSwitch = {
     method: 'POST',
-    url: '/api/puestos/mover',
+    url: '/api/puestos/asignar-switch',
     on: (evt, cb) => {
       if (evt === 'data') cb(Buffer.from(JSON.stringify({
-        host_id: 'dev-1',
-        puesto_id: 'puesto-10'
+        puesto_ids: ['puesto-1', 'puesto-2', 'puesto-3'],
+        switch_id: 'sw-practicas'
       })));
       if (evt === 'end') cb();
     }
   };
-  await router.handle(reqMover, mockRes);
-  const respMover = JSON.parse(responseBody);
-  assert.strictEqual(respMover.success, true);
-  assert.strictEqual(respMover.laboratorio.puestos.find(p => p.id === 'puesto-10').host.nombre, 'UEA-C226');
+  await router.handle(reqAsignarSwitch, mockRes);
+  const respAsignar = JSON.parse(responseBody);
+  assert.strictEqual(respAsignar.success, true);
+  const puesto1Sw = respAsignar.laboratorio.puestos.find(p => p.id === 'puesto-1');
+  assert.strictEqual(puesto1Sw.switch_id, 'sw-practicas');
+  assert.strictEqual(puesto1Sw.switch_nombre, 'Switch Banco de Prácticas');
+
+  // Test de asignaciones en lote (Modo Híbrido atómico)
+  const reqAsignarBatch = {
+    method: 'POST',
+    url: '/api/puestos/asignar-switch',
+    on: (evt, cb) => {
+      if (evt === 'data') cb(Buffer.from(JSON.stringify({
+        asignaciones: [
+          { puesto_ids: ['puesto-1'], switch_id: 'sw-docente' },
+          { puesto_ids: ['puesto-2', 'puesto-3'], switch_id: 'sw-practicas' }
+        ]
+      })));
+      if (evt === 'end') cb();
+    }
+  };
+  await router.handle(reqAsignarBatch, mockRes);
+  const respBatch = JSON.parse(responseBody);
+  assert.strictEqual(respBatch.success, true);
+  assert.strictEqual(respBatch.laboratorio.puestos.find(p => p.id === 'puesto-1').switch_id, 'sw-docente');
+  assert.strictEqual(respBatch.laboratorio.puestos.find(p => p.id === 'puesto-2').switch_id, 'sw-practicas');
+  assert.strictEqual(respBatch.laboratorio.puestos.find(p => p.id === 'puesto-3').switch_id, 'sw-practicas');
+
+  // Test de configuración dinámica de dimensiones (6 filas x 10 columnas = 60 puestos)
+  const reqDimensiones = {
+    method: 'POST',
+    url: '/api/laboratorio/dimensiones',
+    on: (evt, cb) => {
+      if (evt === 'data') cb(Buffer.from(JSON.stringify({ filas: 6, columnas: 10 })));
+      if (evt === 'end') cb();
+    }
+  };
+  await router.handle(reqDimensiones, mockRes);
+  const respDim = JSON.parse(responseBody);
+  assert.strictEqual(respDim.success, true);
+  assert.strictEqual(respDim.laboratorio.filas, 6);
+  assert.strictEqual(respDim.laboratorio.columnas, 10);
+  assert.strictEqual(respDim.laboratorio.puestos.length, 60);
+
+  // Test de asignación por rango (5 puestos a prácticas y 55 a docente)
+  const reqRangoPracticas = {
+    method: 'POST',
+    url: '/api/puestos/asignar-switch',
+    on: (evt, cb) => {
+      if (evt === 'data') cb(Buffer.from(JSON.stringify({ desde: 1, hasta: 5, switch_id: 'sw-practicas' })));
+      if (evt === 'end') cb();
+    }
+  };
+  await router.handle(reqRangoPracticas, mockRes);
+  const respRango = JSON.parse(responseBody);
+  assert.strictEqual(respRango.success, true);
+  const practicasCount = respRango.laboratorio.puestos.filter(p => p.switch_id === 'sw-practicas').length;
+  assert.strictEqual(practicasCount, 5);
+
+  // 8. Verificación de la entidad Switch e Invariantes de No-Colisión (ADR-004)
+  assert.throws(() => new Switch({}), Error);
+  const swDocente = new Switch({
+    id: 'sw-docente',
+    nombre: 'Switch Principal Docente',
+    tipo: 'GESTIONADO',
+    totalPuertos: 48,
+    ipGestion: '10.0.0.2',
+    red: new Red({ id: 'red-uni', nombre: 'Red Universidad', subred: '10.0.0.0', esAislada: false })
+  });
+  assert.strictEqual(swDocente.esGestionado(), true);
+  assert.strictEqual(swDocente.esperaMeshCentral(), true);
+  assert.strictEqual(swDocente.puertosLibres(), 48);
+
+  const swPracticas = new Switch({
+    id: 'sw-practicas',
+    nombre: 'Switch Banco de Prácticas',
+    tipo: 'NO_GESTIONADO',
+    totalPuertos: 24,
+    ipGestion: null,
+    red: new Red({ id: 'red-aislada', nombre: 'Red Prácticas', subred: '192.168.2.0', esAislada: true })
+  });
+  assert.strictEqual(swPracticas.esGestionado(), false);
+  assert.strictEqual(swPracticas.esperaMeshCentral(), false);
+
+  // Invariante de rango de puertos
+  assert.throws(() => swDocente.conectarPuesto(0, 'puesto-01'), Error);
+  assert.throws(() => swDocente.conectarPuesto(49, 'puesto-01'), Error);
+
+  // Invariante de No-Colisión física
+  swDocente.conectarPuesto(1, 'puesto-01');
+  assert.strictEqual(swDocente.obtenerPuestoEnPuerto(1), 'puesto-01');
+  assert.strictEqual(swDocente.puertosLibres(), 47);
+  // Asignar otro puesto al mismo puerto debe lanzar conflicto
+  assert.throws(() => swDocente.conectarPuesto(1, 'puesto-02'), /Conflicto/);
+
+  // Idempotencia: el mismo puesto en el mismo puerto no debe lanzar error
+  swDocente.conectarPuesto(1, 'puesto-01');
+
+  // 9. Verificación de Puesto conectado a Switch y migración de switch
+  const p1 = new Puesto({ id: 'puesto-01', fila: 1, columna: 1, toma: 'ROS-01' });
+  p1.asignarSwitch(swDocente, 2);
+  assert.strictEqual(p1.obtenerSwitch().id, 'sw-docente');
+  assert.strictEqual(p1.puertoSwitch, 2);
+  assert.strictEqual(swDocente.obtenerPuestoEnPuerto(2), 'puesto-01');
+
+  // Al reasignar el puesto a otro switch, se debe liberar la boca anterior
+  p1.asignarSwitch(swPracticas, 1);
+  assert.strictEqual(p1.obtenerSwitch().id, 'sw-practicas');
+  assert.strictEqual(p1.puertoSwitch, 1);
+  assert.strictEqual(swDocente.obtenerPuestoEnPuerto(2), null);
+  assert.strictEqual(swPracticas.obtenerPuestoEnPuerto(1), 'puesto-01');
+  assert.strictEqual(p1.esperaEstarAislado(), true);
+
+  // 10. Verificación de Diagnóstico Contextual por Puesto (ADR-004 Aula Híbrida)
+  // Puesto en Switch Docente con boca DOWN -> DESCONECTADO (naranja)
+  const estDocenteDown = EvaluadorEstado.evaluar({
+    enlaceFisico: { port: 5, link: 'DOWN', speed: 0 },
+    osOnline: false,
+    switchAsignado: swDocente,
+    modoLaboratorio: 'CLASE'
+  });
+  assert.strictEqual(estDocenteDown instanceof EstadoDesconectado, true);
+  assert.strictEqual(estDocenteDown.color, 'NARANJA');
+
+  // Puesto en Switch Prácticas con boca DOWN -> RED_AISLADA (amarillo) AUNQUE EL MODO GLOBAL SEA 'CLASE'
+  const estPracticasHibrido = EvaluadorEstado.evaluar({
+    enlaceFisico: { port: 5, link: 'DOWN', speed: 0 },
+    osOnline: false,
+    switchAsignado: swPracticas,
+    modoLaboratorio: 'CLASE' // Aula híbrida: el modo global es clase, pero este puesto opera en prácticas
+  });
+  assert.strictEqual(estPracticasHibrido instanceof EstadoRedAislada, true);
+  assert.strictEqual(estPracticasHibrido.color, 'AMARILLO');
+
+  // 11. Verificación de Laboratorio albergando Switches
+  const labConSwitches = new Laboratorio({ nombre: 'Laboratorio Telemática' });
+  labConSwitches.agregarSwitch(swDocente).agregarSwitch(swPracticas);
+  assert.strictEqual(labConSwitches.listarSwitches().length, 2);
+  assert.strictEqual(labConSwitches.obtenerSwitch('sw-docente').totalPuertos, 48);
+  const jsonLab = labConSwitches.toJSON();
+  assert.strictEqual(jsonLab.switches.length, 2);
+  assert.strictEqual(jsonLab.switches[0].id, 'sw-docente');
 
   console.log('✔ Todas las pruebas unitarias y de integración pasaron con éxito.');
   process.exit(0);

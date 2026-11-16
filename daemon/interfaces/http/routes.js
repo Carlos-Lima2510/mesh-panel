@@ -14,10 +14,15 @@ function registrarRutas({
   router.post('/api/devices', (req, res) => laboratorioController.escanear(req, res));
   router.post('/api/refresh', (req, res) => laboratorioController.escanear(req, res));
   router.post('/api/laboratorio/modo', (req, res) => laboratorioController.cambiarModo(req, res));
+  router.post('/api/laboratorio/dimensiones', (req, res) => laboratorioController.configurarDimensiones(req, res));
+  router.post('/api/laboratorio/cuadricula', (req, res) => laboratorioController.configurarDimensiones(req, res));
 
   router.post('/api/puestos/mover', (req, res) => laboratorioController.moverPuesto(req, res));
   // Alias de compatibilidad hacia atrás
   router.post('/api/distribuciones/mover', (req, res) => laboratorioController.moverPuesto(req, res));
+
+  router.post('/api/puestos/asignar-switch', (req, res) => laboratorioController.asignarSwitch(req, res));
+  router.post('/api/laboratorio/asignar-switch', (req, res) => laboratorioController.asignarSwitch(req, res));
 
   router.post('/api/power/wake', (req, res) => powerController.wake(req, res));
   router.post('/api/power/off', (req, res) => powerController.powerOff(req, res));

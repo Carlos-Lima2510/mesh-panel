@@ -49,27 +49,61 @@
       <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda" style="display: none;">&times;</button>
     </div>
 
+    <!-- Controles de Cuadrícula Dinámica (Filas x Columnas por Hilera) -->
+    <div class="grid-dimension-controls" aria-label="Dimensiones de la Cuadrícula">
+      <span class="toolbar-label">Cuadrícula:</span>
+      <div class="dim-inputs">
+        <label for="input-filas" class="dim-label">Filas:</label>
+        <input type="number" id="input-filas" class="input-dim" min="1" max="20" value="5" title="Número de filas de mesas" />
+        <span class="dim-sep">&times;</span>
+        <label for="input-columnas" class="dim-label">Cols/Hilera:</label>
+        <input type="number" id="input-columnas" class="input-dim" min="1" max="20" value="4" title="Columnas a cada lado del pasillo central" />
+        <button id="btn-aplicar-cuadricula" class="btn-subtle" type="button" title="Aplicar cuadrícula (pasillo en medio siempre)">
+          📐 Aplicar
+        </button>
+      </div>
+    </div>
+
+    <!-- Herramienta de Asignación de Switch por Rango -->
+    <div class="switch-assign-tool" aria-label="Asignación de Switch por Rango">
+      <span class="toolbar-label">Switch Rango:</span>
+      <div class="range-inputs">
+        <span class="range-text">#</span>
+        <input type="number" id="input-range-desde" class="input-dim" min="1" value="1" title="Puesto inicial" />
+        <span class="range-text">a</span>
+        <input type="number" id="input-range-hasta" class="input-dim" min="1" value="20" title="Puesto final" />
+        <select id="select-range-switch" class="select-range-switch" title="Switch destino">
+          <option value="sw-docente">Sw. Docente</option>
+          <option value="sw-practicas" selected>Sw. Prácticas</option>
+        </select>
+        <button id="btn-aplicar-rango-switch" class="btn-subtle" type="button" title="Asignar switch a este rango de puestos">
+          ⚡ Asignar
+        </button>
+      </div>
+    </div>
+
     <div class="classroom-summary">
-      <span class="summary-tag">40 Puestos Fijos</span>
-      <span class="summary-tag">2 Hileras &times; 4 Columnas</span>
+      <span id="total-puestos-badge" class="summary-tag">40 Puestos</span>
+      <span id="grid-dims-badge" class="summary-tag">5 Filas &times; 4+4 Cols</span>
     </div>
   </section>
 
-  <!-- DISTRIBUCIÓN FIJA DEL AULA: 40 PUESTOS (2 HILERAS DE 4 COLUMNAS X 5 FILAS Y PASILLO CENTRAL) -->
+  <!-- CUADRÍCULA DINÁMICA DEL AULA (PASILLO EN EL MEDIO SIEMPRE) -->
   <main class="classroom-container">
     <div class="classroom-headers" id="classroom-headers">
       <div class="corner-header">Fila</div>
-      <div class="col-header">Hilera Izquierda (4 columnas)</div>
-      <div class="aisle-header">Pasillo</div>
-      <div class="col-header">Hilera Derecha (4 columnas)</div>
+      <div class="col-header" id="header-left-col">Hilera Izquierda (4 cols)</div>
+      <div class="aisle-header">Pasillo Central</div>
+      <div class="col-header" id="header-right-col">Hilera Derecha (4 cols)</div>
+      <div class="corner-header">Fila</div>
     </div>
 
     <div class="classroom-grid" id="classroom-grid">
-      <!-- 5 filas generadas dinámicamente -->
+      <!-- filas generadas dinámicamente con pasillo en medio siempre -->
     </div>
   </main>
 
-  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/app.js?v=20261114_03"></script>
 </body>
 
 </html>

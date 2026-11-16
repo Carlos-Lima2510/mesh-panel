@@ -12,12 +12,20 @@ class Puesto {
     fila
     columna
     toma
+    puertoSwitch
 }
 
 class Host {
     nombre
     mac
     ip
+}
+
+class Switch {
+    nombre
+    tipo
+    totalPuertos
+    ipGestion
 }
 
 class Red {
@@ -38,13 +46,15 @@ enum Estado {
     DESCONECTADO
 }
 
-Laboratorio..ModoOperativo
-Host..Estado
+Laboratorio .. ModoOperativo
+Host .. Estado
 
 Laboratorio "1" *-- "1..*" Puesto : posee físicamente
-Laboratorio "1" o-- "1..*" Red : ofrece acceso a
+Laboratorio "1" o-- "1..*" Switch : alberga >
 
+Puesto "0..*" -- "1" Switch : conecta a boca >
 Puesto "1" o-- "0..1" Host : aloja
-Puesto "0..*" -- "0..1" Red : conecta con >
+
+Switch "1..*" -- "1" Red : da servicio a >
 
 @enduml
