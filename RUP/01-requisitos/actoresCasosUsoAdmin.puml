@@ -1,0 +1,28 @@
+@startuml actoresCasosUsoAdministrador
+
+left to right direction
+
+actor Administrador
+actor UsuarioNoLogueado
+
+usecase iniciarSesion as "iniciarSesion()"
+usecase cerrarSesion as "cerrarSesion()"
+
+UsuarioNoLogueado -- iniciarSesion
+
+usecase consultarEstadoPuestos as "consultarEstadoPuestos()"
+usecase consultarDetallePuesto as "consultarDetallePuesto()"
+usecase encenderPuesto as "encenderPuesto()"
+usecase asignarPuestosASwitch as "asignarPuestosASwitch()"
+usecase dimensionarCuadricula as "dimensionarCuadricula()"
+usecase cambiarModo as "cambiarModo()"
+
+Administrador -- consultarEstadoPuestos
+Administrador -- consultarDetallePuesto
+Administrador -- encenderPuesto
+Administrador -- asignarPuestosASwitch
+Administrador -- dimensionarCuadricula
+Administrador -- cerrarSesion
+Administrador -- cambiarModo
+
+@enduml
