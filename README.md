@@ -60,10 +60,10 @@ mesh-panel/
 │   │   ├── diagrama-clases.puml        # Diagrama de Clases estructural
 │   │   ├── diagrama-objetos.puml       # Instancia canónica de validación
 │   │   └── diagrama-estados/           # Autómatas de estados (Host y Laboratorio)
-│   └── 01-requisitos/                  # Requisitos, casos de uso y diagrama de contexto
-│       ├── README.md                   # Catálogo de actores, casos de uso y contexto
-│       ├── actoresCasosUsoAdmin.puml   # Diagrama de Casos de Uso del Administrador
-│       └── diagrama-de-contexto.puml   # Diagrama de Contexto del Administrador
+│   └── 01-requisitos/                  # Requisitos, casos de uso y detalle
+│       ├── README.md                   # Índice concentrador de la fase de requisitos
+│       ├── 00-actores-casos-uso/       # Actores, catálogo de CUs y diagrama de contexto
+│       └── 01-detalle-casos-uso/       # Fichas detalladas y prototipos por caso de uso
 ├── docs/                               # Documentación de Arquitectura, Matrices y Manuales
 │   ├── adr/                            # Registros de Decisiones Arquitectónicas (ADR)
 │   │   ├── ADR-001-acotamiento-acciones-trazabilidad.md
