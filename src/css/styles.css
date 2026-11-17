@@ -248,7 +248,7 @@ header {
 
 .classroom-headers {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 64px minmax(0, 1fr);
+  grid-template-columns: 48px 1fr 64px 1fr 48px;
   align-items: center;
   text-align: center;
   font-size: 0.8rem;
@@ -298,7 +298,7 @@ header {
 
 .classroom-row {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 64px minmax(0, 1fr);
+  grid-template-columns: 48px 1fr 64px 1fr 48px;
   align-items: stretch;
   gap: 12px;
 }
@@ -318,7 +318,7 @@ header {
 
 .row-block {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -585,4 +585,188 @@ header {
 .card-compact.match-highlight {
   box-shadow: 0 0 0 2px var(--primary), 0 4px 14px rgba(59, 130, 246, 0.4) !important;
   transform: translateY(-1px);
+}
+
+/* Distintivos de Conexión a Switch (ADR-004) */
+.switch-badge {
+  display: inline-block;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.switch-badge.docente {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.switch-badge.practicas {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+/* ==============================================================================
+   CONTROLES DE CONFIGURACIÓN DE CUADRÍCULA Y ASIGNACIÓN DINÁMICA DE SWITCHES
+   ============================================================================== */
+.grid-dimension-controls,
+.switch-assign-tool,
+.switch-assign-presets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.65);
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.toolbar-label,
+.presets-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dim-inputs,
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dim-label,
+.range-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.dim-sep {
+  color: var(--text-muted);
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.input-dim {
+  width: 44px;
+  text-align: center;
+  background: #090e1a;
+  border: 1px solid var(--border);
+  color: #f8fafc;
+  border-radius: 6px;
+  padding: 4px 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-dim:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.select-range-switch {
+  background: #090e1a;
+  border: 1px solid var(--border);
+  color: #f8fafc;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.select-range-switch:focus {
+  border-color: var(--primary);
+}
+
+.select-range-switch option {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+/* Fila interactiva de Switch dentro de cada tarjeta */
+.row-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.switch-select {
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switch-select.docente {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.switch-select.practicas {
+  background: rgba(234, 179, 8, 0.15);
+  color: #eab308;
+  border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.switch-select:hover {
+  filter: brightness(1.15);
+}
+
+.switch-select option {
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+.btn-subtle {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-subtle:hover {
+  background: #334155;
+  color: #f8fafc;
+  border-color: #475569;
+}
+
+.btn-subtle.active,
+.btn-subtle.active-docente {
+  background: rgba(56, 189, 248, 0.18);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.2);
+}
+
+.btn-subtle.active-hibrido {
+  background: rgba(234, 179, 8, 0.18);
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.5);
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.2);
 }

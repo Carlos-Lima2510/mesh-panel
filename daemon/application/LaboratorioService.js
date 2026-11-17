@@ -2,52 +2,98 @@ const Laboratorio = require('../domain/Laboratorio');
 const Host = require('../domain/Host');
 const Red = require('../domain/Red');
 const Puesto = require('../domain/Puesto');
+const Switch = require('../domain/Switch');
 
 /**
- * Crea el mapa fijo del aula: 2 hileras de 4 columnas x 5 filas (40 puestos en total)
- * con pasillo central.
+ * Crea la cuadrícula del aula según filas y columnas por hilera configuradas por el administrador,
+ * garantizando que el pasillo esté siempre en el medio dividiendo dos hileras simétricas.
  */
-function crearPuestosFijosAula(redPorDefecto = null) {
+function crearPuestosCuadricula({
+  filas = 5,
+  columnas = null,
+  columnasHilera = 4,
+  redPorDefecto = null,
+  switchDocente = null,
+  switchPracticas = null,
+  asignacionSwitches = new Map()
+} = {}) {
+  const cHilera = columnasHilera || Math.ceil((columnas || 8) / 2);
   const puestos = [];
-  const FILAS_CONFIG = [
-    { fila: 1, left: [1, 2, 3, 4], right: [5, 6, 7, 8] },
-    { fila: 2, left: [9, 10, 11, 12], right: [13, 14, 15, 16] },
-    { fila: 3, left: [17, 18, 19, 20], right: [21, 22, 23, 24] },
-    { fila: 4, left: [25, 26, 27, 28], right: [29, 30, 31, 32] },
-    { fila: 5, left: [33, 34, 35, 36], right: [37, 38, 39, 40] }
-  ];
+  let slotNum = 1;
 
-  FILAS_CONFIG.forEach(r => {
-    r.left.forEach((slotNum, i) => {
-      puestos.push(new Puesto({
-        id: `puesto-${slotNum}`,
+  for (let f = 1; f <= filas; f++) {
+    // Hilera Izquierda
+    for (let c = 1; c <= cHilera; c++) {
+      const id = `puesto-${slotNum}`;
+      const swId = asignacionSwitches.get(id) || 'sw-docente';
+      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+
+      const p = new Puesto({
+        id,
         etiqueta: `Puesto ${String(slotNum).padStart(2, '0')}`,
-        fila: r.fila,
-        columna: i + 1,
+        fila: f,
+        columna: c,
         hilera: 'IZQUIERDA',
-        red: redPorDefecto
-      }));
-    });
-    r.right.forEach((slotNum, i) => {
-      puestos.push(new Puesto({
-        id: `puesto-${slotNum}`,
+        toma: `ROS-${String(slotNum).padStart(2, '0')}`,
+        red: switchObj && switchObj.red ? switchObj.red : redPorDefecto
+      });
+
+      if (switchObj) {
+        try {
+          p.asignarSwitch(switchObj, slotNum);
+        } catch (_) {}
+      }
+
+      puestos.push(p);
+      slotNum++;
+    }
+
+    // Hilera Derecha (mismo número exacto de columnas, pasillo en medio siempre)
+    for (let c = 1; c <= cHilera; c++) {
+      const id = `puesto-${slotNum}`;
+      const swId = asignacionSwitches.get(id) || 'sw-docente';
+      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+
+      const p = new Puesto({
+        id,
         etiqueta: `Puesto ${String(slotNum).padStart(2, '0')}`,
-        fila: r.fila,
-        columna: i + 5,
+        fila: f,
+        columna: cHilera + c,
         hilera: 'DERECHA',
-        red: redPorDefecto
-      }));
-    });
-  });
+        toma: `ROS-${String(slotNum).padStart(2, '0')}`,
+        red: switchObj && switchObj.red ? switchObj.red : redPorDefecto
+      });
+
+      if (switchObj) {
+        try {
+          p.asignarSwitch(switchObj, slotNum);
+        } catch (_) {}
+      }
+
+      puestos.push(p);
+      slotNum++;
+    }
+  }
 
   return puestos;
 }
 
 class LaboratorioService {
-  constructor({ meshCentralAdapter, networkProvider, mapeoBocas = {}, cacheTtlMs = 3000 }) {
+  constructor({
+    meshCentralAdapter,
+    networkProvider,
+    mapeoBocas = {},
+    cacheTtlMs = 3000,
+    filas = 5,
+    columnasHilera = 4,
+    columnas = 8
+  } = {}) {
     this.meshAdapter = meshCentralAdapter;
     this.networkProvider = networkProvider;
     this.cacheTtlMs = cacheTtlMs;
+    this.filas = filas;
+    this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
+    this.columnas = this.columnasHilera * 2;
     this.ultimoLaboratorio = null;
     this.ultimoRefresco = 0;
     this.promesaRefresco = null;
@@ -76,8 +122,28 @@ class LaboratorioService {
       })
     ];
 
+    this.switchesPorDefecto = [
+      new Switch({
+        id: 'sw-docente',
+        nombre: 'Switch Principal Docente',
+        tipo: 'GESTIONADO',
+        totalPuertos: parseInt(process.env.SWITCH_TOTAL_PUERTOS, 10) || 96,
+        ipGestion: process.env.SNMP_HOST || '10.0.0.2',
+        red: this.redesPorDefecto[0]
+      }),
+      new Switch({
+        id: 'sw-practicas',
+        nombre: 'Switch Banco de Prácticas',
+        tipo: 'NO_GESTIONADO',
+        totalPuertos: parseInt(process.env.SWITCH_PRACTICAS_PUERTOS, 10) || 96,
+        ipGestion: null,
+        red: this.redesPorDefecto[1]
+      })
+    ];
+
     this.modoActual = 'CLASE';
     this.asignacionPuestos = new Map();
+    this.asignacionSwitches = new Map();
   }
 
   establecerModo(modo) {
@@ -86,6 +152,83 @@ class LaboratorioService {
       this.ultimoLaboratorio.establecerModo(this.modoActual);
       return this.ultimoLaboratorio;
     }
+    return this.obtenerLaboratorio({ forzar: true });
+  }
+
+  asignarSwitchAPuestos(puestoIds, switchId) {
+    const swObj = this.switchesPorDefecto.find(s => s.id === switchId);
+    if (!swObj) {
+      throw new Error(`Switch '${switchId}' no reconocido en el catálogo.`);
+    }
+
+    const ids = Array.isArray(puestoIds) ? puestoIds : [puestoIds];
+    for (const id of ids) {
+      const idNorm = id.startsWith('puesto-') ? id : `puesto-${id}`;
+      this.asignacionSwitches.set(idNorm, switchId);
+
+      if (this.ultimoLaboratorio) {
+        const puesto = this.ultimoLaboratorio.obtenerPuesto(idNorm);
+        if (puesto) {
+          const slotNum = puesto.puertoSwitch || parseInt(idNorm.replace('puesto-', ''), 10) || 1;
+          try {
+            puesto.asignarSwitch(swObj, slotNum);
+          } catch (_) {}
+
+          const host = puesto.obtenerHost();
+          if (host && host.telemetria) {
+            host.evaluarEstado({
+              osOnline: host.telemetria.os_online,
+              amtOnline: host.telemetria.amt_online,
+              pwr: host.telemetria.pwr,
+              conn: host.telemetria.conn,
+              modoLaboratorio: this.modoActual,
+              puesto,
+              switchAsignado: swObj
+            });
+          }
+        }
+      }
+    }
+
+    return this.ultimoLaboratorio;
+  }
+
+  asignarRangoSwitch(desde, hasta, switchId) {
+    const d = parseInt(desde, 10);
+    const h = parseInt(hasta, 10);
+    if (!d || !h || d < 1 || h < d) {
+      throw new Error('Rango de puestos inválido.');
+    }
+    const ids = [];
+    for (let i = d; i <= h; i++) {
+      ids.push(`puesto-${i}`);
+    }
+    return this.asignarSwitchAPuestos(ids, switchId);
+  }
+
+  configurarDimensiones(filas, columnas, columnasHilera = null) {
+    const f = parseInt(filas, 10);
+    let cHilera = columnasHilera ? parseInt(columnasHilera, 10) : null;
+    let cTotal = parseInt(columnas, 10);
+
+    if (cHilera && cHilera >= 1) {
+      cTotal = cHilera * 2;
+    } else if (cTotal && cTotal >= 1) {
+      cHilera = Math.ceil(cTotal / 2);
+      cTotal = cHilera * 2;
+    } else {
+      cHilera = 4;
+      cTotal = 8;
+    }
+
+    if (!f || f < 1 || f > 30 || !cHilera || cHilera < 1 || cHilera > 20) {
+      throw new Error('Dimensiones inválidas (filas entre 1-30, columnas entre 1-20).');
+    }
+
+    this.filas = f;
+    this.columnasHilera = cHilera;
+    this.columnas = cTotal;
+
     return this.obtenerLaboratorio({ forzar: true });
   }
 
@@ -125,16 +268,37 @@ class LaboratorioService {
     ]);
 
     const nombreAula = rawDevices.length > 0 && rawDevices[0].groupname ? rawDevices[0].groupname : 'Laboratorio';
-    const laboratorio = new Laboratorio({ nombre: nombreAula, modo: this.modoActual });
+    const laboratorio = new Laboratorio({
+      nombre: nombreAula,
+      modo: this.modoActual,
+      filas: this.filas,
+      columnas: this.columnas,
+      columnasHilera: this.columnasHilera
+    });
+
+    for (const sw of this.switchesPorDefecto) {
+      laboratorio.agregarSwitch(sw);
+    }
 
     for (const r of this.redesPorDefecto) {
       laboratorio.agregarRed(r);
     }
 
-    const puestosFijos = crearPuestosFijosAula(this.redesPorDefecto[0]);
-    for (const p of puestosFijos) {
+    const puestosCuadricula = crearPuestosCuadricula({
+      filas: this.filas,
+      columnas: this.columnas,
+      columnasHilera: this.columnasHilera,
+      redPorDefecto: this.redesPorDefecto[0],
+      switchDocente: this.switchesPorDefecto[0],
+      switchPracticas: this.switchesPorDefecto[1],
+      asignacionSwitches: this.asignacionSwitches
+    });
+
+    for (const p of puestosCuadricula) {
       laboratorio.agregarPuesto(p);
     }
+
+    const maxPuestos = this.filas * this.columnas;
 
     for (const dev of rawDevices) {
       const nodeId = dev._id || dev.id;
@@ -169,16 +333,12 @@ class LaboratorioService {
       const amtOnline = (conn & 14) !== 0;
       const pwr = dev.pwr !== undefined ? dev.pwr : null;
 
-      host.evaluarEstado({ osOnline, amtOnline, pwr, conn, modoLaboratorio: this.modoActual });
-
-      laboratorio.agregarHost(host);
-
-      // Asignación a puesto fijo
+      // Determinación de puesto
       let idPuesto = this.asignacionPuestos.get(nodeId);
       if (!idPuesto) {
-        const slotMatch = bocaAsignada.match(/port0*(\d+)/i) || nombre.match(/(?:pc|puesto|host|uea|c)?[-_\s]?0*([1-9]|[1-3][0-9]|40)$/i);
+        const slotMatch = bocaAsignada.match(/port0*(\d+)/i) || nombre.match(/(?:pc|puesto|host|uea|c)?[-_\s]?0*([1-9]|[1-9][0-9]|1[0-9]{2})$/i);
         const slotNum = slotMatch ? parseInt(slotMatch[1], 10) : null;
-        if (slotNum && slotNum >= 1 && slotNum <= 40) {
+        if (slotNum && slotNum >= 1 && slotNum <= maxPuestos) {
           idPuesto = `puesto-${slotNum}`;
         }
       }
@@ -194,11 +354,23 @@ class LaboratorioService {
         }
       }
 
-      if (puestoDestino) {
+      const switchAsignado = puestoDestino ? puestoDestino.obtenerSwitch() : null;
+
+      host.evaluarEstado({
+        osOnline,
+        amtOnline,
+        pwr,
+        conn,
+        modoLaboratorio: this.modoActual,
+        puesto: puestoDestino,
+        switchAsignado
+      });
+
+      laboratorio.agregarHost(host);
+
+      if (puestoDestino && !puestoDestino.estaOcupado()) {
         puestoDestino.alojarHost(host);
         host.puestoId = puestoDestino.id;
-        const numSlot = parseInt(puestoDestino.id.replace('puesto-', ''), 10);
-        if (!isNaN(numSlot)) host.slot = numSlot;
         this.asignacionPuestos.set(nodeId, puestoDestino.id);
       }
     }

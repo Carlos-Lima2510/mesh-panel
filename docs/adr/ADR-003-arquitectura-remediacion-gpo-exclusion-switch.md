@@ -3,10 +3,11 @@
 * **Proyecto:** OpSys / Mesh-Panel — Observabilidad y Supervisión de Laboratorio Docente
 * **Fecha:** 2026-11-11
 * **Fase:** RUP Inicio (Inception) — Modelo del Dominio y Arquitectura
-* **Estado:** Aprobado / Fundamentado Científica y Técnicamente
+* **Estado:** **DEPRECADA PARCIALMENTE** por [ADR-004](ADR-004-inclusion-switch-asignacion-distribuciones.md) (Decisión 2 superada por la inclusión de `Switch` para soporte de aulas híbridas) / **VIGENTE** en Decisiones 1, 3, 4 y 5 (Remediación GPO Startup con Rollback transaccional y Políticas de Energía).
 * **Documentos complementarios:**
   * [ADR-001: Justificación y Acotamiento de Acciones](ADR-001-acotamiento-acciones-trazabilidad.md)
   * [ADR-002: Acotamiento de Control de Energía y Hardware Dell](ADR-002-acotamiento-control-energia-hardware.md)
+  * [ADR-004: Inclusión de Switch y Asignación Granular en Distribuciones](ADR-004-inclusion-switch-asignacion-distribuciones.md)
   * [Dossier Técnico DOC-01: Windows Internals y DHCP](../doc/DOC-01-microsoft-windows-internals-dhcp-wol.md)
   * [Matriz Documental General](../matriz-documental-general.md)
 
@@ -44,7 +45,11 @@ Se descarta la remediación remota bajo demanda desde el panel. **El panel OpSys
 
 ## 3. Decisión 2: Exclusión del Switch del Modelo del Dominio y `toma` como Atributo de `Puesto`
 
-Se ratifica formalmente mantener a las entidades `Switch` y `PuertoSwitch` fuera del Modelo del Dominio de clases:
+> [!WARNING]
+> **DECISIÓN SUPERADA / DEPRECADA POR [ADR-004](ADR-004-inclusion-switch-asignacion-distribuciones.md)**  
+> Con fecha 2026-11-14, tras revisión con la dirección académica del TFG y análisis de escenarios de **aulas híbridas** (subgrupos donde unos puestos operan en la red docente y otros en la red de prácticas simultáneamente), esta decisión ha sido superada. La entidad `Switch` se incorpora al Modelo del Dominio asumiendo responsabilidades de capacidad, no-colisión de puertos y semántica de red, integrándose con el modelo de `Distribucion`.
+
+Se ratifica formalmente en esta versión preliminar mantener a las entidades `Switch` y `PuertoSwitch` fuera del Modelo del Dominio de clases:
 
 1. **Frontera del Dominio (*Bounded Context* en DDD) [16]:**  
    OpSys supervisa puestos de trabajo y ocupación para la docencia; no es un sistema NMS de telecomunicaciones.

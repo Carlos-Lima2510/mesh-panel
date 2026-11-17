@@ -42,7 +42,17 @@ class Host {
     return this.estado.diagnostico;
   }
 
-  evaluarEstado({ osOnline, amtOnline = false, pwr = null, conn = 0, modoLaboratorio = 'CLASE' }) {
+  evaluarEstado({
+    osOnline,
+    amtOnline = false,
+    pwr = null,
+    conn = 0,
+    modoLaboratorio = 'CLASE',
+    switchAsignado = null,
+    puesto = null
+  }) {
+    const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
+
     this.telemetria = {
       os_online: osOnline,
       amt_online: amtOnline,
@@ -53,7 +63,8 @@ class Host {
         speed: this.enlaceFisico.speed,
         source: this.enlaceFisico.source
       },
-      red_asignada: this.red ? this.red.nombre : 'No identificada',
+      switch_asignado: sw ? sw.nombre : null,
+      red_asignada: this.red ? this.red.nombre : (sw && sw.red ? sw.red.nombre : 'No identificada'),
       modo_laboratorio: modoLaboratorio,
       ip_reportada: this.ip,
       mac: this.mac,
@@ -67,7 +78,9 @@ class Host {
       amtOnline,
       pwr,
       red: this.red,
-      modoLaboratorio
+      modoLaboratorio,
+      switchAsignado: sw,
+      puesto
     });
   }
 

@@ -5,10 +5,27 @@ const EstadoRedAislada = require('./EstadoRedAislada');
 const EstadoDesconectado = require('./EstadoDesconectado');
 
 class EvaluadorEstado {
-  static evaluar({ enlaceFisico, osOnline, amtOnline = false, pwr = null, red = null, modoLaboratorio = 'CLASE' }) {
+  static evaluar({
+    enlaceFisico,
+    osOnline,
+    amtOnline = false,
+    pwr = null,
+    red = null,
+    modoLaboratorio = 'CLASE',
+    switchAsignado = null,
+    puesto = null
+  }) {
+    const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
+
+    // Si el puesto tiene un switch asignado expresamente, su política prima sobre el modo global
+    const esperaAislado = sw
+      ? !sw.esperaMeshCentral()
+      : (puesto && puesto.esperaEstarAislado ? puesto.esperaEstarAislado() : (modoLaboratorio === 'PRACTICA'));
+
     if (enlaceFisico.link === 'DOWN') {
-      if (modoLaboratorio === 'PRACTICA') {
-        return new EstadoRedAislada('Puesto en Red Aislada (Modo Práctica activo; cable conectado al switch de prácticas).');
+      if (esperaAislado) {
+        const detalle = sw ? ` en ${sw.nombre}` : ' (Modo Práctica activo)';
+        return new EstadoRedAislada(`Puesto en Red Aislada${detalle}; cable conectado al switch de prácticas.`);
       }
       return new EstadoDesconectado(
         `Cable desconectado físicamente (Puerto ${enlaceFisico.port} en estado DOWN en el switch principal).`
@@ -27,9 +44,10 @@ class EvaluadorEstado {
     }
 
     if (enlaceFisico.link === 'UP' && enlaceFisico.speed >= 1000) {
-      if (red && red.esAislada) {
+      if (esperaAislado || (red && red.esAislada)) {
+        const nombreRed = red ? red.nombre : (sw ? sw.nombre : 'Red Aislada');
         return new EstadoRedAislada(
-          `Puesto en ${red.nombre}. Cable a 1 Gbps pero en segmento aislado sin salida a MeshCentral.`
+          `Puesto en ${nombreRed}. Cable a 1 Gbps pero en segmento aislado sin salida a MeshCentral.`
         );
       }
       const nombreRed = red ? ' en ' + red.nombre : '';
