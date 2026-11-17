@@ -60,9 +60,10 @@ mesh-panel/
 │   │   ├── diagrama-clases.puml        # Diagrama de Clases estructural
 │   │   ├── diagrama-objetos.puml       # Instancia canónica de validación
 │   │   └── diagrama-estados/           # Autómatas de estados (Host y Laboratorio)
-│   └── 01-requisitos/                  # Casos de uso y actores
-│       ├── README.md                   # Catálogo de actores y casos de uso con diagrama
-│       └── actoresCasosUsoAdmin.puml   # Diagrama de Casos de Uso del Administrador
+│   └── 01-requisitos/                  # Requisitos, casos de uso y diagrama de contexto
+│       ├── README.md                   # Catálogo de actores, casos de uso y contexto
+│       ├── actoresCasosUsoAdmin.puml   # Diagrama de Casos de Uso del Administrador
+│       └── diagrama-de-contexto.puml   # Diagrama de Contexto del Administrador
 ├── docs/                               # Documentación de Arquitectura, Matrices y Manuales
 │   ├── adr/                            # Registros de Decisiones Arquitectónicas (ADR)
 │   │   ├── ADR-001-acotamiento-acciones-trazabilidad.md
@@ -77,7 +78,7 @@ mesh-panel/
 │       └── matriz-referencias-plataforma-microsoft.md
 ├── images/                             # Estructura espejo de gráficos vectoriales SVG
 │   ├── 00-modelo-del-dominio/          # SVGs compilados del Modelo de Dominio
-│   └── 01-requisitos/                  # SVGs de la fase de requisitos (actoresCasosUsoAdministrador.svg)
+│   └── 01-requisitos/                  # SVGs de requisitos (Casos de Uso y Contexto)
 ├── daemon/                             # Backend de telemetría y API REST (Node.js DDD)
 ├── src/                                # Frontend web reactivo (HTML5, CSS3, JS Vanilla, SSE)
 ├── scripts/                            # Scripts de pruebas y validación de dominio

@@ -20,7 +20,18 @@ Modela los casos de uso disponibles para el operador del laboratorio, estructura
 
 ---
 
-## 2. Identificación y Descripción de Actores
+## 2. Diagrama de Contexto
+
+Modela los estados de navegación y contextos de interfaz del operador `Administrador`, reflejando la disponibilidad del sistema (`SESION_CERRADA`, `SISTEMA_DISPONIBLE` y `PUESTO_ABIERTO`) y los casos de uso que disparan cada transición o bucle operativo.
+
+<div align="center">
+  <img src="../../images/01-requisitos/diagramaContextoAdmin.svg" alt="Diagrama de Contexto del Administrador" />
+  <p><em>Fuente: <a href="diagrama-de-contexto.puml">diagrama-de-contexto.puml</a></em></p>
+</div>
+
+---
+
+## 3. Identificación y Descripción de Actores
 
 Siguiendo el principio de operador único acordado en **[ADR-001](../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)** y la delimitación estricta de la frontera del sistema (*System Boundary*), se modelan exclusivamente actores humanos que inician interacciones:
 
@@ -35,7 +46,7 @@ Siguiendo el principio de operador único acordado en **[ADR-001](../../docs/adr
 
 ---
 
-## 3. Catálogo Consolidado de Casos de Uso
+## 4. Catálogo Consolidado de Casos de Uso
 
 El catálogo consta de **8 casos de uso** a nivel de objetivo de usuario (*User-Goal Level*), organizados según su ámbito funcional:
 
@@ -104,7 +115,7 @@ El catálogo consta de **8 casos de uso** a nivel de objetivo de usuario (*User-
 
 ---
 
-## 4. Trazabilidad con Decisiones Arquitectónicas (ADRs)
+## 5. Trazabilidad con Decisiones Arquitectónicas (ADRs)
 
 * **[ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md):** Fundamenta la existencia del `Administrador` como único operador humano en la frontera del sistema y descarta la reificación de acciones como clases del dominio en favor de casos de uso operativos.
 * **[ADR-002: Acotamiento de Control de Energía (WoL vs Apagado)](../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md):** Fundamenta por qué `encenderPuesto()` es el único caso de uso de control energético viable y fiable bajo las restricciones de hardware del parque Dell OptiPlex (SKU 631-ADPL).
