@@ -86,7 +86,10 @@ class LaboratorioService {
     cacheTtlMs = 3000,
     filas = 5,
     columnasHilera = 4,
-    columnas = 8
+    columnas = 8,
+    autoCompletarPuertos = false,
+    excluirSubred = '172.22.',
+    modoDespliegue = false
   } = {}) {
     this.meshAdapter = meshCentralAdapter;
     this.networkProvider = networkProvider;
@@ -94,6 +97,9 @@ class LaboratorioService {
     this.filas = filas;
     this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
     this.columnas = this.columnasHilera * 2;
+    this.autoCompletarPuertos = autoCompletarPuertos;
+    this.excluirSubred = excluirSubred;
+    this.modoDespliegue = Boolean(modoDespliegue);
     this.ultimoLaboratorio = null;
     this.ultimoRefresco = 0;
     this.promesaRefresco = null;
@@ -104,6 +110,33 @@ class LaboratorioService {
       'UEA-C234': 'port3',
       'UEA-C236': 'port4',
       'UEA-C403': 'port5',
+
+      // Switch .42 (puerto 49)
+      'UEA-C240': 'sw42:port49',
+      'C240': 'sw42:port49',
+
+      // Switch .13 port34 (switch de mesa fila 5)
+      'UEA-C244': 'port34',
+      'C244': 'port34',
+      'UEA-C245': 'port34',
+      'C245': 'port34',
+      'UEA-C246': 'port34',
+      'C246': 'port34',
+      'UEA-C250': 'port34',
+      'C250': 'port34',
+      'UEA-C421': 'port34',
+      'C421': 'port34',
+
+      // Switch .13 port43 (switch de mesa fila 6)
+      'UEA-C271': 'port43',
+      'C271': 'port43',
+      'UEA-C272': 'port43',
+      'C272': 'port43',
+      'UEA-C273': 'port43',
+      'C273': 'port43',
+      'UEA-C277': 'port43',
+      'C277': 'port43',
+
       ...mapeoBocas
     };
 
@@ -141,13 +174,14 @@ class LaboratorioService {
       })
     ];
 
-    this.modoActual = 'CLASE';
+    this.modoActual = this.modoDespliegue ? 'CABLEADO' : 'CLASE';
     this.asignacionPuestos = new Map();
     this.asignacionSwitches = new Map();
   }
 
   establecerModo(modo) {
-    this.modoActual = modo === 'PRACTICA' ? 'PRACTICA' : 'CLASE';
+    const modosValidos = ['CLASE', 'PRACTICA', 'CABLEADO'];
+    this.modoActual = modosValidos.includes(modo) ? modo : 'CLASE';
     if (this.ultimoLaboratorio) {
       this.ultimoLaboratorio.establecerModo(this.modoActual);
       return this.ultimoLaboratorio;
@@ -273,7 +307,8 @@ class LaboratorioService {
       modo: this.modoActual,
       filas: this.filas,
       columnas: this.columnas,
-      columnasHilera: this.columnasHilera
+      columnasHilera: this.columnasHilera,
+      modoDespliegue: this.modoDespliegue
     });
 
     for (const sw of this.switchesPorDefecto) {
@@ -301,19 +336,25 @@ class LaboratorioService {
     const maxPuestos = this.filas * this.columnas;
 
     for (const dev of rawDevices) {
+      const ip = dev.ip || dev.host || null;
+      if (this.excluirSubred && ip && ip.startsWith(this.excluirSubred)) {
+        continue; // Excluir equipos de la red indicada (ej: 172.22.)
+      }
+
       const nodeId = dev._id || dev.id;
       const nombre = dev.name || ('Puesto-' + (nodeId ? nodeId.substring(0, 6) : 'X'));
       const bocaAsignada = this.mapeoBocas[nombre] || 'port99';
-      const ip = dev.ip || dev.host || null;
 
-      const numBoca = parseInt(bocaAsignada.replace('port', ''), 10) || 99;
-      const infoBoca = (mapaPuertos && mapaPuertos[bocaAsignada]) ? mapaPuertos[bocaAsignada] : {
-        port: numBoca,
-        portName: bocaAsignada,
-        link: 'UP',
-        speed: 1000,
-        source: 'default'
-      };
+      const numBoca = parseInt(bocaAsignada.replace(/\D/g, ''), 10) || 99;
+      const infoBoca = (mapaPuertos && (mapaPuertos[bocaAsignada] || mapaPuertos[`10.10.136.42:${bocaAsignada}`]))
+        ? (mapaPuertos[bocaAsignada] || mapaPuertos[`10.10.136.42:${bocaAsignada}`])
+        : {
+          port: numBoca,
+          portName: bocaAsignada,
+          link: 'UP',
+          speed: 1000,
+          source: 'default'
+        };
 
       const redAsignada = laboratorio.obtenerRedDeIp(ip) || this.redesPorDefecto[0];
 
@@ -371,7 +412,182 @@ class LaboratorioService {
       if (puestoDestino && !puestoDestino.estaOcupado()) {
         puestoDestino.alojarHost(host);
         host.puestoId = puestoDestino.id;
+        const slotNum = parseInt(puestoDestino.id.replace('puesto-', ''), 10);
+        if (slotNum) host.slot = slotNum;
         this.asignacionPuestos.set(nodeId, puestoDestino.id);
+      }
+    }
+
+    if (this.autoCompletarPuertos) {
+      const slotsOcupados = new Set();
+      for (const h of laboratorio.hosts) {
+        if (h.slot) slotsOcupados.add(h.slot);
+      }
+
+      // 1. Equipos especiales detallados (mesas y switch auxiliar .42)
+      const equiposEspeciales = [
+        // Switch .42 (puerto 49)
+        { nombre: 'UEA-C240', boca: 'sw42:port49', slot: 49 },
+
+        // Switch .13 port34 (switch de mesa fila 5)
+        { nombre: 'UEA-C244', boca: 'port34', slot: 33 },
+        { nombre: 'UEA-C245', boca: 'port34', slot: 34 },
+        { nombre: 'UEA-C246', boca: 'port34', slot: 35 },
+        { nombre: 'UEA-C250', boca: 'port34', slot: 36 },
+        { nombre: 'UEA-C421', boca: 'port34', slot: 37 },
+
+        // Switch .13 port43 (switch de mesa fila 6)
+        { nombre: 'UEA-C271', boca: 'port43', slot: 41 },
+        { nombre: 'UEA-C272', boca: 'port43', slot: 42 },
+        { nombre: 'UEA-C273', boca: 'port43', slot: 43 },
+        { nombre: 'UEA-C277', boca: 'port43', slot: 44 }
+      ];
+
+      for (const eq of equiposEspeciales) {
+        if (!slotsOcupados.has(eq.slot) && !laboratorio.hosts.some(h => h.nombre === eq.nombre)) {
+          const idPuesto = `puesto-${eq.slot}`;
+          const puestoDestino = laboratorio.obtenerPuesto(idPuesto);
+          if (!puestoDestino) continue;
+          const switchAsignado = puestoDestino ? puestoDestino.obtenerSwitch() : null;
+
+          const infoBoca = (mapaPuertos && (mapaPuertos[eq.boca] || mapaPuertos[`10.10.136.42:${eq.boca}`]))
+            ? (mapaPuertos[eq.boca] || mapaPuertos[`10.10.136.42:${eq.boca}`])
+            : {
+              port: parseInt(eq.boca.replace(/\D/g, ''), 10) || 99,
+              portName: eq.boca,
+              link: 'DOWN',
+              speed: 0,
+              source: 'snmp_real'
+            };
+
+          const host = new Host({
+            id: `inv-${eq.nombre.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+            nombre: eq.nombre,
+            ip: null,
+            mac: null,
+            bocaSwitch: eq.boca,
+            soportaWoL: true,
+            red: this.redesPorDefecto[0],
+            enlaceFisico: infoBoca
+          });
+
+          host.evaluarEstado({
+            osOnline: false,
+            amtOnline: false,
+            conn: 0,
+            modoLaboratorio: this.modoActual,
+            puesto: puestoDestino,
+            switchAsignado
+          });
+          laboratorio.agregarHost(host);
+
+          if (!puestoDestino.estaOcupado()) {
+            puestoDestino.alojarHost(host);
+            host.puestoId = puestoDestino.id;
+            host.slot = eq.slot;
+            slotsOcupados.add(eq.slot);
+          }
+        }
+      }
+
+      // 2. Autocompletar puestos del switch principal (.13: port1 al port48)
+      for (let numPuerto = 1; numPuerto <= 48; numPuerto++) {
+        if (numPuerto === 47) continue; // Puerto 47 no se usa en este laboratorio
+        if (slotsOcupados.has(numPuerto)) continue;
+
+        const idPuesto = `puesto-${numPuerto}`;
+        const puestoDestino = laboratorio.obtenerPuesto(idPuesto);
+        if (!puestoDestino) continue;
+        const switchAsignado = puestoDestino ? puestoDestino.obtenerSwitch() : null;
+
+        const boca = `port${numPuerto}`;
+        const infoBoca = (mapaPuertos && mapaPuertos[boca]) ? mapaPuertos[boca] : {
+          port: numPuerto,
+          portName: boca,
+          link: 'DOWN',
+          speed: 0,
+          source: 'snmp_real'
+        };
+
+        const nombreHost = `Puesto-${String(numPuerto).padStart(2, '0')}`;
+        const host = new Host({
+          id: `puesto-port-${numPuerto}`,
+          nombre: nombreHost,
+          ip: null,
+          mac: null,
+          bocaSwitch: boca,
+          soportaWoL: true,
+          red: this.redesPorDefecto[0],
+          enlaceFisico: infoBoca
+        });
+
+        host.evaluarEstado({
+          osOnline: false,
+          amtOnline: false,
+          conn: 0,
+          modoLaboratorio: this.modoActual,
+          puesto: puestoDestino,
+          switchAsignado
+        });
+        laboratorio.agregarHost(host);
+
+        if (!puestoDestino.estaOcupado()) {
+          puestoDestino.alojarHost(host);
+          host.puestoId = puestoDestino.id;
+          host.slot = numPuerto;
+          slotsOcupados.add(numPuerto);
+        }
+      }
+
+      // 3. Switch auxiliar .39 (puertos 1 al 7 -> slots 50 a 56)
+      for (let pIdx = 1; pIdx <= 7; pIdx++) {
+        const slotDestino = 49 + pIdx; // 50..56
+        if (slotsOcupados.has(slotDestino)) continue;
+
+        const idPuesto = `puesto-${slotDestino}`;
+        const puestoDestino = laboratorio.obtenerPuesto(idPuesto);
+        if (!puestoDestino) continue;
+        const switchAsignado = puestoDestino ? puestoDestino.obtenerSwitch() : null;
+
+        const boca = `sw39:port${pIdx}`;
+        const infoBoca = (mapaPuertos && (mapaPuertos[boca] || mapaPuertos[`10.10.136.39:port${pIdx}`]))
+          ? (mapaPuertos[boca] || mapaPuertos[`10.10.136.39:port${pIdx}`])
+          : {
+            port: pIdx,
+            portName: boca,
+            link: 'DOWN',
+            speed: 0,
+            source: 'snmp_real'
+          };
+
+        const nombreHost = `Puesto-Aux${pIdx}`;
+        const host = new Host({
+          id: `puesto-sw39-${pIdx}`,
+          nombre: nombreHost,
+          ip: null,
+          mac: null,
+          bocaSwitch: boca,
+          soportaWoL: true,
+          red: this.redesPorDefecto[0],
+          enlaceFisico: infoBoca
+        });
+
+        host.evaluarEstado({
+          osOnline: false,
+          amtOnline: false,
+          conn: 0,
+          modoLaboratorio: this.modoActual,
+          puesto: puestoDestino,
+          switchAsignado
+        });
+        laboratorio.agregarHost(host);
+
+        if (!puestoDestino.estaOcupado()) {
+          puestoDestino.alojarHost(host);
+          host.puestoId = puestoDestino.id;
+          host.slot = slotDestino;
+          slotsOcupados.add(slotDestino);
+        }
       }
     }
 

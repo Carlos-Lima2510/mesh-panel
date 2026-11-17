@@ -4,13 +4,15 @@ class Laboratorio {
     modo = 'CLASE',
     filas = 5,
     columnas = 8,
-    columnasHilera = null
+    columnasHilera = null,
+    modoDespliegue = false
   } = {}) {
     this.nombre = nombre;
     this.modo = modo;
     this.filas = filas;
     this.columnas = columnas;
     this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
+    this.modoDespliegue = Boolean(modoDespliegue);
     this.redes = [];
     this.hosts = [];
     this.puestos = new Map();
@@ -34,7 +36,8 @@ class Laboratorio {
   }
 
   establecerModo(modo) {
-    this.modo = modo === 'PRACTICA' ? 'PRACTICA' : 'CLASE';
+    const modos = ['CLASE', 'PRACTICA', 'CABLEADO'];
+    this.modo = modos.includes(modo) ? modo : 'CLASE';
     for (const host of this.hosts) {
       if (host.telemetria) {
         const puesto = this.obtenerPuestoDeHost(host.id);
@@ -45,7 +48,27 @@ class Laboratorio {
           conn: host.telemetria.conn,
           modoLaboratorio: this.modo,
           puesto: puesto,
-          switchAsignado: puesto ? puesto.obtenerSwitch() : null
+          switchAsignado: puesto ? puesto.obtenerSwitch() : null,
+          modoDespliegue: this.modoDespliegue
+        });
+      }
+    }
+  }
+
+  establecerModoDespliegue(activo) {
+    this.modoDespliegue = Boolean(activo);
+    for (const host of this.hosts) {
+      if (host.telemetria) {
+        const puesto = this.obtenerPuestoDeHost(host.id);
+        host.evaluarEstado({
+          osOnline: host.telemetria.os_online,
+          amtOnline: host.telemetria.amt_online,
+          pwr: host.telemetria.pwr,
+          conn: host.telemetria.conn,
+          modoLaboratorio: this.modo,
+          puesto: puesto,
+          switchAsignado: puesto ? puesto.obtenerSwitch() : null,
+          modoDespliegue: this.modoDespliegue
         });
       }
     }
@@ -206,6 +229,7 @@ class Laboratorio {
     return {
       nombre: this.nombre,
       modo: this.modo,
+      modo_despliegue: this.modoDespliegue,
       filas: this.filas,
       columnas: this.columnas,
       columnas_hilera: this.columnasHilera,

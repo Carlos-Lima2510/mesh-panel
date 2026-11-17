@@ -82,6 +82,26 @@ assert.strictEqual(estDhcp.color, 'AMARILLO');
 assert.strictEqual(estDhcp.categoria, 'FALLO_LOGICO');
 assert.strictEqual(estDhcp.obtenerAccion().tipo, 'REMEDIAR_DHCP');
 
+// Verificación de Modo Pre-despliegue / Verificación física de cableado
+const estCableadoUp = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 5, link: 'UP', speed: 1000 },
+  osOnline: false,
+  modoLaboratorio: 'CABLEADO'
+});
+assert.strictEqual(estCableadoUp instanceof EstadoOperativo, true);
+assert.strictEqual(estCableadoUp.color, 'VERDE');
+assert.strictEqual(estCableadoUp.categoria, 'OPERATIVO');
+assert.strictEqual(estCableadoUp.obtenerAccion().tipo, 'NINGUNA');
+assert.strictEqual(estCableadoUp.permiteAccionRemota(), false);
+
+const estCableadoDown = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 6, link: 'DOWN', speed: 0 },
+  osOnline: false,
+  modoLaboratorio: 'CABLEADO'
+});
+assert.strictEqual(estCableadoDown instanceof EstadoDesconectado, true);
+assert.strictEqual(estCableadoDown.color, 'NARANJA');
+
 // 2. Verificación de Host
 const host1 = new Host({
   id: 'node-pc-01',

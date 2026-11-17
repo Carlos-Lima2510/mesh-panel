@@ -17,6 +17,7 @@ const scanIcon = document.getElementById('btn-scan-icon');
 
 const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
+const btnModeCableado = document.getElementById('btn-mode-cableado');
 
 const inputFilas = document.getElementById('input-filas');
 const inputColumnas = document.getElementById('input-columnas');
@@ -50,12 +51,16 @@ function setStatusBadge(text, isOffline = false) {
 
 function actualizarBotonesModo(modo) {
   if (!btnModeClase || !btnModePractica) return;
+  btnModeClase.classList.remove('active-clase');
+  btnModePractica.classList.remove('active-practica');
+  if (btnModeCableado) btnModeCableado.classList.remove('active-cableado');
+
   if (modo === 'PRACTICA') {
     btnModePractica.classList.add('active-practica');
-    btnModeClase.classList.remove('active-clase');
+  } else if (modo === 'CABLEADO') {
+    if (btnModeCableado) btnModeCableado.classList.add('active-cableado');
   } else {
     btnModeClase.classList.add('active-clase');
-    btnModePractica.classList.remove('active-practica');
   }
 }
 
@@ -216,6 +221,10 @@ if (btnModeClase) {
 
 if (btnModePractica) {
   btnModePractica.addEventListener('click', () => cambiarModo('PRACTICA'));
+}
+
+if (btnModeCableado) {
+  btnModeCableado.addEventListener('click', () => cambiarModo('CABLEADO'));
 }
 
 window.cambiarSwitchPuesto = async function (puestoId, switchId) {

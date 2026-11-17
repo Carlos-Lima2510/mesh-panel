@@ -107,7 +107,7 @@ header {
   transition: all 0.2s ease;
 }
 
-.btn-mode:hover:not(.active-clase):not(.active-practica) {
+.btn-mode:hover:not(.active-clase):not(.active-practica):not(.active-cableado) {
   color: var(--text);
   background: rgba(255, 255, 255, 0.05);
 }
@@ -122,6 +122,12 @@ header {
   background: #7c3aed;
   color: #ffffff;
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+}
+
+.btn-mode.active-cableado {
+  background: #059669;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
 }
 
 /* Botón de Escaneo / Refresco */

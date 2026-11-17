@@ -1,3 +1,4 @@
+const Accion = require('../Accion');
 const EstadoOperativo = require('./EstadoOperativo');
 const EstadoStandby = require('./EstadoStandby');
 const EstadoFalloLogico = require('./EstadoFalloLogico');
@@ -13,7 +14,8 @@ class EvaluadorEstado {
     red = null,
     modoLaboratorio = 'CLASE',
     switchAsignado = null,
-    puesto = null
+    puesto = null,
+    modoDespliegue = false
   }) {
     const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
 
@@ -34,6 +36,16 @@ class EvaluadorEstado {
 
     if (osOnline) {
       return new EstadoOperativo();
+    }
+
+    // Modo Pre-despliegue / Verificación física de cableado
+    // En fase de pruebas físicas antes de instalar MeshAgent, un enlace UP se certifica como VERDE
+    if (modoLaboratorio === 'CABLEADO' || modoLaboratorio === 'DESPLIEGUE') {
+      const accion = new Accion('NINGUNA', 'Enlace físico activo. Pendiente de instalación de MeshAgent en el puesto.', false);
+      return new EstadoOperativo(
+        `Enlace físico verificado a ${enlaceFisico.speed} Mbps (Puerto ${enlaceFisico.port} en switch). Pendiente de instalación de MeshAgent.`,
+        accion
+      );
     }
 
     const apagadoPorMesh = amtOnline && pwr !== null && pwr !== 1;
