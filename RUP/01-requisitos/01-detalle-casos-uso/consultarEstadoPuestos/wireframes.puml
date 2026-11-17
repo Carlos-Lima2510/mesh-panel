@@ -1,0 +1,23 @@
+@startsalt consultarEstadoPuestosWireframe
+{+
+  <b>OpSys</b> - Supervisión de Laboratorio
+  {
+    [ 🎓 Modo Clase ] | . | . | . | . | [ Asignar a switch de prácticas ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
+  }
+  --
+  {
+    <b>Métricas en tiempo real:</b> | 🟢 Operativos: 45 | ⚫ Standby: 10 | 🟡 Prácticas/DHCP: 3 | 🟠 Desconectados: 2 | <b>Total: 60</b>
+  }
+  --
+  {
+    {/ <b>Disposición Espacial del Aula</b> }
+    {#
+      . | <b>Col 1</b> | <b>Col 2</b> | <b>Col 3</b> | <b>=== PASILLO CENTRAL ===</b> | <b>Col 4</b> | <b>Col 5</b> | <b>Col 6</b>
+      <b>Fila 1</b> | [] 🟢 PC-01 | [X] 🟢 PC-02 | [] ⚫ PC-03 | <b>║  Pasillo  ║</b> | [X] 🟢 PC-04 | [] 🟠 PC-05 | [] 🟢 PC-06
+      <b>Fila 2</b> | [] 🟢 PC-07 | [X] 🟡 PC-08 | [] 🟢 PC-09 | <b>║  Pasillo  ║</b> | [] 🟢 PC-10 | [X] 🟢 PC-11 | [] 🟢 PC-12
+      <b>Fila 3</b> | [] ⚫ PC-13 | [] 🟢 PC-14 | [X] 🟢 PC-15 | <b>║  Pasillo  ║</b> | [] 🟢 PC-16 | [] 🟢 PC-17 | [] 🟢 PC-18
+      <b>Fila 4</b> | [] 🟢 PC-19 | [] 🟢 PC-20 | [] 🟠 PC-21 | <b>║  Pasillo  ║</b> | [X] 🟢 PC-22 | [] ⚫ PC-23 | [] 🟢 PC-24
+    }
+  }
+}
+@endsalt

@@ -1,0 +1,29 @@
+@startuml diagramaContextoAdmin
+
+left to right direction
+skinparam linetype polyline
+
+state SESION_CERRADA
+state SISTEMA_DISPONIBLE
+state PUESTO_ABIERTO
+
+[*] --> SESION_CERRADA
+
+SESION_CERRADA --> SISTEMA_DISPONIBLE : iniciarSesion()
+SESION_CERRADA --> SESION_CERRADA : iniciarSesion()
+SISTEMA_DISPONIBLE --> SESION_CERRADA : cerrarSesion()
+
+SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : consultarEstadoPuestos()
+SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : cambiarModo()
+SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : dimensionarCuadricula()
+SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : asignarPuestosASwitch()
+SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : encenderPuesto()
+
+SISTEMA_DISPONIBLE --> PUESTO_ABIERTO : consultarDetallePuesto()
+
+PUESTO_ABIERTO --> SISTEMA_DISPONIBLE : consultarEstadoPuestos()
+PUESTO_ABIERTO --> PUESTO_ABIERTO : encenderPuesto()
+PUESTO_ABIERTO --> PUESTO_ABIERTO : asignarPuestosASwitch()
+PUESTO_ABIERTO --> SESION_CERRADA : cerrarSesion()
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
+
+SISTEMA_DISPONIBLE -[#green]-> consultarEstadoPuestos
+note on link
+<b>Administrador</b> solicita consultar estado de los puestos
+end note
+
+state consultarEstadoPuestos as "consultarEstadoPuestos()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+
+    c -[#green]-> [*]
+    note on link
+    [Infraestructura de monitorización disponible]
+    <b>Sistema</b> presenta la cuadrícula del aula con el estado de los puestos
+    <b>Sistema</b> presenta el resumen de métricas del laboratorio
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [Fallo de comunicación con la infraestructura]
+    <b>Sistema</b> presenta mensaje de advertencia por fallo de comunicación
+    end note
+}
+
+consultarEstadoPuestos -[#green]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+cuadrícula y métricas actualizadas
+end note
+
+consultarEstadoPuestos -[#red]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+aviso de error, sin cambios
+end note
+
+@enduml
