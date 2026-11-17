@@ -301,6 +301,8 @@ class LaboratorioService {
       })
     ]);
 
+    const hayTelemetriaSwitch = Boolean(mapaPuertos && Object.keys(mapaPuertos).length > 0);
+
     const nombreAula = rawDevices.length > 0 && rawDevices[0].groupname ? rawDevices[0].groupname : 'Laboratorio';
     const laboratorio = new Laboratorio({
       nombre: nombreAula,
@@ -312,6 +314,9 @@ class LaboratorioService {
     });
 
     for (const sw of this.switchesPorDefecto) {
+      if (sw.esGestionado()) {
+        sw.alcanzable = hayTelemetriaSwitch;
+      }
       laboratorio.agregarSwitch(sw);
     }
 
@@ -351,9 +356,9 @@ class LaboratorioService {
         : {
           port: numBoca,
           portName: bocaAsignada,
-          link: 'UP',
-          speed: 1000,
-          source: 'default'
+          link: hayTelemetriaSwitch ? 'DOWN' : 'DESCONOCIDO',
+          speed: 0,
+          source: hayTelemetriaSwitch ? 'snmp_real' : 'unreachable'
         };
 
       const redAsignada = laboratorio.obtenerRedDeIp(ip) || this.redesPorDefecto[0];
@@ -418,7 +423,7 @@ class LaboratorioService {
       }
     }
 
-    if (this.autoCompletarPuertos) {
+    if (this.autoCompletarPuertos && hayTelemetriaSwitch) {
       const slotsOcupados = new Set();
       for (const h of laboratorio.hosts) {
         if (h.slot) slotsOcupados.add(h.slot);
@@ -455,9 +460,9 @@ class LaboratorioService {
             : {
               port: parseInt(eq.boca.replace(/\D/g, ''), 10) || 99,
               portName: eq.boca,
-              link: 'DOWN',
+              link: 'DESCONOCIDO',
               speed: 0,
-              source: 'snmp_real'
+              source: 'unreachable'
             };
 
           const host = new Host({
@@ -504,9 +509,9 @@ class LaboratorioService {
         const infoBoca = (mapaPuertos && mapaPuertos[boca]) ? mapaPuertos[boca] : {
           port: numPuerto,
           portName: boca,
-          link: 'DOWN',
+          link: 'DESCONOCIDO',
           speed: 0,
-          source: 'snmp_real'
+          source: 'unreachable'
         };
 
         const nombreHost = `Puesto-${String(numPuerto).padStart(2, '0')}`;
@@ -555,9 +560,9 @@ class LaboratorioService {
           : {
             port: pIdx,
             portName: boca,
-            link: 'DOWN',
+            link: 'DESCONOCIDO',
             speed: 0,
-            source: 'snmp_real'
+            source: 'unreachable'
           };
 
         const nombreHost = `Puesto-Aux${pIdx}`;

@@ -30,24 +30,41 @@ body {
 }
 
 /* ==============================================================================
-   HEADER PRINCIPAL
+   HEADER PRINCIPAL (ESTRUCTURA WIREFRAME OpSys)
    ============================================================================== */
-header {
+.app-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(51, 65, 85, 0.4);
 }
 
-.header-brand h2 {
+.header-brand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.brand-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brand-title {
   font-size: 1.45rem;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: #ffffff;
+}
+
+.brand-title strong {
+  color: #38bdf8;
 }
 
 .status-badge {
@@ -61,7 +78,6 @@ header {
   background: rgba(16, 185, 129, 0.12);
   color: var(--verde);
   border: 1px solid rgba(16, 185, 129, 0.25);
-  margin-top: 6px;
 }
 
 .status-badge.offline {
@@ -78,14 +94,15 @@ header {
   box-shadow: 0 0 6px currentColor;
 }
 
-.header-actions {
+/* Fila de Acciones Principales (según wireframe) */
+.header-actions-bar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
 }
 
-/* Selector de Modo (Clase vs Práctica) */
 .mode-selector {
   display: flex;
   background: #090e1a;
@@ -130,12 +147,18 @@ header {
   box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
 }
 
-/* Botón de Escaneo / Refresco */
-.btn-scan {
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-control {
   background: #1e293b;
   color: #f1f5f9;
   border: 1px solid var(--border);
-  padding: 8px 16px;
+  padding: 7px 14px;
   border-radius: 8px;
   font-size: 0.83rem;
   font-weight: 600;
@@ -146,26 +169,312 @@ header {
   transition: all 0.2s ease;
 }
 
-.btn-scan:hover:not(:disabled) {
+.btn-control:hover:not(:disabled) {
   background: #334155;
   border-color: #475569;
   transform: translateY(-1px);
 }
 
-.btn-scan:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.btn-control.active {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.btn-action-primary {
+  background: #4f46e5;
+  color: #ffffff;
+  border: 1px solid #6366f1;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+}
+
+.btn-action-primary:hover {
+  background: #4338ca;
+  border-color: #818cf8;
+  transform: translateY(-1px);
+}
+
+.btn-action-primary.has-selection {
+  background: #7c3aed;
+  border-color: #a78bfa;
+  box-shadow: 0 0 14px rgba(124, 58, 237, 0.55);
+}
+
+.btn-action-secondary {
+  background: rgba(30, 41, 59, 0.8);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-action-secondary:hover {
+  background: rgba(37, 99, 235, 0.25);
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-action-secondary.has-selection {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.55);
+}
+
+.btn-scan {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+.btn-logout {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 /* ==============================================================================
-   BARRA DE HERRAMIENTAS Y RESUMEN
+   DRAWER DE DIMENSIONES Y RANGO
    ============================================================================== */
-.toolbar {
+.drawer-dimensiones {
+  background: #090e1a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.drawer-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+.grid-dimension-controls, .switch-assign-tool {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dim-inputs, .range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dim-label, .range-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.input-dim {
+  width: 48px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 0.83rem;
+  text-align: center;
+  outline: none;
+}
+
+.input-dim:focus {
+  border-color: var(--primary);
+}
+
+.dim-sep {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.btn-subtle {
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-subtle:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+.select-range-switch {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.classroom-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-tag {
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+
+/* ==============================================================================
+   MÉTRICAS EN TIEMPO REAL (BANDA HORIZONTAL DEL WIREFRAME)
+   ============================================================================== */
+.realtime-metrics-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #0f172a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  flex-wrap: wrap;
+}
+
+.metrics-header-label {
+  font-size: 0.88rem;
+  color: #cbd5e1;
+  letter-spacing: -0.2px;
+}
+
+.metrics-grid {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.metric-pill .metric-name {
+  color: #94a3b8;
+}
+
+.metric-pill .metric-val {
+  color: #ffffff;
+  font-size: 0.88rem;
+}
+
+.metric-pill.verde .metric-val { color: var(--verde); }
+.metric-pill.gris .metric-val { color: #cbd5e1; }
+.metric-pill.amarillo .metric-val { color: var(--amarillo); }
+.metric-pill.naranja .metric-val { color: var(--naranja); }
+.metric-pill.desconocido .metric-val { color: #94a3b8; }
+
+.metric-pill.total {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.metric-pill.total .metric-name { color: #93c5fd; font-weight: 700; }
+.metric-pill.total .metric-val { color: #60a5fa; font-weight: 800; font-size: 0.92rem; }
+
+/* ==============================================================================
+   SECCIÓN DISPOSICIÓN ESPACIAL DEL AULA (TAB WIREFRAME)
+   ============================================================================== */
+.spatial-layout-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-tab-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 0;
+  margin-bottom: -1px;
+  z-index: 2;
+}
+
+.section-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #090e1a;
+  border: 1px solid var(--border);
+  border-bottom: 2px solid #090e1a;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  letter-spacing: -0.2px;
+}
+
+.section-tab .tab-icon {
+  font-size: 1rem;
+}
+
+.tab-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
@@ -173,9 +482,8 @@ header {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 280px;
-  max-width: 440px;
+  min-width: 260px;
+  max-width: 400px;
 }
 
 .search-icon {
@@ -191,9 +499,9 @@ header {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
-  padding: 8px 36px 8px 36px;
+  padding: 7px 32px 7px 34px;
   border-radius: 8px;
-  font-size: 0.85rem;
+  font-size: 0.83rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -223,30 +531,13 @@ header {
   color: var(--text);
 }
 
-.classroom-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.summary-tag {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 6px;
-  letter-spacing: 0.3px;
-}
-
 /* ==============================================================================
-   PLANO DEL AULA (40 PUESTOS: 2 HILERAS DE 4 COLS X 5 FILAS + PASILLO)
+   PLANO DEL AULA (CUADRÍCULA ESPACIAL CON PASILLO EN MEDIO)
    ============================================================================== */
 .classroom-container {
   background: #090e1a;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 0 0 12px 12px;
   padding: 20px;
   overflow-x: auto;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
@@ -254,7 +545,7 @@ header {
 
 .classroom-headers {
   display: grid;
-  grid-template-columns: 48px 1fr 64px 1fr 48px;
+  grid-template-columns: 60px 1fr 100px 1fr 60px;
   align-items: center;
   text-align: center;
   font-size: 0.8rem;
@@ -262,32 +553,40 @@ header {
   color: var(--text-muted);
   margin-bottom: 12px;
   gap: 12px;
-  min-width: 960px;
+  min-width: 980px;
 }
 
 .corner-header {
   font-size: 0.72rem;
-  color: #475569;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.classroom-headers .col-header {
+.col-header-block {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
+  gap: 10px;
+}
+
+.col-header-cell {
   background: rgba(30, 41, 59, 0.5);
-  padding: 8px 14px;
+  padding: 6px 4px;
   border-radius: 6px;
   border: 1px solid rgba(51, 65, 85, 0.6);
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: 0.74rem;
+  font-weight: 700;
   color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .classroom-headers .aisle-header {
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   color: #94a3b8;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,12 +598,12 @@ header {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 960px;
+  min-width: 980px;
 }
 
 .classroom-row {
   display: grid;
-  grid-template-columns: 48px 1fr 64px 1fr 48px;
+  grid-template-columns: 60px 1fr 100px 1fr 60px;
   align-items: stretch;
   gap: 12px;
 }
@@ -313,13 +612,14 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 800;
   color: #94a3b8;
   background: #111827;
   border: 1px solid var(--border);
   border-radius: 8px;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .row-block {
@@ -347,6 +647,22 @@ header {
   bottom: 0;
   width: 1px;
   border-left: 2px dashed #334155;
+  z-index: 1;
+}
+
+.aisle-divider .aisle-text {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.5px;
+  background: #090e1a;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px dashed #334155;
+  user-select: none;
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
 }
 
 /* ==============================================================================
@@ -396,6 +712,12 @@ header {
   background: linear-gradient(135deg, rgba(249, 115, 22, 0.08) 0%, var(--card) 100%);
 }
 
+.card-compact.DESCONOCIDO {
+  border-left-color: #64748b;
+  background: linear-gradient(135deg, rgba(100, 116, 139, 0.04) 0%, var(--card) 100%);
+  opacity: 0.85;
+}
+
 /* Cabecera de la tarjeta */
 .card-compact .card-top {
   display: flex;
@@ -412,6 +734,28 @@ header {
   min-width: 0;
   overflow: hidden;
   flex: 1;
+}
+
+.slot-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+.slot-checkbox {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  accent-color: #6366f1;
+  border-radius: 3px;
+}
+
+.card-compact.selected {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.4) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, var(--card) 100%) !important;
 }
 
 .slot-badge {
@@ -461,6 +805,11 @@ header {
 
 .status-dot.GRIS {
   background: #64748b;
+}
+
+.status-dot.DESCONOCIDO {
+  background: #475569;
+  box-shadow: none;
 }
 
 .status-dot.EMPTY {
@@ -700,6 +1049,31 @@ header {
 .select-range-switch option {
   background: #0f172a;
   color: #f8fafc;
+}
+
+/* Badge de Switch dentro de cada tarjeta (Wireframe OpSys) */
+.badge-switch {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.badge-switch.docente {
+  background: rgba(37, 99, 235, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.badge-switch.practicas {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.35);
 }
 
 /* Fila interactiva de Switch dentro de cada tarjeta */

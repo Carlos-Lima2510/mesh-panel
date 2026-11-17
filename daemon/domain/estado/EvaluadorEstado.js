@@ -4,6 +4,7 @@ const EstadoStandby = require('./EstadoStandby');
 const EstadoFalloLogico = require('./EstadoFalloLogico');
 const EstadoRedAislada = require('./EstadoRedAislada');
 const EstadoDesconectado = require('./EstadoDesconectado');
+const EstadoSinTelemetria = require('./EstadoSinTelemetria');
 
 class EvaluadorEstado {
   static evaluar({
@@ -23,6 +24,22 @@ class EvaluadorEstado {
     const esperaAislado = sw
       ? !sw.esperaMeshCentral()
       : (puesto && puesto.esperaEstarAislado ? puesto.esperaEstarAislado() : (modoLaboratorio === 'PRACTICA'));
+
+    // 0. Si el switch está inalcanzable o no hay enlace físico reportado (sin telemetría de Capa 1)
+    const sinTelemetriaSwitch = !enlaceFisico ||
+      enlaceFisico.link === 'DESCONOCIDO' ||
+      enlaceFisico.link === 'UNKNOWN' ||
+      enlaceFisico.source === 'unreachable';
+
+    if (sinTelemetriaSwitch) {
+      if (osOnline) {
+        return new EstadoOperativo();
+      }
+      const puertoStr = enlaceFisico && enlaceFisico.port ? `puerto ${enlaceFisico.port}` : 'switch';
+      return new EstadoSinTelemetria(
+        `Sin telemetría de red. Switch inalcanzable o sin respuesta SNMP (${puertoStr}).`
+      );
+    }
 
     if (enlaceFisico.link === 'DOWN') {
       if (esperaAislado) {

@@ -19,6 +19,18 @@ const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
 const btnModeCableado = document.getElementById('btn-mode-cableado');
 
+const btnAsignarPracticas = document.getElementById('btn-asignar-practicas');
+const btnAsignarPracticasText = document.getElementById('btn-asignar-practicas-text');
+const btnAsignarDocente = document.getElementById('btn-asignar-docente');
+const btnAsignarDocenteText = document.getElementById('btn-asignar-docente-text');
+
+const btnDimensionarToggle = document.getElementById('btn-dimensionar-toggle');
+const btnDimensionarLabel = document.getElementById('btn-dimensionar-label');
+const drawerDimensiones = document.getElementById('drawer-dimensiones');
+
+const btnSelectAll = document.getElementById('btn-select-all');
+const btnLogout = document.getElementById('btn-logout');
+
 const inputFilas = document.getElementById('input-filas');
 const inputColumnas = document.getElementById('input-columnas');
 const btnAplicarCuadricula = document.getElementById('btn-aplicar-cuadricula');
@@ -63,6 +75,33 @@ function actualizarBotonesModo(modo) {
     btnModeClase.classList.add('active-clase');
   }
 }
+
+function actualizarBotonesAsignacion(totalSel) {
+  if (btnAsignarPracticas && btnAsignarPracticasText) {
+    if (totalSel > 0) {
+      btnAsignarPracticasText.textContent = `A Switch Prácticas (${totalSel})`;
+      btnAsignarPracticas.classList.add('has-selection');
+    } else {
+      btnAsignarPracticasText.textContent = 'Asignar a switch de prácticas';
+      btnAsignarPracticas.classList.remove('has-selection');
+    }
+  }
+
+  if (btnAsignarDocente && btnAsignarDocenteText) {
+    if (totalSel > 0) {
+      btnAsignarDocenteText.textContent = `A Switch Normal (${totalSel})`;
+      btnAsignarDocente.classList.add('has-selection');
+    } else {
+      btnAsignarDocenteText.textContent = 'Reasignar a switch normal';
+      btnAsignarDocente.classList.remove('has-selection');
+    }
+  }
+}
+
+window.togglePuestoSeleccionado = function (puestoId, isChecked) {
+  const totalSel = renderer.toggleSeleccion(puestoId, isChecked);
+  actualizarBotonesAsignacion(totalSel);
+};
 
 function actualizarVista() {
   renderer.render(puestos, lastMetricas, {
@@ -124,6 +163,9 @@ function procesarDatosLaboratorio(lab) {
   if (gridDimsBadge) {
     gridDimsBadge.textContent = `${labFilas} Filas × ${labColsHilera}+${labColsHilera} Cols`;
   }
+  if (btnDimensionarLabel) {
+    btnDimensionarLabel.textContent = `Dimensionar: ${labFilas}×${labColumnas}`;
+  }
   if (inputRangeHasta && (!inputRangeHasta.value || parseInt(inputRangeHasta.value, 10) > totalCalculado)) {
     inputRangeHasta.value = Math.min(20, totalCalculado);
     inputRangeHasta.max = totalCalculado;
@@ -159,7 +201,7 @@ export async function fetchDevices() {
     if (btnScan) {
       btnScan.disabled = false;
       if (scanIcon) scanIcon.textContent = '🔄';
-      if (scanText) scanText.textContent = 'Consultar Estado Puestos';
+      if (scanText) scanText.textContent = 'Consultar estado';
     }
   }
 }
@@ -227,6 +269,101 @@ if (btnModeCableado) {
   btnModeCableado.addEventListener('click', () => cambiarModo('CABLEADO'));
 }
 
+// Acción Granular conjunta: [ Asignar a switch de prácticas ] según wireframe
+if (btnAsignarPracticas) {
+  btnAsignarPracticas.addEventListener('click', async () => {
+    const seleccionados = renderer.obtenerPuestosSeleccionados();
+    if (!seleccionados || seleccionados.length === 0) {
+      alert('Marca primero uno o más puestos usando sus casillas [ ] para asignarlos al switch de prácticas.');
+      return;
+    }
+
+    try {
+      setStatusBadge(`Asignando ${seleccionados.length} puestos a Switch de Prácticas...`);
+      const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          puesto_ids: seleccionados,
+          switch_id: 'sw-practicas'
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.laboratorio) {
+        renderer.limpiarSeleccion();
+        actualizarBotonesAsignacion(0);
+        procesarDatosLaboratorio(data.laboratorio);
+        setStatusBadge(`${seleccionados.length} puestos asignados a Switch de Prácticas.`);
+      }
+    } catch (err) {
+      console.error('[-] Error asignando puestos a switch de prácticas:', err);
+      setStatusBadge('Error al asignar switch', true);
+    }
+  });
+}
+
+// Acción Granular conjunta complementaria: [ Reasignar a switch normal ]
+if (btnAsignarDocente) {
+  btnAsignarDocente.addEventListener('click', async () => {
+    const seleccionados = renderer.obtenerPuestosSeleccionados();
+    if (!seleccionados || seleccionados.length === 0) {
+      alert('Marca primero uno o más puestos usando sus casillas [ ] para reasignarlos al switch normal.');
+      return;
+    }
+
+    try {
+      setStatusBadge(`Reasignando ${seleccionados.length} puestos a Switch Normal (Docente)...`);
+      const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          puesto_ids: seleccionados,
+          switch_id: 'sw-docente'
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.laboratorio) {
+        renderer.limpiarSeleccion();
+        actualizarBotonesAsignacion(0);
+        procesarDatosLaboratorio(data.laboratorio);
+        setStatusBadge(`${seleccionados.length} puestos reasignados a Switch Normal.`);
+      }
+    } catch (err) {
+      console.error('[-] Error reasignando puestos a switch docente:', err);
+      setStatusBadge('Error al reasignar switch', true);
+    }
+  });
+}
+
+// Conmutar panel de dimensionamiento
+if (btnDimensionarToggle && drawerDimensiones) {
+  btnDimensionarToggle.addEventListener('click', () => {
+    const isHidden = drawerDimensiones.style.display === 'none';
+    drawerDimensiones.style.display = isHidden ? 'block' : 'none';
+    btnDimensionarToggle.classList.toggle('active', isHidden);
+  });
+}
+
+// Seleccionar todos los puestos visibles
+if (btnSelectAll) {
+  btnSelectAll.addEventListener('click', () => {
+    const allIds = Array.from(renderer.slotElements.keys());
+    const totalSel = renderer.seleccionarTodos(allIds);
+    actualizarBotonesAsignacion(totalSel);
+    btnSelectAll.textContent = totalSel > 0 ? '☒ Deseleccionar todos' : '☑ Seleccionar todos';
+  });
+}
+
+// Botón Cerrar Sesión
+if (btnLogout) {
+  btnLogout.addEventListener('click', () => {
+    if (confirm('¿Deseas cerrar la sesión de administración de OpSys?')) {
+      setStatusBadge('Sesión finalizada. Recargando...');
+      setTimeout(() => window.location.reload(), 400);
+    }
+  });
+}
+
 window.cambiarSwitchPuesto = async function (puestoId, switchId) {
   try {
     setStatusBadge(`Asignando ${puestoId} a ${switchId}...`);
@@ -256,7 +393,6 @@ async function aplicarDimensionesCuadricula() {
     return;
   }
 
-  // 1. Actualización visual instantánea en el cliente (0ms) con pasillo en medio siempre
   labFilas = filas;
   labColsHilera = colsHilera;
   labColumnas = colsHilera * 2;
@@ -268,6 +404,9 @@ async function aplicarDimensionesCuadricula() {
   if (gridDimsBadge) {
     gridDimsBadge.textContent = `${labFilas} Filas × ${colsHilera}+${colsHilera} Cols`;
   }
+  if (btnDimensionarLabel) {
+    btnDimensionarLabel.textContent = `Dimensionar: ${labFilas}×${labColumnas}`;
+  }
   if (inputRangeHasta) {
     inputRangeHasta.max = total;
   }
@@ -276,7 +415,6 @@ async function aplicarDimensionesCuadricula() {
   actualizarVista();
   setStatusBadge(`Cuadrícula: ${labFilas} filas × ${colsHilera}+${colsHilera} cols (${total} puestos)`);
 
-  // 2. Sincronización con el daemon backend
   try {
     const res = await fetch(`${DAEMON_URL}/api/laboratorio/dimensiones`, {
       method: 'POST',

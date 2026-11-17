@@ -9,6 +9,7 @@ const {
   EstadoFalloLogico,
   EstadoRedAislada,
   EstadoDesconectado,
+  EstadoSinTelemetria,
   EvaluadorEstado
 } = require('../daemon/domain/estado');
 const Host = require('../daemon/domain/Host');
@@ -101,6 +102,34 @@ const estCableadoDown = EvaluadorEstado.evaluar({
 });
 assert.strictEqual(estCableadoDown instanceof EstadoDesconectado, true);
 assert.strictEqual(estCableadoDown.color, 'NARANJA');
+
+// Verificación de EstadoSinTelemetria (Switch inalcanzable / sin telemetría de Capa 1)
+const estSinTelemetria = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 7, link: 'DESCONOCIDO', speed: 0, source: 'unreachable' },
+  osOnline: false,
+  modoLaboratorio: 'CLASE'
+});
+assert.strictEqual(estSinTelemetria instanceof EstadoSinTelemetria, true);
+assert.strictEqual(Estado.esInstancia(estSinTelemetria), true);
+assert.strictEqual(estSinTelemetria.color, 'DESCONOCIDO');
+assert.strictEqual(estSinTelemetria.categoria, 'SIN_TELEMETRIA');
+assert.strictEqual(estSinTelemetria.obtenerAccion().tipo, 'VERIFICAR_INFRAESTRUCTURA');
+assert.strictEqual(estSinTelemetria.permiteAccionRemota(), false);
+
+// Si no hay enlaceFisico en absoluto y el SO está apagado -> EstadoSinTelemetria
+const estSinEnlace = EvaluadorEstado.evaluar({
+  enlaceFisico: null,
+  osOnline: false
+});
+assert.strictEqual(estSinEnlace instanceof EstadoSinTelemetria, true);
+
+// Si el switch está inalcanzable pero el agente de MeshCentral sí responde -> EstadoOperativo
+const estSwitchCaidoPeroOsVivo = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 8, link: 'DESCONOCIDO', source: 'unreachable' },
+  osOnline: true
+});
+assert.strictEqual(estSwitchCaidoPeroOsVivo instanceof EstadoOperativo, true);
+assert.strictEqual(estSwitchCaidoPeroOsVivo.color, 'VERDE');
 
 // 2. Verificación de Host
 const host1 = new Host({
@@ -430,6 +459,35 @@ const mockNetworkProvider = {
   const jsonLab = labConSwitches.toJSON();
   assert.strictEqual(jsonLab.switches.length, 2);
   assert.strictEqual(jsonLab.switches[0].id, 'sw-docente');
+
+  // 12. Verificación de robustez ante switch inalcanzable (sin telemetría de Capa 1)
+  const serviceSinRed = new LaboratorioService({
+    meshCentralAdapter: { listarDispositivos: async () => [] },
+    networkProvider: { obtenerTodosLosPuertos: async () => ({}) },
+    autoCompletarPuertos: true
+  });
+  const labSinRed = await serviceSinRed.obtenerLaboratorio({ forzar: true });
+  // Si no hay respuesta del switch ni de MeshCentral, no debe inventar hosts falsos en naranja
+  assert.strictEqual(labSinRed.hosts.length, 0, 'No debe autocompletar hosts falsos si el switch no respondió');
+  assert.strictEqual(labSinRed.obtenerSwitch('sw-docente').alcanzable, false);
+  assert.strictEqual(labSinRed.obtenerMetricas().naranja, 0);
+
+  // Con telemetría real del switch, sí autocompleta los puestos
+  const serviceConRed = new LaboratorioService({
+    meshCentralAdapter: { listarDispositivos: async () => [] },
+    networkProvider: {
+      obtenerTodosLosPuertos: async () => ({
+        port1: { port: 1, portName: 'port1', link: 'UP', speed: 1000, source: 'snmp_real' },
+        port2: { port: 2, portName: 'port2', link: 'DOWN', speed: 0, source: 'snmp_real' }
+      })
+    },
+    autoCompletarPuertos: true,
+    filas: 5,
+    columnasHilera: 4
+  });
+  const labConRed = await serviceConRed.obtenerLaboratorio({ forzar: true });
+  assert.strictEqual(labConRed.obtenerSwitch('sw-docente').alcanzable, true);
+  assert.strictEqual(labConRed.hosts.length > 0, true);
 
   console.log('✔ Todas las pruebas unitarias y de integración pasaron con éxito.');
   process.exit(0);

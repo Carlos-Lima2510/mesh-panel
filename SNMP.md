@@ -163,7 +163,8 @@ El motor determinista ([EvaluadorEstado.js](file:///daemon/domain/estado/Evaluad
 | ⚫ **GRIS** | `UP` (10 o 100 Mbps) | Desconectado | `CLASE` o `PRACTICA` | **Apagado en Standby (S5)**: Tarjeta en bajo consumo, lista para despertar. | ⚡ `WAKE_ON_LAN` |
 | 🟡 **AMARILLO** | `UP` (1000 Mbps) | Desconectado | `CLASE` | **Fallo Lógico / DHCP**: Cable a 1 Gbps pero el agente no conecta. | `REMEDIAR_DHCP` |
 | 🟡 **AMARILLO** | `DOWN` | Desconectado | `PRACTICA` | **Red Aislada de Prácticas**: Cable movido al switch de prácticas. | `NINGUNA` |
-| 🟠 **NARANJA** | `DOWN` | Desconectado | `CLASE` o `CABLEADO` | **Cable Desconectado / Deep Sleep**: Sin portadora eléctrica en switch. | `INSPECCION_CABLE` |
+| 🟠 **NARANJA** | `DOWN` | Desconectado | `CLASE` o `CABLEADO` | **Cable Desconectado / Deep Sleep**: Sin portadora eléctrica en switch verificado. | `INSPECCION_CABLE` |
+| 🔘 **DESCONOCIDO** | `DESCONOCIDO` (Sin telemetría) | Desconectado | Cualquiera | **Sin Telemetría**: Switch inalcanzable o sin respuesta SNMP. | `VERIFICAR_INFRAESTRUCTURA` |
 
 ---
 

@@ -211,7 +211,8 @@ class Laboratorio {
       verde: 0,
       amarillo: 0,
       gris: 0,
-      naranja: 0
+      naranja: 0,
+      desconocido: 0
     };
 
     for (const host of this.hosts) {
@@ -219,7 +220,8 @@ class Laboratorio {
       if (color === 'VERDE') metricas.verde++;
       else if (color === 'AMARILLO') metricas.amarillo++;
       else if (color === 'GRIS') metricas.gris++;
-      else metricas.naranja++;
+      else if (color === 'NARANJA') metricas.naranja++;
+      else metricas.desconocido++;
     }
 
     return metricas;

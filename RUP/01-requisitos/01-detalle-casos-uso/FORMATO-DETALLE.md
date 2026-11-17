@@ -97,7 +97,7 @@ Los prototipos de interfaz se diseñan como maquetas visuales ejecutables median
 1. **Alineación de Cabecera:**
    - La barra de navegación debe estructurarse en filas diferenciadas:
      - Fila 1: Título de la aplicación / vista (`{+ <b>OpSys</b> ...}`).
-     - Fila 2: Botón de modo contextual a la izquierda (`[ 🎓 Modo Clase ]` o `[ 🧪 Modo Práctica ]`) inmediatamente bajo el título, y a la derecha los botones de acción global alineados horizontalmente sobre la misma línea base (`[ Asignar a switch de prácticas ]`, `[Dimensionar: 6x10]`, `[Consultar estado]`, `[🚪 Cerrar sesión]`).
+     - Fila 2: Botón de modo contextual a la izquierda (`[ 🎓 Modo Clase ]` o `[ 🧪 Modo Práctica ]`) inmediatamente bajo el título, y a la derecha los botones de acción global alineados horizontalmente sobre la misma línea base (`[ Asignar a switch ]`, `[Dimensionar: 6x10]`, `[Consultar estado]`, `[🚪 Cerrar sesión]`).
 2. **Pasillo Central Explícito:**
    - Cuando se represente la cuadrícula de puestos del laboratorio, debe reflejarse obligatoriamente la división física de pasillo central:
      - Cabecera: `<b>=== PASILLO CENTRAL ===</b>`
@@ -121,7 +121,7 @@ skinparam defaultFontName sans-serif
 {+
   {* <b>OpSys</b> | <color:gray>Supervisión de Laboratorio</color> }
   {
-    [ 🎓 Modo Clase ] | . | [ Asignar a switch de prácticas ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
+    [ 🎓 Modo Clase ] | . | [ Asignar a switch ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
   }
   {
     <b>Métricas:</b> | Total: <b>60</b> | 🟢 Op: <b>42</b> | ⚫ Standby: <b>10</b> | 🟡 Práct/DHCP: <b>5</b> | 🟠 Desc: <b>3</b>

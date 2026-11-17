@@ -4,6 +4,7 @@ const EstadoStandby = require('./EstadoStandby');
 const EstadoFalloLogico = require('./EstadoFalloLogico');
 const EstadoRedAislada = require('./EstadoRedAislada');
 const EstadoDesconectado = require('./EstadoDesconectado');
+const EstadoSinTelemetria = require('./EstadoSinTelemetria');
 const EvaluadorEstado = require('./EvaluadorEstado');
 
 module.exports = {
@@ -13,5 +14,6 @@ module.exports = {
   EstadoFalloLogico,
   EstadoRedAislada,
   EstadoDesconectado,
+  EstadoSinTelemetria,
   EvaluadorEstado
 };

@@ -4,20 +4,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telemetría de Puestos - Panel de Observabilidad</title>
+  <title>OpSys - Supervisión de Laboratorio</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-  <header>
-    <div class="header-brand">
-      <h2>Telemetría del Laboratorio</h2>
-      <div id="conn-status" class="status-badge">
-        <span class="pulse"></span> <span>Consultas a demanda</span>
+  <!-- CABECERA: BRANDING Y BARRA DE ACCIONES (ESTRUCTURA WIREFRAME) -->
+  <header class="app-header">
+    <div class="header-brand-row">
+      <div class="brand-title-wrap">
+        <h1 class="brand-title"><strong>OpSys</strong> - Supervisión de Laboratorio</h1>
+        <div id="conn-status" class="status-badge">
+          <span class="pulse"></span> <span>Consultas a demanda</span>
+        </div>
       </div>
     </div>
 
-    <div class="header-actions">
+    <!-- FILA DE ACCIONES PRINCIPALES (MODO, ASIGNAR PRACTICAS, DIMENSIONAR, CONSULTAR, CERRAR SESION) -->
+    <div class="header-actions-bar">
+      <!-- Selector de Modo Operativo -->
       <div class="mode-selector">
         <button id="btn-mode-clase" class="btn-mode active-clase" type="button" title="Modo Clase (Operación normal)">
           🎓 Modo Clase
@@ -30,83 +35,158 @@
         </button>
       </div>
 
-      <button id="btn-scan" class="btn-scan" type="button">
-        <span id="btn-scan-icon">🔄</span>
-        <span id="btn-scan-text">Consultar Estado Puestos</span>
-      </button>
+      <div class="header-right-actions">
+        <!-- [ Asignar a switch de prácticas ] según wireframe -->
+        <button id="btn-asignar-practicas" class="btn-action-primary" type="button" title="Asignar los puestos seleccionados al switch de prácticas">
+          <span class="btn-icon">⚡</span> <span id="btn-asignar-practicas-text">Asignar a switch de prácticas</span>
+        </button>
+
+        <!-- [ Reasignar a switch normal ] para resolver la vuelta al switch docente -->
+        <button id="btn-asignar-docente" class="btn-action-secondary" type="button" title="Reasignar los puestos seleccionados al switch normal (Docente)">
+          <span class="btn-icon">🎓</span> <span id="btn-asignar-docente-text">Reasignar a switch normal</span>
+        </button>
+
+        <!-- [ Dimensionar: 6x10 ] según wireframe -->
+        <button id="btn-dimensionar-toggle" class="btn-control" type="button" title="Ajustar dimensiones y herramientas de cuadrícula">
+          <span class="btn-icon">📐</span> <span id="btn-dimensionar-label">Dimensionar: 5×8</span>
+        </button>
+
+        <!-- [ Consultar estado ] según wireframe -->
+        <button id="btn-scan" class="btn-control btn-scan" type="button" title="Consultar estado de todos los puestos">
+          <span id="btn-scan-icon">🔄</span> <span id="btn-scan-text">Consultar estado</span>
+        </button>
+
+        <!-- [ 🚪 Cerrar sesión ] según wireframe -->
+        <button id="btn-logout" class="btn-control btn-logout" type="button" title="Cerrar sesión de administrador">
+          <span class="btn-icon">🚪</span> <span>Cerrar sesión</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <section class="toolbar">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input
-        type="search"
-        id="search-input"
-        class="search-input"
-        placeholder="Buscar por puesto, IP, MAC o boca switch (ej. UEA-C236, port1)..."
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="Buscar puestos"
-      >
-      <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda" style="display: none;">&times;</button>
-    </div>
-
-    <!-- Controles de Cuadrícula Dinámica (Filas x Columnas por Hilera) -->
-    <div class="grid-dimension-controls" aria-label="Dimensiones de la Cuadrícula">
-      <span class="toolbar-label">Cuadrícula:</span>
-      <div class="dim-inputs">
-        <label for="input-filas" class="dim-label">Filas:</label>
-        <input type="number" id="input-filas" class="input-dim" min="1" max="20" value="5" title="Número de filas de mesas" />
-        <span class="dim-sep">&times;</span>
-        <label for="input-columnas" class="dim-label">Cols/Hilera:</label>
-        <input type="number" id="input-columnas" class="input-dim" min="1" max="20" value="4" title="Columnas a cada lado del pasillo central" />
-        <button id="btn-aplicar-cuadricula" class="btn-subtle" type="button" title="Aplicar cuadrícula (pasillo en medio siempre)">
-          📐 Aplicar
-        </button>
+  <!-- PANEL DESPLEGABLE DE DIMENSIONES Y RANGO (HERRAMIENTA EXPANDIBLE) -->
+  <section id="drawer-dimensiones" class="drawer-dimensiones" style="display: none;">
+    <div class="drawer-content">
+      <div class="grid-dimension-controls" aria-label="Dimensiones de la Cuadrícula">
+        <span class="toolbar-label">Configurar Cuadrícula:</span>
+        <div class="dim-inputs">
+          <label for="input-filas" class="dim-label">Filas:</label>
+          <input type="number" id="input-filas" class="input-dim" min="1" max="20" value="5" title="Número de filas de mesas" />
+          <span class="dim-sep">&times;</span>
+          <label for="input-columnas" class="dim-label">Cols/Hilera:</label>
+          <input type="number" id="input-columnas" class="input-dim" min="1" max="20" value="4" title="Columnas a cada lado del pasillo central" />
+          <button id="btn-aplicar-cuadricula" class="btn-subtle" type="button" title="Aplicar cuadrícula (pasillo en medio siempre)">
+            📐 Aplicar
+          </button>
+        </div>
       </div>
-    </div>
 
-    <!-- Herramienta de Asignación de Switch por Rango -->
-    <div class="switch-assign-tool" aria-label="Asignación de Switch por Rango">
-      <span class="toolbar-label">Switch Rango:</span>
-      <div class="range-inputs">
-        <span class="range-text">#</span>
-        <input type="number" id="input-range-desde" class="input-dim" min="1" value="1" title="Puesto inicial" />
-        <span class="range-text">a</span>
-        <input type="number" id="input-range-hasta" class="input-dim" min="1" value="20" title="Puesto final" />
-        <select id="select-range-switch" class="select-range-switch" title="Switch destino">
-          <option value="sw-docente">Sw. Docente</option>
-          <option value="sw-practicas" selected>Sw. Prácticas</option>
-        </select>
-        <button id="btn-aplicar-rango-switch" class="btn-subtle" type="button" title="Asignar switch a este rango de puestos">
-          ⚡ Asignar
-        </button>
+      <div class="switch-assign-tool" aria-label="Asignación de Switch por Rango">
+        <span class="toolbar-label">Asignación por Rango:</span>
+        <div class="range-inputs">
+          <span class="range-text">#</span>
+          <input type="number" id="input-range-desde" class="input-dim" min="1" value="1" title="Puesto inicial" />
+          <span class="range-text">a</span>
+          <input type="number" id="input-range-hasta" class="input-dim" min="1" value="20" title="Puesto final" />
+          <select id="select-range-switch" class="select-range-switch" title="Switch destino">
+            <option value="sw-docente">Sw. Docente</option>
+            <option value="sw-practicas" selected>Sw. Prácticas</option>
+          </select>
+          <button id="btn-aplicar-rango-switch" class="btn-subtle" type="button" title="Asignar switch a este rango de puestos">
+            ⚡ Asignar Rango
+          </button>
+        </div>
       </div>
-    </div>
 
-    <div class="classroom-summary">
-      <span id="total-puestos-badge" class="summary-tag">40 Puestos</span>
-      <span id="grid-dims-badge" class="summary-tag">5 Filas &times; 4+4 Cols</span>
+      <div class="classroom-summary">
+        <span id="total-puestos-badge" class="summary-tag">40 Puestos</span>
+        <span id="grid-dims-badge" class="summary-tag">5 Filas &times; 4+4 Cols</span>
+      </div>
     </div>
   </section>
 
-  <!-- CUADRÍCULA DINÁMICA DEL AULA (PASILLO EN EL MEDIO SIEMPRE) -->
-  <main class="classroom-container">
-    <div class="classroom-headers" id="classroom-headers">
-      <div class="corner-header">Fila</div>
-      <div class="col-header" id="header-left-col">Hilera Izquierda (4 cols)</div>
-      <div class="aisle-header">Pasillo Central</div>
-      <div class="col-header" id="header-right-col">Hilera Derecha (4 cols)</div>
-      <div class="corner-header">Fila</div>
+  <!-- MÉTRICAS EN TIEMPO REAL (SEGUNDA BANDA DEL WIREFRAME) -->
+  <section class="realtime-metrics-bar" aria-label="Métricas en tiempo real">
+    <div class="metrics-header-label">
+      <strong>Métricas en tiempo real:</strong>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-pill verde" title="Equipos encendidos y reportando por agente">
+        <span class="status-dot VERDE"></span>
+        <span class="metric-name">Operativos:</span>
+        <strong id="metric-operativos" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill gris" title="Equipos apagados en Standby S5 listos para WoL">
+        <span class="status-dot GRIS"></span>
+        <span class="metric-name">Standby:</span>
+        <strong id="metric-standby" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill amarillo" title="Equipos en Red de Prácticas o con fallo DHCP">
+        <span class="status-dot AMARILLO"></span>
+        <span class="metric-name">Prácticas/DHCP:</span>
+        <strong id="metric-practicas" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill naranja" title="Cables desconectados en roseta o PC en Deep Sleep">
+        <span class="status-dot NARANJA"></span>
+        <span class="metric-name">Desconectados:</span>
+        <strong id="metric-desconectados" class="metric-val">0</strong>
+      </div>
+      <div id="metric-pill-desconocido" class="metric-pill desconocido" style="display: none;" title="Puestos sin telemetría de red">
+        <span class="status-dot DESCONOCIDO"></span>
+        <span class="metric-name">Sin Telemetría:</span>
+        <strong id="metric-desconocido" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill total" title="Total de puestos monitorizados en el laboratorio">
+        <span class="metric-name">Total:</span>
+        <strong id="metric-total" class="metric-val">0</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- PESTAÑA DE SECCIÓN Y BARRA DE HERRAMIENTAS (TERCERA BANDA DEL WIREFRAME) -->
+  <section class="spatial-layout-section">
+    <div class="section-tab-bar">
+      <div class="section-tab active">
+        <span class="tab-icon">📁</span>
+        <span class="tab-title">Disposición Espacial del Aula</span>
+      </div>
+
+      <div class="tab-toolbar-actions">
+        <!-- Buscador integrado -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Buscar puesto, IP, MAC o boca (ej. UEA-C236, port1)..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Buscar puestos"
+          >
+          <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" style="display: none;">&times;</button>
+        </div>
+
+        <!-- Botón Selección Masiva Granular -->
+        <button id="btn-select-all" class="btn-subtle" type="button" title="Seleccionar o deseleccionar todos los puestos visibles">
+          ☑ Seleccionar todos
+        </button>
+      </div>
     </div>
 
-    <div class="classroom-grid" id="classroom-grid">
-      <!-- filas generadas dinámicamente con pasillo en medio siempre -->
-    </div>
-  </main>
+    <!-- CUADRÍCULA DINÁMICA DEL AULA (PASILLO EN EL MEDIO SIEMPRE) -->
+    <main class="classroom-container">
+      <div class="classroom-headers" id="classroom-headers">
+        <!-- Columnas generadas dinámicamente: Col 1..Col N | === PASILLO CENTRAL === | Col N+1..Col 2N -->
+      </div>
 
-  <script type="module" src="js/app.js?v=20261114_03"></script>
+      <div class="classroom-grid" id="classroom-grid">
+        <!-- Filas generadas dinámicamente con Fila X, Bloque Izquierdo, ║ Pasillo ║, Bloque Derecho, Fila X -->
+      </div>
+    </main>
+  </section>
+
+  <script type="module" src="js/app.js?v=20261117_01"></script>
 </body>
 
 </html>
