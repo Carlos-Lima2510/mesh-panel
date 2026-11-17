@@ -312,6 +312,7 @@ docker exec -it tfg-daemon snmpwalk -v 2c -c public virtual-switch:1616 1.3.6.1.
 3. **No reintroducir ICMP Pings**: La comprobación de enlace físico pertenece exclusivamente al Switch (`SNMP`), nunca a pings ICMP desde el daemon.
 4. **Priorizar Rendimiento No Bloqueante**: Las peticiones de lectura deben servirse desde el snapshot en memoria de `LaboratorioService`; nunca ejecutar procesos CLI síncronos en bucles por puesto.
 5. **Respetar el Contrato de la API**: Toda respuesta de estado debe ser consumida a través de la raíz `laboratorio` (`laboratorio.hosts`, `laboratorio.metricas`, `laboratorio.modo`).
+6. **Estándar de Modelado en Requisitos (RUP)**: En el detallado de casos de uso (`RUP/01-requisitos/01-detalle-casos-uso/`), es obligatorio cumplir la política de espejo con `images/`, la gramática estricta de verbos (`solicita`/`introduce` para el Actor; `presenta`/`permite` para el Sistema), el prototipado en PlantUML Salt con checkboxes limpios (`[]`/`[X]`) y pasillo central, y la compilación a SVG vectorial según lo documentado en [FORMATO-DETALLE.md](RUP/01-requisitos/01-detalle-casos-uso/FORMATO-DETALLE.md).
 
 ---
 

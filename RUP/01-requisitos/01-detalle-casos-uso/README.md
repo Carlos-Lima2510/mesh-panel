@@ -25,6 +25,8 @@ Cada caso de uso se documenta en su propia carpeta bajo una estructura formal un
 2. **Prototipo de Interfaz (`wireframes.puml`):** Maqueta visual navegable implementada en PlantUML Salt que plasma los controles, datos y disposición física en la interfaz.
 3. **Ficha descriptiva (`README.md`):** Tabla con atributos de objetivo, actor, tipo y nivel, descripción funcional y matriz de trazabilidad con el Diagrama de Contexto, el Modelo de Dominio y los ADRs.
 
+> 📘 **Guía y Plantillas:** Para consultar la especificación completa de la gramática de verbos, convenciones de wireframes Salt, comandos de compilación SVG y plantillas base, véase el manual normativo: **[FORMATO-DETALLE.md](FORMATO-DETALLE.md)**.
+
 ---
 
 ## 2. Estado de Detallado de los Casos de Uso
