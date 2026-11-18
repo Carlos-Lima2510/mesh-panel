@@ -2,21 +2,126 @@
 {+
   <b>OpSys</b> - Supervisión de Laboratorio
   {
-    [ 🎓 Modo Clase ] | . | . | . | . | [ Asignar a switch ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
+    [ 🎓 Modo Clase ] | <color:transparent>_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | [ Asignar a switch ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
   }
   --
   {
-    <b>Métricas en tiempo real:</b> | 🟢 Operativos: 45 | ⚫ Standby: 10 | 🟡 Prácticas/DHCP: 3 | 🟠 Desconectados: 2 | <b>Total: 60</b>
+    <b>Métricas en tiempo real:</b> | <color:transparent>_____________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | 🟢 Operativos: <b>45</b> | ⚫ Standby: <b>10</b> | 🟡 Prácticas/DHCP: <b>3</b> | 🟠 Desconectados: <b>2</b> | Total: <b>60</b>
   }
   --
-  {
-    {/ <b>Disposición Espacial del Aula</b> }
-    {#
-      . | <b>Col 1</b> | <b>Col 2</b> | <b>Col 3</b> | <b>=== PASILLO CENTRAL ===</b> | <b>Col 4</b> | <b>Col 5</b> | <b>Col 6</b>
-      <b>Fila 1</b> | 🟢 PC-01 | <back:#bfdbfe><b> 🟢 PC-02 </b></back> | ⚫ PC-03 | <b>║  Pasillo  ║</b> | <back:#bfdbfe><b> 🟢 PC-04 </b></back> | 🟠 PC-05 | 🟢 PC-06
-      <b>Fila 2</b> | 🟢 PC-07 | 🟡 PC-08 | 🟢 PC-09 | <b>║  Pasillo  ║</b> | 🟢 PC-10 | <back:#bfdbfe><b> 🟢 PC-11 </b></back> | 🟢 PC-12
-      <b>Fila 3</b> | ⚫ PC-13 | 🟢 PC-14 | 🟢 PC-15 | <b>║  Pasillo  ║</b> | 🟢 PC-16 | 🟢 PC-17 | 🟢 PC-18
-      <b>Fila 4</b> | 🟢 PC-19 | 🟢 PC-20 | 🟠 PC-21 | <b>║  Pasillo  ║</b> | <back:#bfdbfe><b> 🟢 PC-22 </b></back> | ⚫ PC-23 | 🟢 PC-24
+  {/ <b>Disposición Espacial del Aula</b> }
+  {#
+    . | <b>Col 1</b> | <b>Col 2</b> | <b>Col 3</b> | <b> === PASILLO CENTRAL === </b> | <b>Col 4</b> | <b>Col 5</b> | <b>Col 6</b>
+    <b>Fila 1</b> | {
+      <b>🟢 PC-01</b> | <i>#01</i>
+      IP: 10.10.136.101
+      Port: port1 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | {
+      <back:#bfdbfe><b>🟢 PC-02</b></back> | <back:#bfdbfe><i>#02</i></back>
+      <back:#bfdbfe>IP: 10.10.136.102</back>
+      <back:#bfdbfe>Port: port2 (UP)</back>
+      <back:#bfdbfe>Switch: Universitario</back>
+      <back:#bfdbfe>🪟 Agente: En línea</back>
+    } | {
+      <b>⚫ PC-03</b> | <i>#03</i>
+      IP: ---
+      Port: port3 (UP)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    } | <b>            ║  Pasillo  ║</b> | {
+      <back:#bfdbfe><b>🟢 PC-04</b></back> | <back:#bfdbfe><i>#04</i></back>
+      <back:#bfdbfe>IP: 10.10.136.104</back>
+      <back:#bfdbfe>Port: port4 (UP)</back>
+      <back:#bfdbfe>Switch: Universitario</back>
+      <back:#bfdbfe>🪟 Agente: En línea</back>
+    } | {
+      <b>🟠 PC-05</b> | <i>#05</i>
+      IP: ---
+      Port: port5 (DOWN)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    } | {
+      <b>🟢 PC-06</b> | <i>#06</i>
+      IP: 10.10.136.106
+      Port: port6 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    }
+    <b>Fila 2</b> | {
+      <b>🟢 PC-07</b> | <i>#07</i>
+      IP: 10.10.136.107
+      Port: port7 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | {
+      <b>🟡 PC-08</b> | <i>#08</i>
+      IP: 10.10.136.108
+      Port: port8 (UP)
+      Switch: Prácticas
+      🪟 Agente: Desconectado
+    } | {
+      <b>🟢 PC-09</b> | <i>#09</i>
+      IP: 10.10.136.109
+      Port: port9 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | <b>            ║  Pasillo  ║</b> | {
+      <b>🟢 PC-10</b> | <i>#10</i>
+      IP: 10.10.136.110
+      Port: port10 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | {
+      <back:#bfdbfe><b>🟢 PC-11</b></back> | <back:#bfdbfe><i>#11</i></back>
+      <back:#bfdbfe>IP: 10.10.136.111</back>
+      <back:#bfdbfe>Port: port11 (UP)</back>
+      <back:#bfdbfe>Switch: Universitario</back>
+      <back:#bfdbfe>🪟 Agente: En línea</back>
+    } | {
+      <b>⚫ PC-12</b> | <i>#12</i>
+      IP: ---
+      Port: port12 (UP)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    }
+    <b>Fila 3</b> | {
+      <b>⚫ PC-13</b> | <i>#13</i>
+      IP: ---
+      Port: port13 (UP)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    } | {
+      <b>🟡 PC-14</b> | <i>#14</i>
+      IP: ---
+      Port: port14 (UP)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    } | {
+      <b>🟢 PC-15</b> | <i>#15</i>
+      IP: 10.10.136.115
+      Port: port15 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | <b>            ║  Pasillo  ║</b> | {
+      <b>🟢 PC-16</b> | <i>#16</i>
+      IP: 10.10.136.116
+      Port: port16 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
+    } | {
+      <b>🟠 PC-17</b> | <i>#17</i>
+      IP: ---
+      Port: port17 (DOWN)
+      Switch: Universitario
+      🪟 Agente: Desconectado
+    } | {
+      <b>🟢 PC-18</b> | <i>#18</i>
+      IP: 10.10.136.118
+      Port: port18 (UP)
+      Switch: Universitario
+      🪟 Agente: En línea
     }
   }
 }
