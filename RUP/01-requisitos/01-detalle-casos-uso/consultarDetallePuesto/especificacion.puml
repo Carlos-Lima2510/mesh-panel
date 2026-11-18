@@ -1,0 +1,45 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state PUESTO_ABIERTO
+
+SISTEMA_DISPONIBLE -[#green]-> consultarDetallePuesto
+note on link
+<b>Administrador</b> solicita consultar detalle de un puesto
+end note
+
+state consultarDetallePuesto as "consultarDetallePuesto()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+
+    c -[#green]-> [*]
+    note on link
+    [Puesto identificado en el laboratorio]
+    <b>Sistema</b> presenta la ficha técnica, cableado y diagnóstico pormenorizado del puesto
+    <b>Sistema</b> permite solicitar encender puesto (WoL)
+    <b>Sistema</b> permite solicitar asignar switch
+    <b>Sistema</b> permite solicitar cerrar detalle
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [Fallo de lectura o puesto no encontrado]
+    <b>Sistema</b> presenta mensaje de error
+    end note
+}
+
+consultarDetallePuesto -[#green]-> PUESTO_ABIERTO
+note on link
+vista de detalle del puesto desplegada
+end note
+
+consultarDetallePuesto -[#red]-> SISTEMA_DISPONIBLE
+note on link
+aviso de error, retorno al cuadro general
+end note
+
+@enduml

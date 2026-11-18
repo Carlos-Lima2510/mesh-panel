@@ -1,0 +1,32 @@
+@startsalt wireframes
+{+
+  --
+  {^"<b>Detalle de Puesto: PC-02 </b>"
+    {
+      <b>Estado:</b> | 🟢 <b>  OPERATIVO </b>
+    }
+    --
+    {
+      {
+        <b>Dirección IPv4:</b> 10.10.136.102
+        <b>Dirección MAC:</b> 20:88:10:71:F8:E3
+        🪟 En línea
+      } | <color:transparent>_________________________</color> | {
+        <b>Switch Físico:</b> 10.10.136.13 (R1_SW3)
+        <b>Puerto de Switch:</b> port2 (1000 Mbps - UP)
+        <b>Switch Asignado:</b> [Switch Universitario]
+      }
+    }
+    --
+    {
+      <b>Diagnóstico detallado:</b>
+      Enlace eléctrico PHY activo a 1 Gbps en Switch Universitario y sesión de agente activa.
+      El puesto se encuentra completamente disponible para la sesión docente.
+    }
+    --
+    {
+      [ <color:gray>⚡ Enviar Wake-on-LAN </color> ] | <color:transparent>____________________________________________________________________________________________________________________________________________________________</color> | [ ✖ Cerrar ]
+    }
+  }
+}
+@endsalt
