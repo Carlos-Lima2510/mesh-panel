@@ -15,113 +15,113 @@
     <b>Fila 1</b> | {
       <b>🟢 PC-01</b> | <i>#01</i>
       IP: 10.10.136.101
-      Port: port1 (UP)
+      Port: port1 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | {
       <back:#bfdbfe><b>🟢 PC-02</b></back> | <back:#bfdbfe><i>#02</i></back>
       <back:#bfdbfe>IP: 10.10.136.102</back>
-      <back:#bfdbfe>Port: port2 (UP)</back>
+      <back:#bfdbfe>Port: port2 🟢</back>
       <back:#bfdbfe>Switch: Universitario</back>
-      <back:#bfdbfe>🪟 Agente: En línea</back>
+      <back:#bfdbfe>🪟 En línea</back>
     } | {
       <b>⚫ PC-03</b> | <i>#03</i>
       IP: ---
-      Port: port3 (UP)
+      Port: port3 🟢
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | <b>            ║  Pasillo  ║</b> | {
       <back:#bfdbfe><b>🟢 PC-04</b></back> | <back:#bfdbfe><i>#04</i></back>
       <back:#bfdbfe>IP: 10.10.136.104</back>
-      <back:#bfdbfe>Port: port4 (UP)</back>
+      <back:#bfdbfe>Port: port4 🟢</back>
       <back:#bfdbfe>Switch: Universitario</back>
-      <back:#bfdbfe>🪟 Agente: En línea</back>
+      <back:#bfdbfe>🪟 En línea</back>
     } | {
       <b>🟠 PC-05</b> | <i>#05</i>
       IP: ---
-      Port: port5 (DOWN)
+      Port: port5 🔴
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | {
       <b>🟢 PC-06</b> | <i>#06</i>
       IP: 10.10.136.106
-      Port: port6 (UP)
+      Port: port6 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     }
     <b>Fila 2</b> | {
       <b>🟢 PC-07</b> | <i>#07</i>
       IP: 10.10.136.107
-      Port: port7 (UP)
+      Port: port7 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | {
       <b>🟡 PC-08</b> | <i>#08</i>
       IP: 10.10.136.108
-      Port: port8 (UP)
+      Port: port8 🟢
       Switch: Prácticas
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | {
       <b>🟢 PC-09</b> | <i>#09</i>
       IP: 10.10.136.109
-      Port: port9 (UP)
+      Port: port9 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | <b>            ║  Pasillo  ║</b> | {
       <b>🟢 PC-10</b> | <i>#10</i>
       IP: 10.10.136.110
-      Port: port10 (UP)
+      Port: port10 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | {
       <back:#bfdbfe><b>🟢 PC-11</b></back> | <back:#bfdbfe><i>#11</i></back>
       <back:#bfdbfe>IP: 10.10.136.111</back>
-      <back:#bfdbfe>Port: port11 (UP)</back>
+      <back:#bfdbfe>Port: port11 🟢</back>
       <back:#bfdbfe>Switch: Universitario</back>
-      <back:#bfdbfe>🪟 Agente: En línea</back>
+      <back:#bfdbfe>🪟 En línea</back>
     } | {
       <b>⚫ PC-12</b> | <i>#12</i>
       IP: ---
-      Port: port12 (UP)
+      Port: port12 🟢
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     }
     <b>Fila 3</b> | {
       <b>⚫ PC-13</b> | <i>#13</i>
       IP: ---
-      Port: port13 (UP)
+      Port: port13 🟢
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | {
       <b>🟡 PC-14</b> | <i>#14</i>
       IP: ---
-      Port: port14 (UP)
+      Port: port14 🟢
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | {
       <b>🟢 PC-15</b> | <i>#15</i>
       IP: 10.10.136.115
-      Port: port15 (UP)
+      Port: port15 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | <b>            ║  Pasillo  ║</b> | {
       <b>🟢 PC-16</b> | <i>#16</i>
       IP: 10.10.136.116
-      Port: port16 (UP)
+      Port: port16 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     } | {
       <b>🟠 PC-17</b> | <i>#17</i>
       IP: ---
-      Port: port17 (DOWN)
+      Port: port17 🔴
       Switch: Universitario
-      🪟 Agente: Desconectado
+      🪟 Desconectado
     } | {
       <b>🟢 PC-18</b> | <i>#18</i>
       IP: 10.10.136.118
-      Port: port18 (UP)
+      Port: port18 🟢
       Switch: Universitario
-      🪟 Agente: En línea
+      🪟 En línea
     }
   }
 }

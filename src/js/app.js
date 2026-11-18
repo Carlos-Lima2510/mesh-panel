@@ -46,6 +46,25 @@ const gridDimsBadge = document.getElementById('grid-dims-badge');
 const searchInput = document.getElementById('search-input');
 const btnClearSearch = document.getElementById('btn-clear-search');
 
+// Elementos del Modal de Detalle de Puesto (Wireframe RUP consultarDetallePuesto)
+const modalDetallePuesto = document.getElementById('modal-detalle-puesto');
+const modalPuestoNombre = document.getElementById('modal-puesto-nombre');
+const modalEstadoBadge = document.getElementById('modal-estado-badge');
+const modalEstadoTexto = document.getElementById('modal-estado-texto');
+const modalIp = document.getElementById('modal-ip');
+const modalMac = document.getElementById('modal-mac');
+const modalAgente = document.getElementById('modal-agente');
+const modalAgenteTexto = document.getElementById('modal-agente-texto');
+const modalSwitchFisico = document.getElementById('modal-switch-fisico');
+const modalSwitchPuerto = document.getElementById('modal-switch-puerto');
+const btnModalToggleSwitch = document.getElementById('btn-modal-toggle-switch');
+const modalDiagText = document.getElementById('modal-diag-text');
+const btnModalWol = document.getElementById('btn-modal-wol');
+const btnModalClose = document.getElementById('btn-modal-close');
+const btnModalDismiss = document.getElementById('btn-modal-dismiss');
+
+let puestoModalActivo = null;
+
 const renderer = new DashboardRenderer('classroom-grid');
 
 const DAEMON_URL = `http://${window.location.hostname || 'localhost'}:3001`;
@@ -174,6 +193,11 @@ function procesarDatosLaboratorio(lab) {
   actualizarBotonesModo(lab.modo);
   lastMetricas = lab.metricas;
   actualizarVista();
+
+  // Si el modal de inspección está abierto, refrescar su contenido en vivo
+  if (puestoModalActivo && modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
+    window.abrirDetallePuesto(puestoModalActivo.nodeId, puestoModalActivo.puestoId, true);
+  }
 
   const timeStr = new Date().toLocaleTimeString();
   setStatusBadge(`${lab.nombre} [${lab.modo}] (${labFilas}F × ${labColsHilera}+${labColsHilera}C) | ${timeStr}`);
@@ -529,6 +553,197 @@ window.ejecutarPowerOff = async function (nodeId) {
     alert(`[!] Error de red: ${err.message}`);
   }
 };
+
+/* ==============================================================================
+   CONTROLADOR DEL MODAL DE DETALLE DE PUESTO (WIREFRAME RUP consultarDetallePuesto)
+   ============================================================================== */
+window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false) {
+  if (!modalDetallePuesto) return;
+
+  puestoModalActivo = { nodeId, puestoId };
+
+  // 1. Localizar el host correspondiente
+  let host = null;
+  if (nodeId && puestos.has(nodeId)) {
+    host = puestos.get(nodeId);
+  } else if (puestoId) {
+    for (const h of puestos.values()) {
+      if (h.puesto_id === puestoId || `puesto-${h.slot}` === puestoId) {
+        host = h;
+        break;
+      }
+    }
+  }
+
+  // 2. Localizar el puesto físico si existe
+  const pf = puestosFisicos.find(p => p.id === puestoId);
+
+  if (host) {
+    const nombre = host.nombre || puestoId || 'Puesto';
+    if (modalPuestoNombre) modalPuestoNombre.textContent = `Detalle de Puesto: ${nombre}`;
+
+    // Estado visual del host
+    const estado = host.estado || 'GRIS';
+    if (modalEstadoBadge) {
+      modalEstadoBadge.className = `modal-estado-pill ${estado}`;
+      const dot = modalEstadoBadge.querySelector('.status-dot');
+      if (dot) dot.className = `status-dot ${estado}`;
+    }
+
+    const estadoMap = {
+      VERDE: 'OPERATIVO',
+      GRIS: 'STANDBY',
+      AMARILLO: 'PRÁCTICAS / DHCP',
+      NARANJA: 'DESCONECTADO'
+    };
+    if (modalEstadoTexto) modalEstadoTexto.textContent = estadoMap[estado] || estado;
+
+    // Red Lógica (IPv4, MAC, Agente)
+    if (modalIp) modalIp.textContent = host.telemetria?.ip_reportada || host.ip || '---';
+    if (modalMac) modalMac.textContent = host.telemetria?.mac || host.mac || '---';
+
+    const connVal = parseInt(host.telemetria?.conn, 10) || 0;
+    const isConn = (connVal & 1) !== 0;
+    if (modalAgente) {
+      if (isConn) {
+        modalAgente.className = 'modal-agent-badge online';
+        if (modalAgenteTexto) modalAgenteTexto.textContent = 'En línea';
+      } else {
+        modalAgente.className = 'modal-agent-badge offline';
+        if (modalAgenteTexto) modalAgenteTexto.textContent = 'Fuera de línea';
+      }
+    }
+
+    // Red Física (Switch Físico, Puerto)
+    const swInfo = host.telemetria?.switch || {};
+    if (modalSwitchFisico) {
+      modalSwitchFisico.textContent = host.switch_fisico || swInfo.ip || '10.10.136.13 (R1_SW3)';
+    }
+
+    const portName = host.boca_switch || swInfo.portName || (swInfo.port ? `port${swInfo.port}` : 'No asignado');
+    const speedStr = swInfo.speed ? `${swInfo.speed} - ` : (swInfo.link === 'up' ? '1000 Mbps - ' : '');
+    const linkStr = (swInfo.link || 'DOWN').toUpperCase();
+    if (modalSwitchPuerto) {
+      modalSwitchPuerto.textContent = `${portName} (${speedStr}${linkStr})`;
+    }
+
+    // Switch Asignado (Toggle interactivo directo)
+    const isPracticas = pf?.switch_id === 'sw-practicas' ||
+      host.red?.es_aislada === true ||
+      (host.telemetria?.switch_asignado && host.telemetria.switch_asignado.toLowerCase().includes('práctica'));
+
+    if (btnModalToggleSwitch) {
+      if (isPracticas) {
+        btnModalToggleSwitch.className = 'btn-switch-assigned practicas';
+        btnModalToggleSwitch.textContent = 'Switch Prácticas';
+        btnModalToggleSwitch.title = 'Asignado a Switch Prácticas. Clic para cambiar a Switch Universitario.';
+      } else {
+        btnModalToggleSwitch.className = 'btn-switch-assigned docente';
+        btnModalToggleSwitch.textContent = 'Switch Universitario';
+        btnModalToggleSwitch.title = 'Asignado a Switch Universitario. Clic para cambiar a Switch Prácticas.';
+      }
+
+      btnModalToggleSwitch.onclick = async () => {
+        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        btnModalToggleSwitch.disabled = true;
+        btnModalToggleSwitch.textContent = 'Cambiando...';
+        await window.cambiarSwitchPuesto(puestoId || host.puesto_id, nuevoSwitch);
+        btnModalToggleSwitch.disabled = false;
+        window.abrirDetallePuesto(host.node_id, puestoId || host.puesto_id, true);
+      };
+    }
+
+    // Diagnóstico Detallado
+    if (modalDiagText) {
+      modalDiagText.textContent = host.diagnostico ||
+        (isConn
+          ? 'Enlace eléctrico PHY activo a 1 Gbps en Switch Universitario y sesión de agente activa. El puesto se encuentra completamente disponible para la sesión docente.'
+          : 'Equipo sin sesión activa de agente o cable de red desconectado de la roseta docente.');
+    }
+
+    // Botón Wake-on-LAN:
+    // Si está OPERATIVO (VERDE), el puesto ya está encendido: botón desactivado según wireframe.
+    if (btnModalWol) {
+      if (estado === 'VERDE') {
+        btnModalWol.disabled = true;
+        btnModalWol.classList.add('disabled');
+        btnModalWol.title = 'El equipo ya se encuentra encendido y operativo';
+        btnModalWol.onclick = null;
+      } else {
+        btnModalWol.disabled = false;
+        btnModalWol.classList.remove('disabled');
+        btnModalWol.title = 'Enviar paquete Wake-on-LAN para encender el equipo';
+        btnModalWol.onclick = () => window.ejecutarWoL(host.node_id);
+      }
+    }
+
+  } else {
+    // Puesto libre sin equipo vinculado
+    if (modalPuestoNombre) modalPuestoNombre.textContent = `Detalle de Puesto: ${puestoId || 'Libre'}`;
+    if (modalEstadoBadge) {
+      modalEstadoBadge.className = 'modal-estado-pill EMPTY';
+      const dot = modalEstadoBadge.querySelector('.status-dot');
+      if (dot) dot.className = 'status-dot EMPTY';
+    }
+    if (modalEstadoTexto) modalEstadoTexto.textContent = 'LIBRE';
+
+    if (modalIp) modalIp.textContent = '---';
+    if (modalMac) modalMac.textContent = '---';
+    if (modalAgente) {
+      modalAgente.className = 'modal-agent-badge offline';
+      if (modalAgenteTexto) modalAgenteTexto.textContent = 'Sin Host';
+    }
+
+    if (modalSwitchFisico) modalSwitchFisico.textContent = '10.10.136.13 (R1_SW3)';
+    if (modalSwitchPuerto) modalSwitchPuerto.textContent = `${pf?.boca_switch || 'No asignado'} (DOWN)`;
+
+    const isPracticas = pf?.switch_id === 'sw-practicas';
+    if (btnModalToggleSwitch) {
+      btnModalToggleSwitch.className = `btn-switch-assigned ${isPracticas ? 'practicas' : 'docente'}`;
+      btnModalToggleSwitch.textContent = isPracticas ? 'Switch Prácticas' : 'Switch Universitario';
+      btnModalToggleSwitch.onclick = async () => {
+        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        await window.cambiarSwitchPuesto(puestoId, nuevoSwitch);
+        window.abrirDetallePuesto(null, puestoId, true);
+      };
+    }
+
+    if (modalDiagText) {
+      modalDiagText.textContent = 'Mesa de laboratorio disponible. No existe equipo informático vinculado a este puesto.';
+    }
+    if (btnModalWol) {
+      btnModalWol.disabled = true;
+      btnModalWol.classList.add('disabled');
+      btnModalWol.title = 'Sin host para emitir Wake-on-LAN';
+      btnModalWol.onclick = null;
+    }
+  }
+
+  if (modalDetallePuesto) {
+    modalDetallePuesto.style.display = 'flex';
+  }
+};
+
+function cerrarModalDetalle() {
+  if (modalDetallePuesto) {
+    modalDetallePuesto.style.display = 'none';
+  }
+  puestoModalActivo = null;
+}
+
+if (btnModalClose) btnModalClose.addEventListener('click', cerrarModalDetalle);
+if (btnModalDismiss) btnModalDismiss.addEventListener('click', cerrarModalDetalle);
+if (modalDetallePuesto) {
+  modalDetallePuesto.addEventListener('click', (e) => {
+    if (e.target === modalDetallePuesto) cerrarModalDetalle();
+  });
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
+    cerrarModalDetalle();
+  }
+});
 
 const client = new SseClient(`${DAEMON_URL}/events`, {
   onOpen: () => {

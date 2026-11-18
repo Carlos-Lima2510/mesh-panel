@@ -186,6 +186,90 @@
     </main>
   </section>
 
+  <!-- MODAL DE INSPECCIÓN: DETALLE DE PUESTO (SEGÚN WIREFRAME RUP consultarDetallePuesto) -->
+  <div id="modal-detalle-puesto" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-puesto-nombre">
+    <div class="modal-window">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">🖥️</span>
+          <h2 id="modal-puesto-nombre" class="modal-title">Detalle de Puesto: PC-01</h2>
+        </div>
+        <div class="modal-header-actions">
+          <div id="modal-estado-badge" class="modal-estado-pill VERDE">
+            <span class="status-dot VERDE"></span>
+            <span id="modal-estado-texto" class="modal-estado-texto">OPERATIVO</span>
+          </div>
+          <button id="btn-modal-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- Cuerpo del Modal: 2 Columnas Minimalistas sin tablas -->
+      <div class="modal-body">
+        <div class="modal-columns">
+          <!-- Columna Izquierda: Red Lógica y Agente -->
+          <div class="modal-col">
+            <div class="modal-field">
+              <span class="modal-label">Dirección IPv4:</span>
+              <span id="modal-ip" class="modal-value mono">10.10.136.101</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Dirección MAC:</span>
+              <span id="modal-mac" class="modal-value mono">00:1A:2B:3C:4D:5E</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Agente:</span>
+              <div id="modal-agente" class="modal-agent-badge online">
+                <span class="agent-os-icon">
+                  <svg class="icon-windows" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="M6.555 1.375 0 2.237v5.45h6.555zM0 8.313l6.555.863v5.449l-6.555-.862zm7.278-6.945L16 0v7.688H7.278zm0 7.848L16 16V8.313H7.278z"/>
+                  </svg>
+                </span>
+                <span id="modal-agente-texto" class="agent-status-label">En línea</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Red Física y Asignación de Switch -->
+          <div class="modal-col">
+            <div class="modal-field">
+              <span class="modal-label">Switch Físico:</span>
+              <span id="modal-switch-fisico" class="modal-value">10.10.136.13 (R1_SW3)</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Puerto de Switch:</span>
+              <span id="modal-switch-puerto" class="modal-value">port1 (1000 Mbps - UP)</span>
+            </div>
+            <div class="modal-field modal-field-switch">
+              <span class="modal-label">Switch Asignado:</span>
+              <button id="btn-modal-toggle-switch" type="button" class="btn-switch-assigned docente" title="Clic para alternar entre Switch Universitario y Switch Prácticas">
+                Switch Universitario
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Diagnóstico Detallado -->
+        <div class="modal-diagnostic-box">
+          <span class="diagnostic-title">Diagnóstico detallado:</span>
+          <p id="modal-diag-text" class="diagnostic-text">
+            Enlace eléctrico PHY activo a 1 Gbps en Switch Universitario y sesión de agente activa. El puesto se encuentra completamente disponible para la sesión docente.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pie del Modal: Acciones según Wireframe RUP -->
+      <div class="modal-footer">
+        <button id="btn-modal-wol" type="button" class="btn-modal-action btn-modal-wol" title="Enviar Magic Packet Wake-on-LAN">
+          ⚡ Enviar Wake-on-LAN
+        </button>
+        <button id="btn-modal-dismiss" type="button" class="btn-modal-action btn-modal-dismiss">
+          ✖ Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script type="module" src="js/app.js?v=20261117_01"></script>
 </body>
 

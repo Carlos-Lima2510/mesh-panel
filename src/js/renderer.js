@@ -8,6 +8,8 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+const ICON_WINDOWS_SVG = `<svg class="icon-windows" viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6.555 1.375 0 2.237v5.45h6.555zM0 8.313l6.555.863v5.449l-6.555-.862zm7.278-6.945L16 0v7.688H7.278zm0 7.848L16 16V8.313H7.278z"/></svg>`;
+
 export class DashboardRenderer {
   constructor(containerId = 'classroom-grid') {
     this.classroomGrid = document.getElementById(containerId);
@@ -108,21 +110,41 @@ export class DashboardRenderer {
     slotCard.className = 'card-compact card-empty';
     slotCard.dataset.slot = slotKey;
     slotCard.dataset.num = displayNum || slotKey;
+
+    // Al hacer clic en la tarjeta: selección rápida sin checkboxes según wireframe RUP
+    slotCard.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-card-detail')) return;
+      const targetPuestoId = slotCard.dataset.puestoId || slotCard.dataset.slot;
+      window.togglePuestoSeleccionado(targetPuestoId);
+    });
+
+    // Al hacer doble clic: abrir modal de inspección detallada
+    slotCard.addEventListener('dblclick', (e) => {
+      const nodeId = slotCard.dataset.nodeId || null;
+      const targetPuestoId = slotCard.dataset.puestoId || slotCard.dataset.slot;
+      window.abrirDetallePuesto(nodeId, targetPuestoId);
+    });
+
     return slotCard;
   }
 
   toggleSeleccion(puestoId, isSelected) {
-    if (isSelected) {
-      this.puestosSeleccionados.add(puestoId);
+    if (typeof isSelected === 'boolean') {
+      if (isSelected) this.puestosSeleccionados.add(puestoId);
+      else this.puestosSeleccionados.delete(puestoId);
     } else {
-      this.puestosSeleccionados.delete(puestoId);
+      if (this.puestosSeleccionados.has(puestoId)) {
+        this.puestosSeleccionados.delete(puestoId);
+      } else {
+        this.puestosSeleccionados.add(puestoId);
+      }
     }
+
+    const estaSel = this.puestosSeleccionados.has(puestoId);
     const card = this.slotElements.get(puestoId);
     if (card) {
-      if (isSelected) card.classList.add('selected');
+      if (estaSel) card.classList.add('selected');
       else card.classList.remove('selected');
-      const chk = card.querySelector(`input[data-puesto-id="${puestoId}"]`);
-      if (chk) chk.checked = isSelected;
     }
     return this.puestosSeleccionados.size;
   }
@@ -135,8 +157,6 @@ export class DashboardRenderer {
     this.puestosSeleccionados.clear();
     for (const card of this.slotElements.values()) {
       card.classList.remove('selected');
-      const chk = card.querySelector('.slot-checkbox');
-      if (chk) chk.checked = false;
     }
   }
 
@@ -151,8 +171,6 @@ export class DashboardRenderer {
       const isSel = this.puestosSeleccionados.has(id);
       if (isSel) card.classList.add('selected');
       else card.classList.remove('selected');
-      const chk = card.querySelector(`input[data-puesto-id="${id}"]`);
-      if (chk) chk.checked = isSel;
     }
     return this.puestosSeleccionados.size;
   }
@@ -224,40 +242,41 @@ export class DashboardRenderer {
     const swIdActual = puestoFisico?.switch_id || 'sw-docente';
     const isSwPracticas = swIdActual === 'sw-practicas';
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const tomaStr = puestoFisico?.toma || `ROS-${slotStr}`;
-    const isSelected = this.puestosSeleccionados.has(puestoId);
-
-    const selectOptions = (Array.isArray(switchesList) && switchesList.length > 0)
-      ? switchesList.map(sw => `<option value="${escapeHtml(sw.id)}" ${sw.id === swIdActual ? 'selected' : ''}>${escapeHtml(sw.nombre || sw.id)}</option>`).join('')
-      : `
-        <option value="sw-docente" ${!isSwPracticas ? 'selected' : ''}>Sw. Docente</option>
-        <option value="sw-practicas" ${isSwPracticas ? 'selected' : ''}>Sw. Prácticas</option>
-      `;
+    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
 
     return `
-      <div>
-        <div class="card-top">
-          <div class="card-title">
-            <label class="slot-checkbox-label" title="Seleccionar puesto ${escapeHtml(puestoId)}">
-              <input type="checkbox" class="slot-checkbox" data-puesto-id="${escapeHtml(puestoId)}" ${isSelected ? 'checked' : ''} onchange="window.togglePuestoSeleccionado('${escapeHtml(puestoId)}', this.checked)">
-              <span class="custom-checkbox"></span>
-            </label>
-            <span class="status-dot EMPTY" title="Puesto libre"></span>
-            <span class="host-name text-muted">Libre</span>
-          </div>
+      <div class="card-top">
+        <div class="card-title">
+          <span class="status-dot EMPTY" title="Puesto libre"></span>
+          <span class="host-name text-muted">Libre</span>
+        </div>
+        <div class="card-top-right">
+          <button type="button" class="btn-card-detail" title="Ver detalle del puesto ${escapeHtml(puestoId)}" onclick="event.stopPropagation(); window.abrirDetallePuesto(null, '${escapeHtml(puestoId)}')">ℹ️</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
-        <div class="card-body">
-          <div class="row"><span>IP:</span><span>---</span></div>
-          <div class="row"><span>Boca:</span><span>port${num}</span></div>
-          <div class="row">
-            <span>Switch:</span>
-            <span class="badge-switch ${swBadgeClass}">${escapeHtml(isSwPracticas ? 'Sw. Prácticas' : 'Sw. Docente')}</span>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <span class="row-label-text">IP:</span>
+          <span class="row-val-text">---</span>
+        </div>
+        <div class="row">
+          <span class="row-label-text">Port:</span>
+          <span class="row-val-text row-val-port">
+            <span>port${num}</span>
+            <span class="port-link-dot down" title="Enlace físico DOWN"></span>
+          </span>
+        </div>
+        <div class="row">
+          <span class="row-label-text">Switch:</span>
+          <span class="badge-switch ${swBadgeClass}">${escapeHtml(swLabel)}</span>
+        </div>
+        <div class="row row-agent">
+          <div class="agent-compact-wrap offline">
+            <span class="agent-icon">${ICON_WINDOWS_SVG}</span>
+            <span class="agent-status-text agent-offline">Sin Host</span>
           </div>
         </div>
-      </div>
-      <div class="card-bottom">
-        <div class="diag-compact" title="Mesa disponible (${escapeHtml(tomaStr)})">Disponible</div>
       </div>
     `;
   }
@@ -265,73 +284,57 @@ export class DashboardRenderer {
   generarCompactCardHtml(p, slotNum, puestoFisico = null, switchesList = []) {
     const slotStr = String(slotNum).padStart(2, '0');
     const sw = p.telemetria?.switch || {};
-    const linkStr = sw.link ? sw.link.toUpperCase() : 'DOWN';
-    const portName = p.boca_switch || (sw.portName ? sw.portName : `p${sw.port || '?'}`);
+    const isLinkUp = (sw.link || '').toLowerCase() === 'up';
+    const portDotClass = isLinkUp ? 'up' : 'down';
+    const portDotTitle = isLinkUp ? 'Enlace físico activo (UP)' : 'Enlace físico caído (DOWN)';
+    const portName = p.boca_switch || (sw.portName ? sw.portName : `port${sw.port || slotNum}`);
 
     const connVal = parseInt(p.telemetria?.conn, 10) || 0;
     const isConnAgent = (connVal & 1) !== 0;
-
-    let bottomActionHtml = '';
-    const accion = p.accion || {};
-
-    if (accion.ejecutable && accion.tipo === 'POWER_OFF') {
-      bottomActionHtml = `
-        <button type="button" class="btn-action btn-power-off" onclick="window.ejecutarPowerOff('${escapeHtml(p.node_id)}')">
-          🛑 Apagar
-        </button>`;
-    } else if (accion.ejecutable && accion.tipo === 'WAKE_ON_LAN') {
-      bottomActionHtml = `
-        <button type="button" class="btn-action btn-wol" onclick="window.ejecutarWoL('${escapeHtml(p.node_id)}')">
-          ⚡ WoL
-        </button>`;
-    } else {
-      const diagText = p.diagnostico || (isConnAgent ? 'PC Operativo' : 'Desconectado');
-      bottomActionHtml = `<div class="diag-compact" title="${escapeHtml(diagText)}">${escapeHtml(diagText)}</div>`;
-    }
+    const agenteText = isConnAgent ? 'En línea' : 'Desconectado';
+    const agenteClass = isConnAgent ? 'agent-online' : 'agent-offline';
 
     const puestoId = p.puesto_id || puestoFisico?.id || `puesto-${slotNum}`;
     const swIdActual = puestoFisico?.switch_id || (p.telemetria?.switch_asignado?.toLowerCase().includes('práctica') ? 'sw-practicas' : 'sw-docente');
     const isSwPracticas = swIdActual === 'sw-practicas' || (p.red?.es_aislada === true);
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const isSelected = this.puestosSeleccionados.has(puestoId);
+    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
 
-    const selectOptions = (Array.isArray(switchesList) && switchesList.length > 0)
-      ? switchesList.map(sw => `<option value="${escapeHtml(sw.id)}" ${sw.id === swIdActual ? 'selected' : ''}>${escapeHtml(sw.nombre || sw.id)}</option>`).join('')
-      : `
-        <option value="sw-docente" ${!isSwPracticas ? 'selected' : ''}>Sw. Docente</option>
-        <option value="sw-practicas" ${isSwPracticas ? 'selected' : ''}>Sw. Prácticas</option>
-      `;
+    const ipText = p.telemetria?.ip_reportada || p.ip || '---';
 
     return `
-      <div>
-        <div class="card-top">
-          <div class="card-title">
-            <label class="slot-checkbox-label" title="Seleccionar puesto ${escapeHtml(puestoId)}">
-              <input type="checkbox" class="slot-checkbox" data-puesto-id="${escapeHtml(puestoId)}" ${isSelected ? 'checked' : ''} onchange="window.togglePuestoSeleccionado('${escapeHtml(puestoId)}', this.checked)">
-              <span class="custom-checkbox"></span>
-            </label>
-            <span class="status-dot ${p.estado || 'GRIS'}" title="${escapeHtml(p.diagnostico || p.estado || 'Estado')}"></span>
-            <span class="host-name" title="${escapeHtml(p.nombre || 'PC-???')}">${escapeHtml(p.nombre || 'PC-???')}</span>
-          </div>
+      <div class="card-top">
+        <div class="card-title">
+          <span class="status-dot ${p.estado || 'GRIS'}" title="${escapeHtml(p.diagnostico || p.estado || 'Estado')}"></span>
+          <span class="host-name" title="${escapeHtml(p.nombre || 'PC-???')}">${escapeHtml(p.nombre || 'PC-???')}</span>
+        </div>
+        <div class="card-top-right">
+          <button type="button" class="btn-card-detail" title="Ver detalle de ${escapeHtml(p.nombre || 'puesto')}" onclick="event.stopPropagation(); window.abrirDetallePuesto('${escapeHtml(p.node_id)}', '${escapeHtml(puestoId)}')">ℹ️</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <span>IP:</span>
-            <span title="${escapeHtml(p.telemetria?.ip_reportada || '---')}">${escapeHtml(p.telemetria?.ip_reportada || '---')}</span>
-          </div>
-          <div class="row">
-            <span>Boca:</span>
-            <span title="${escapeHtml(portName)} (${linkStr})">${escapeHtml(portName)} (${linkStr})</span>
-          </div>
-          <div class="row">
-            <span>Switch:</span>
-            <span class="badge-switch ${swBadgeClass}">${escapeHtml(isSwPracticas ? 'Sw. Prácticas' : 'Sw. Docente')}</span>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <span class="row-label-text">IP:</span>
+          <span class="row-val-text" title="${escapeHtml(ipText)}">${escapeHtml(ipText)}</span>
+        </div>
+        <div class="row">
+          <span class="row-label-text">Port:</span>
+          <span class="row-val-text row-val-port">
+            <span>${escapeHtml(portName)}</span>
+            <span class="port-link-dot ${portDotClass}" title="${escapeHtml(portDotTitle)}"></span>
+          </span>
+        </div>
+        <div class="row">
+          <span class="row-label-text">Switch:</span>
+          <span class="badge-switch ${swBadgeClass}">${escapeHtml(swLabel)}</span>
+        </div>
+        <div class="row row-agent">
+          <div class="agent-compact-wrap ${isConnAgent ? 'online' : 'offline'}">
+            <span class="agent-icon">${ICON_WINDOWS_SVG}</span>
+            <span class="agent-status-text ${agenteClass}">${escapeHtml(agenteText)}</span>
           </div>
         </div>
-      </div>
-      <div class="card-bottom">
-        ${bottomActionHtml}
       </div>
     `;
   }
@@ -391,6 +394,9 @@ export class DashboardRenderer {
 
       if (host) {
         const isMatch = this.matches(host, query);
+        const targetPuestoId = host.puesto_id || puestoFisico?.id || key;
+        slotCard.dataset.nodeId = host.node_id || '';
+        slotCard.dataset.puestoId = targetPuestoId;
         slotCard.className = `card-compact ${host.estado}${isSelected ? ' selected' : ''}`;
         slotCard.innerHTML = this.generarCompactCardHtml(host, displayNum, puestoFisico, switchesList);
 
@@ -406,6 +412,9 @@ export class DashboardRenderer {
           slotCard.classList.remove('dimmed', 'match-highlight');
         }
       } else {
+        const targetPuestoId = puestoFisico?.id || key;
+        slotCard.dataset.nodeId = '';
+        slotCard.dataset.puestoId = targetPuestoId;
         slotCard.className = `card-compact card-empty${isSelected ? ' selected' : ''}`;
         slotCard.innerHTML = this.generarEmptySlotHtml(displayNum, puestoFisico, switchesList);
         if (hasFilter) {
