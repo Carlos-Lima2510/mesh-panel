@@ -16,23 +16,31 @@ state dimensionarCuadricula as "dimensionarCuadricula()" {
 
     [*] -[#green]-> c
     note on link
-    <b>Sistema</b> presenta diálogo modal de dimensionamiento de cuadrícula
+    <b>Sistema</b> presenta diálogo de dimensionamiento de cuadrícula
+    <b>Sistema</b> permite introducir número de filas y columnas por hilera
+    <b>Sistema</b> permite solicitar aplicar dimensiones o cancelar
     <b>Administrador</b> introduce número de filas y columnas por hilera
-    <b>Administrador</b> solicita aplicar dimensiones
+    <b>Administrador</b> solicita aplicar dimensiones o cancelar
     end note
 
     c -[#green]-> [*]
     note on link
-    [Dimensiones válidas (> 0 y dentro de límites del aula)]
+    [Dimensiones válidas (> 0 y dentro de límites físicos)]
     <b>Sistema</b> presenta la cuadrícula del laboratorio reestructurada con las nuevas filas y columnas
     <b>Sistema</b> presenta la división física del pasillo central preservada entre hileras
-    <b>Sistema</b> presenta el botón de control con las nuevas dimensiones aplicadas
+    <b>Sistema</b> presenta las nuevas dimensiones en la cabecera
     end note
 
     c -[#red]-> [*]
     note on link
-    [Valores no numéricos, fuera de rango o cancelación]
-    <b>Sistema</b> presenta mensaje de advertencia o cancela manteniendo las dimensiones previas
+    [Valores no numéricos o fuera de límites]
+    <b>Sistema</b> presenta mensaje de advertencia y mantiene las dimensiones previas
+    end note
+
+    c -[#orange]-> [*]
+    note on link
+    [Cancelación de la solicitud]
+    <b>Sistema</b> cierra el diálogo manteniendo las dimensiones previas sin cambios
     end note
 }
 
@@ -43,7 +51,12 @@ end note
 
 dimensionarCuadricula -[#red]-> SISTEMA_DISPONIBLE_SALIDA
 note on link
-aviso de advertencia o cancelación, dimensiones previas preservadas
+aviso de advertencia, dimensiones previas preservadas
+end note
+
+dimensionarCuadricula -[#orange]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+solicitud cancelada, retorno al cuadro general
 end note
 
 @enduml

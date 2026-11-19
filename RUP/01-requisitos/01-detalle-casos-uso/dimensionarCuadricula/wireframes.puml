@@ -10,8 +10,8 @@ skinparam defaultFontName sans-serif
     }
     --
     {
-      <b>Filas de mesas:</b> | [ 5       ] | <i>Mesas en profundidad</i>
-      <b>Columnas por hilera:</b> | [ 4       ] | <i>Puestos a cada lado del pasillo</i>
+      <b>Filas de mesas:</b> | " 5       " | <i>Mesas en profundidad</i>
+      <b>Columnas por hilera:</b> | " 4       " | <i>Puestos a cada lado del pasillo</i>
     }
     --
     {

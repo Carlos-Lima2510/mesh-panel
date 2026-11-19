@@ -1,0 +1,494 @@
+{
+  "daemon/application/LaboratorioService.js": {
+    "mtime": 1795071139.4066806,
+    "seen": 1795123976.6108627,
+    "ast_hash": "bdfee9ff3e73c3625433f84a88611a86",
+    "semantic_hash": "bdfee9ff3e73c3625433f84a88611a86"
+  },
+  "daemon/config.js": {
+    "mtime": 1795071139.4066806,
+    "seen": 1795123976.6108754,
+    "ast_hash": "1ac26f408d34cd66d04ee6633edba6d4",
+    "semantic_hash": "1ac26f408d34cd66d04ee6633edba6d4"
+  },
+  "daemon/daemon.js": {
+    "mtime": 1795071139.4076805,
+    "seen": 1795123976.6108823,
+    "ast_hash": "8a757ad489d44f56ddc674e3ed78c2b3",
+    "semantic_hash": "8a757ad489d44f56ddc674e3ed78c2b3"
+  },
+  "daemon/domain/Accion.js": {
+    "mtime": 1795071139.4076805,
+    "seen": 1795123976.6108866,
+    "ast_hash": "fbab9325d0917e8da10bfb27ce958638",
+    "semantic_hash": "fbab9325d0917e8da10bfb27ce958638"
+  },
+  "daemon/domain/Estado.js": {
+    "mtime": 1794436312.4348238,
+    "seen": 1795123976.61089,
+    "ast_hash": "120ca44ce7c9f69674d5618c953f97a3",
+    "semantic_hash": "120ca44ce7c9f69674d5618c953f97a3"
+  },
+  "daemon/domain/Host.js": {
+    "mtime": 1795071139.4076805,
+    "seen": 1795123976.6108923,
+    "ast_hash": "4f773416e680c0343fc5bec868c51e57",
+    "semantic_hash": "4f773416e680c0343fc5bec868c51e57"
+  },
+  "daemon/domain/Laboratorio.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.610895,
+    "ast_hash": "4d4fb9eb40fc9f062f8fa8c23f372f89",
+    "semantic_hash": "4d4fb9eb40fc9f062f8fa8c23f372f89"
+  },
+  "daemon/domain/Puesto.js": {
+    "mtime": 1794945093.0092013,
+    "seen": 1795123976.610897,
+    "ast_hash": "2337941f621b65c198f643edd674ccaa",
+    "semantic_hash": "2337941f621b65c198f643edd674ccaa"
+  },
+  "daemon/domain/Red.js": {
+    "mtime": 1794436312.4357662,
+    "seen": 1795123976.6108997,
+    "ast_hash": "61c3d7c7e6bcea17ce6ccbfe7867c34c",
+    "semantic_hash": "61c3d7c7e6bcea17ce6ccbfe7867c34c"
+  },
+  "daemon/domain/Switch.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.6109023,
+    "ast_hash": "75f53ef05107153875398ac3399b185e",
+    "semantic_hash": "75f53ef05107153875398ac3399b185e"
+  },
+  "daemon/domain/estado/Estado.js": {
+    "mtime": 1794436312.435944,
+    "seen": 1795123976.610905,
+    "ast_hash": "67d17fcabd8ce9f6cfc805ba9f13aa6d",
+    "semantic_hash": "67d17fcabd8ce9f6cfc805ba9f13aa6d"
+  },
+  "daemon/domain/estado/EstadoDesconectado.js": {
+    "mtime": 1794436312.4361308,
+    "seen": 1795123976.6109083,
+    "ast_hash": "97c279a182c5dccdf5f1fb82204c0312",
+    "semantic_hash": "97c279a182c5dccdf5f1fb82204c0312"
+  },
+  "daemon/domain/estado/EstadoFalloLogico.js": {
+    "mtime": 1794436312.4363863,
+    "seen": 1795123976.6109107,
+    "ast_hash": "57ba448dc9f6e8f2b757429e2fdb7f63",
+    "semantic_hash": "57ba448dc9f6e8f2b757429e2fdb7f63"
+  },
+  "daemon/domain/estado/EstadoOperativo.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.6109133,
+    "ast_hash": "0dbc131d52bb8693d92e6db5e9ea3e53",
+    "semantic_hash": "0dbc131d52bb8693d92e6db5e9ea3e53"
+  },
+  "daemon/domain/estado/EstadoRedAislada.js": {
+    "mtime": 1794436312.436697,
+    "seen": 1795123976.610916,
+    "ast_hash": "165bb285a04c815166ac5ad5c445a02c",
+    "semantic_hash": "165bb285a04c815166ac5ad5c445a02c"
+  },
+  "daemon/domain/estado/EstadoSinTelemetria.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.6109178,
+    "ast_hash": "1ee6230bc7f60a9e98ca360f7edb9a2d",
+    "semantic_hash": "1ee6230bc7f60a9e98ca360f7edb9a2d"
+  },
+  "daemon/domain/estado/EstadoStandby.js": {
+    "mtime": 1794436312.4368522,
+    "seen": 1795123976.6109202,
+    "ast_hash": "e6fe02f31c32a9c2a36890f3aa434ab7",
+    "semantic_hash": "e6fe02f31c32a9c2a36890f3aa434ab7"
+  },
+  "daemon/domain/estado/EvaluadorEstado.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.6109226,
+    "ast_hash": "94e6602e02b13e3b7358adfa8d24a786",
+    "semantic_hash": "94e6602e02b13e3b7358adfa8d24a786"
+  },
+  "daemon/domain/estado/index.js": {
+    "mtime": 1795071139.4086807,
+    "seen": 1795123976.6109252,
+    "ast_hash": "349a738bab1d94281c56c2f05bd4dfcd",
+    "semantic_hash": "349a738bab1d94281c56c2f05bd4dfcd"
+  },
+  "daemon/infrastructure/meshcentral/MeshCentralAdapter.js": {
+    "mtime": 1794436312.437533,
+    "seen": 1795123976.6109276,
+    "ast_hash": "3fff533bd4f43467b9dc5703c7f8d3ca",
+    "semantic_hash": "3fff533bd4f43467b9dc5703c7f8d3ca"
+  },
+  "daemon/infrastructure/network/NetworkProvider.js": {
+    "mtime": 1794436312.4376924,
+    "seen": 1795123976.61093,
+    "ast_hash": "04ec079f62a3c7c574f44f5bcbecdf94",
+    "semantic_hash": "04ec079f62a3c7c574f44f5bcbecdf94"
+  },
+  "daemon/infrastructure/network/SimulatedSwitchProvider.js": {
+    "mtime": 1794436312.4379585,
+    "seen": 1795123976.610932,
+    "ast_hash": "9e4e833b78f610c8e72dacfeafc3988e",
+    "semantic_hash": "9e4e833b78f610c8e72dacfeafc3988e"
+  },
+  "daemon/infrastructure/network/SnmpSwitchProvider.js": {
+    "mtime": 1795071139.4096806,
+    "seen": 1795123976.610935,
+    "ast_hash": "68f13d783522b9a36e879d0f03d373f0",
+    "semantic_hash": "68f13d783522b9a36e879d0f03d373f0"
+  },
+  "daemon/interfaces/http/Router.js": {
+    "mtime": 1794436312.438642,
+    "seen": 1795123976.6109374,
+    "ast_hash": "0bbc9b95372f54baa20d06a944e57d7d",
+    "semantic_hash": "0bbc9b95372f54baa20d06a944e57d7d"
+  },
+  "daemon/interfaces/http/SseBroadcaster.js": {
+    "mtime": 1794436312.4388232,
+    "seen": 1795123976.6109397,
+    "ast_hash": "c1c149406c4eb4f5188d6bf7026d3154",
+    "semantic_hash": "c1c149406c4eb4f5188d6bf7026d3154"
+  },
+  "daemon/interfaces/http/controllers/LaboratorioController.js": {
+    "mtime": 1795071139.4096806,
+    "seen": 1795123976.6109416,
+    "ast_hash": "dbd5b73c461cee679bc8fb16df25c7b4",
+    "semantic_hash": "dbd5b73c461cee679bc8fb16df25c7b4"
+  },
+  "daemon/interfaces/http/controllers/PowerController.js": {
+    "mtime": 1794436312.4391878,
+    "seen": 1795123976.6109443,
+    "ast_hash": "fbe556940ebfcff3eafa39281d9a1ccd",
+    "semantic_hash": "fbe556940ebfcff3eafa39281d9a1ccd"
+  },
+  "daemon/interfaces/http/controllers/SwitchController.js": {
+    "mtime": 1794436312.4394448,
+    "seen": 1795123976.6109467,
+    "ast_hash": "3a4b1fcc5dc5d7fb904d110c217a3deb",
+    "semantic_hash": "3a4b1fcc5dc5d7fb904d110c217a3deb"
+  },
+  "daemon/interfaces/http/routes.js": {
+    "mtime": 1794945093.010099,
+    "seen": 1795123976.6109488,
+    "ast_hash": "5bf875de2ffc0f0a242c2427600af715",
+    "semantic_hash": "5bf875de2ffc0f0a242c2427600af715"
+  },
+  "daemon/package.json": {
+    "mtime": 1794436312.4398406,
+    "seen": 1795123976.6109512,
+    "ast_hash": "99352c6a64fcbca0105e09a8c433c614",
+    "semantic_hash": "99352c6a64fcbca0105e09a8c433c614"
+  },
+  "docker-compose.yml": {
+    "mtime": 1795071139.4108818,
+    "seen": 1795123976.6109536,
+    "ast_hash": "aac1465d75cf51cda53246f92c3cdff5",
+    "semantic_hash": "aac1465d75cf51cda53246f92c3cdff5"
+  },
+  "scripts/compile-plantuml.py": {
+    "mtime": 1795130413.370713,
+    "seen": 1795130415.6331704,
+    "ast_hash": "af8697da0b6446e264f34b023709cab2",
+    "semantic_hash": ""
+  },
+  "scripts/test-domain.js": {
+    "mtime": 1795071139.4116807,
+    "seen": 1795123976.610958,
+    "ast_hash": "78e1547d0a209f94b1ffc8d3bc228232",
+    "semantic_hash": "78e1547d0a209f94b1ffc8d3bc228232"
+  },
+  "scripts/test-snmp.js": {
+    "mtime": 1794436312.4456427,
+    "seen": 1795123976.6109607,
+    "ast_hash": "18ef668a2135e25361d028414b1d20c1",
+    "semantic_hash": "18ef668a2135e25361d028414b1d20c1"
+  },
+  "scripts/test-switch.sh": {
+    "mtime": 1794436312.4460213,
+    "seen": 1795123976.6109629,
+    "ast_hash": "790696d6758e900c8009a823f5795935",
+    "semantic_hash": "790696d6758e900c8009a823f5795935"
+  },
+  "src/js/app.js": {
+    "mtime": 1795107450.4083362,
+    "seen": 1795123976.6109655,
+    "ast_hash": "c3baf02b3a7fcaa531549ecc8328090e",
+    "semantic_hash": "c3baf02b3a7fcaa531549ecc8328090e"
+  },
+  "src/js/renderer.js": {
+    "mtime": 1795107450.409581,
+    "seen": 1795123976.6109803,
+    "ast_hash": "6adf4ab596437e373a3090472e13c676",
+    "semantic_hash": "6adf4ab596437e373a3090472e13c676"
+  },
+  "src/js/sse-client.js": {
+    "mtime": 1791390682.2203777,
+    "seen": 1795123976.6109831,
+    "ast_hash": "0870f610f73aabd0bd617811655fc28c",
+    "semantic_hash": "0870f610f73aabd0bd617811655fc28c"
+  },
+  "AGENTS-RUP.md": {
+    "mtime": 1794436312.4306705,
+    "seen": 1795124177.6340063,
+    "ast_hash": "a2238bad723704bb0030c411f774b23f",
+    "semantic_hash": "a2238bad723704bb0030c411f774b23f"
+  },
+  "AGENTS.md": {
+    "mtime": 1794945093.0022626,
+    "seen": 1795124177.6340106,
+    "ast_hash": "370e14664da4939a32bb8cc56edd11e6",
+    "semantic_hash": "370e14664da4939a32bb8cc56edd11e6"
+  },
+  "README.md": {
+    "mtime": 1794945093.0028932,
+    "seen": 1795124177.6340137,
+    "ast_hash": "b609b12b30495a079c65b0a07aa5c083",
+    "semantic_hash": "b609b12b30495a079c65b0a07aa5c083"
+  },
+  "RUP/00-modelo-del-dominio/README.md": {
+    "mtime": 1794945093.003258,
+    "seen": 1795124177.634016,
+    "ast_hash": "f0176ddced01936a46b7e1492c67fc1c",
+    "semantic_hash": "f0176ddced01936a46b7e1492c67fc1c"
+  },
+  "RUP/01-requisitos/00-actores-casos-uso/README.md": {
+    "mtime": 1794945093.0044737,
+    "seen": 1795124177.6340184,
+    "ast_hash": "037d9aec5e71c05643628218849f7fc5",
+    "semantic_hash": "037d9aec5e71c05643628218849f7fc5"
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/FORMATO-DETALLE.md": {
+    "mtime": 1795071139.4045506,
+    "seen": 1795124177.6340237,
+    "ast_hash": "afac11715142795bc5e0cf3edd584eb1",
+    "semantic_hash": "afac11715142795bc5e0cf3edd584eb1"
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/README.md": {
+    "mtime": 1795107450.401363,
+    "seen": 1795124177.6340258,
+    "ast_hash": "75ae01b48cb7f34959cdf2aca28873e1",
+    "semantic_hash": "75ae01b48cb7f34959cdf2aca28873e1"
+  },
+  "RUP/01-requisitos/README.md": {
+    "mtime": 1794945093.0080395,
+    "seen": 1795124177.634028,
+    "ast_hash": "b1d592ebe7f9dca5791732682b0f03e8",
+    "semantic_hash": "b1d592ebe7f9dca5791732682b0f03e8"
+  },
+  "SNMP.md": {
+    "mtime": 1795071139.4066806,
+    "seen": 1795124177.63403,
+    "ast_hash": "57b027ac7ea33403e97b4cce392c3d93",
+    "semantic_hash": "57b027ac7ea33403e97b4cce392c3d93"
+  },
+  "docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md": {
+    "mtime": 1794436312.440159,
+    "seen": 1795124177.6340325,
+    "ast_hash": "c2b891bde2b9c3a46f3b1fe3d6fa4626",
+    "semantic_hash": "c2b891bde2b9c3a46f3b1fe3d6fa4626"
+  },
+  "docs/adr/ADR-002-acotamiento-control-energia-hardware.md": {
+    "mtime": 1794436312.440451,
+    "seen": 1795124177.6340344,
+    "ast_hash": "01340bb7eb054e2c28ccbc086c31f25a",
+    "semantic_hash": "01340bb7eb054e2c28ccbc086c31f25a"
+  },
+  "docs/adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md": {
+    "mtime": 1794945093.010542,
+    "seen": 1795124177.634037,
+    "ast_hash": "a86769508e4a0b1fc3fcf819d6c777d9",
+    "semantic_hash": "a86769508e4a0b1fc3fcf819d6c777d9"
+  },
+  "docs/adr/ADR-004-inclusion-switch-asignacion-distribuciones.md": {
+    "mtime": 1794945093.0109124,
+    "seen": 1795124177.634039,
+    "ast_hash": "53cc73e5811637ba96968023eae234a4",
+    "semantic_hash": "53cc73e5811637ba96968023eae234a4"
+  },
+  "docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md": {
+    "mtime": 1794436312.4413607,
+    "seen": 1795124177.6340413,
+    "ast_hash": "e05a86fc30b0007a2a092bc6fa3ae992",
+    "semantic_hash": "e05a86fc30b0007a2a092bc6fa3ae992"
+  },
+  "docs/matrices-documentales/matriz-referencias-apagado.md": {
+    "mtime": 1794436312.4419687,
+    "seen": 1795124177.6340437,
+    "ast_hash": "7c65040cd3a93510fafac6909c7d8dfe",
+    "semantic_hash": "7c65040cd3a93510fafac6909c7d8dfe"
+  },
+  "docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md": {
+    "mtime": 1794436312.442598,
+    "seen": 1795124177.6340458,
+    "ast_hash": "3be64cd41d5d444e355805ccdab3abe7",
+    "semantic_hash": "3be64cd41d5d444e355805ccdab3abe7"
+  },
+  "docs/matriz-documental-general.md": {
+    "mtime": 1794436312.443531,
+    "seen": 1795124177.634048,
+    "ast_hash": "1c9ee9e16d7dfb8804cb0f187f11ae98",
+    "semantic_hash": "1c9ee9e16d7dfb8804cb0f187f11ae98"
+  },
+  "src/index.html": {
+    "mtime": 1795107450.4081573,
+    "seen": 1795124177.6340504,
+    "ast_hash": "ae6daae07c6659b7da6356221295bb37",
+    "semantic_hash": "ae6daae07c6659b7da6356221295bb37"
+  },
+  "images/00-modelo-del-dominio/diagrama-clases.svg": {
+    "mtime": 1795125102.834852,
+    "seen": 1795129689.317716,
+    "ast_hash": "8f7d88109f731f7de4ea70dc26fce991",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/especificacion.svg": {
+    "mtime": 1795071139.4110215,
+    "seen": 1795124177.6340551,
+    "ast_hash": "7d33a8e16d452adc004bc8397e4d44bd",
+    "semantic_hash": "7d33a8e16d452adc004bc8397e4d44bd"
+  },
+  "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/especificacion.svg": {
+    "mtime": 1795071139.4112995,
+    "seen": 1795124177.6340575,
+    "ast_hash": "0b065f79f1ac9cc037068caf2e26fd74",
+    "semantic_hash": "0b065f79f1ac9cc037068caf2e26fd74"
+  },
+  "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/especificacion.svg": {
+    "mtime": 1795129981.190256,
+    "seen": 1795130415.6333132,
+    "ast_hash": "936d7a382f727b806823a4960a22f4af",
+    "semantic_hash": ""
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
+    "mtime": 1795107450.4016194,
+    "seen": 1795125009.3285904,
+    "ast_hash": "29ab686bdc0fd5017cfd2f3ec998c9fb",
+    "semantic_hash": ""
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
+    "mtime": 1795107450.402154,
+    "seen": 1795125009.3285968,
+    "ast_hash": "f02c3dc0074982c61e73a78687ad16bd",
+    "semantic_hash": ""
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
+    "mtime": 1795071139.4055865,
+    "seen": 1795125009.3286002,
+    "ast_hash": "8f3bcf63bc7dd03ab3b6b9670217ff40",
+    "semantic_hash": ""
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
+    "mtime": 1795107450.4029503,
+    "seen": 1795125009.3286035,
+    "ast_hash": "b95f4b4d0d565587649d6d92043704c5",
+    "semantic_hash": ""
+  },
+  "RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md": {
+    "mtime": 1795129710.0144668,
+    "seen": 1795129712.2643702,
+    "ast_hash": "7dd2c8abb15b28df78e9bdc56a514bd8",
+    "semantic_hash": ""
+  },
+  "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg": {
+    "mtime": 1794679347.122069,
+    "seen": 1795125009.3286545,
+    "ast_hash": "657dc57441bb715549b3a9407b618c77",
+    "semantic_hash": ""
+  },
+  "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg": {
+    "mtime": 1794679347.122105,
+    "seen": 1795125009.328658,
+    "ast_hash": "d9b7d645fb35442e96777263d40a8d64",
+    "semantic_hash": ""
+  },
+  "images/00-modelo-del-dominio/diagrama-objetos.svg": {
+    "mtime": 1794945093.011633,
+    "seen": 1795125009.3286614,
+    "ast_hash": "eb00b5923caf24c57df579a0a45f4ea3",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/00-actores-casos-uso/actoresCasosUsoAdministrador.svg": {
+    "mtime": 1794945093.0118194,
+    "seen": 1795125009.3286648,
+    "ast_hash": "4aa5030f17ecc646744b45d7c8528679",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/00-actores-casos-uso/diagramaContextoAdmin.svg": {
+    "mtime": 1794945093.0120895,
+    "seen": 1795125009.328668,
+    "ast_hash": "fb8bad7bbb0cd5ce3b147ff918fe9e2f",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/especificacion.svg": {
+    "mtime": 1795107450.4039876,
+    "seen": 1795125009.3286715,
+    "ast_hash": "a733cdb0f64196c7b9e2b06c5aeaa1ec",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
+    "mtime": 1795107450.4042895,
+    "seen": 1795125009.3286746,
+    "ast_hash": "e0c6b3de7f030ba170d6ee0d222273ba",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/cambiarModo/especificacion.svg": {
+    "mtime": 1795107450.4046528,
+    "seen": 1795125009.3286774,
+    "ast_hash": "03a9db564e3779b4398a725cd96a51d5",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/cambiarModo/wireframes.svg": {
+    "mtime": 1795107450.4052286,
+    "seen": 1795125009.3286808,
+    "ast_hash": "c836fb493135ea73cdb78a6471a52b57",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
+    "mtime": 1795071139.4112995,
+    "seen": 1795125009.3286884,
+    "ast_hash": "cf0988b2691f6f9e7081131f10e063a9",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
+    "mtime": 1795107450.4062414,
+    "seen": 1795125009.3286982,
+    "ast_hash": "f71231729174d327e71f72285555860d",
+    "semantic_hash": ""
+  },
+  "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/wireframes.svg": {
+    "mtime": 1795129981.9061081,
+    "seen": 1795130415.6333163,
+    "ast_hash": "b3d209577cdcadede90beb3b0b52e595",
+    "semantic_hash": ""
+  },
+  "scripts/auto-compile-plantuml.py": {
+    "mtime": 1795130426.1807902,
+    "seen": 1795130428.3879235,
+    "ast_hash": "0b438f98acc352d61b1caf0d382421d9",
+    "semantic_hash": ""
+  },
+  "scripts/auto-sync-graphify.py": {
+    "mtime": 1795125043.3682415,
+    "seen": 1795125081.6436327,
+    "ast_hash": "0ad993d811851fd447479c8b030411e1",
+    "semantic_hash": ""
+  },
+  ".agents/hooks.json": {
+    "mtime": 1795125128.80395,
+    "seen": 1795129689.317501,
+    "ast_hash": "c25d55f30405bdcaa2174abdd71b2cb8",
+    "semantic_hash": ""
+  },
+  ".agents/rules/rup-auditor.md": {
+    "mtime": 1795130375.1984825,
+    "seen": 1795130415.6331925,
+    "ast_hash": "ec8c24a4cf06fe24ed295982fa489817",
+    "semantic_hash": ""
+  },
+  "daemon/package-lock.json": {
+    "mtime": 1794436312.4397247,
+    "seen": 1795125009.3287156,
+    "ast_hash": "81d9514f4f17f124dad9e19407cf29d3",
+    "semantic_hash": ""
+  }
+}

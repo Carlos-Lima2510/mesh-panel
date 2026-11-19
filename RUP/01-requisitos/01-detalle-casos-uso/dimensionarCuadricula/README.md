@@ -48,16 +48,15 @@ El caso de uso modela el ajuste y dimensionado de la cuadrícula visual del aula
      * **Columnas por hilera (`columnas_hilera`):** Cantidad de puestos por fila a cada lado del pasillo central (ej. 3, 4, 5). El total de columnas resultante en el aula es siempre $2 \times \text{columnas\_hilera}$.
 
 2. **Flujo Principal:**
-   * El Administrador solicita dimensionar la cuadrícula pulsando en el botón de control en la barra de acciones superior (`[ Dimensionar: Fx(2C) ]`).
-   * El sistema presenta el diálogo modal **Dimensionar Cuadrícula** con los valores numéricos actuales en los campos de entrada (`Filas de mesas` y `Columnas por hilera`), junto al cálculo previo de la estructura resultante y capacidad máxima de puestos físicos.
-   * El Administrador introduce los nuevos valores numéricos deseados y solicita aplicar las dimensiones (`[ 📐 Aplicar ]`).
-   * El sistema valida los datos introducidos, actualiza la geometría del aula en memoria y reestructura dinámicamente las celdas de la cuadrícula, preservando los puestos físicos y las asignaciones de equipos existentes sin pérdida de información.
-   * El sistema cierra el modal, presenta la nueva disposición espacial con las dimensiones configuradas manteniendo el pasillo central, y actualiza la etiqueta informativa del botón de la cabecera.
-   * El sistema difunde la actualización a través del canal SSE para reflejar el nuevo layout en tiempo real en todos los clientes conectados.
+   * El Administrador solicita dimensionar la cuadrícula del aula.
+   * El sistema presenta el diálogo de dimensionamiento con las dimensiones actuales en los campos de entrada (`Filas de mesas` y `Columnas por hilera`), la estructura resultante y la capacidad máxima de puestos físicos.
+   * El sistema permite introducir el número de filas y columnas por hilera, y permite solicitar aplicar las dimensiones o cancelar.
+   * El Administrador introduce las nuevas dimensiones deseadas y solicita aplicar los cambios.
+   * El sistema valida los datos introducidos, reestructura la cuadrícula del laboratorio preservando los puestos físicos asignados y el pasillo central divisorio entre hileras, cierra el diálogo y presenta la nueva disposición espacial con las dimensiones configuradas.
 
 3. **Flujos Alternativos y Excepcionales:**
-   * **Dimensiones inválidas o fuera de rango:** Si el Administrador introduce valores menores a 1, no numéricos o que excedan los límites físicos configurables, el sistema presenta un aviso visual de advertencia y mantiene las dimensiones previas de la cuadrícula sin aplicar modificaciones.
-   * **Cancelación de la solicitud:** Si el Administrador pulsa `[ Cancelar ]`, cierra el modal o pulsa la tecla `Escape`, el sistema retorna al cuadro general sin modificar las dimensiones del laboratorio.
+   * **Dimensiones inválidas o fuera de rango:** Si el Administrador introduce valores menores a 1, no numéricos o incompatibles con los límites del laboratorio, el sistema presenta un aviso visual de advertencia y mantiene las dimensiones previas de la cuadrícula sin aplicar modificaciones.
+   * **Cancelación de la solicitud:** Si el Administrador solicita cancelar la operación, el sistema cierra el diálogo y retorna al cuadro general sin modificar las dimensiones del laboratorio.
 
 ### Referencias
 * **Diagrama de contexto de Admin:** 

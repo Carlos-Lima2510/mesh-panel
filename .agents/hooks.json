@@ -1,0 +1,30 @@
+{
+  "plantuml-auto-compile": {
+    "PostToolUse": [
+      {
+        "matcher": "edit_file|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -u \"$(git rev-parse --show-toplevel)/scripts/auto-compile-plantuml.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "graphify-auto-sync": {
+    "PostToolUse": [
+      {
+        "matcher": "edit_file|write_file",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -u \"$(git rev-parse --show-toplevel)/scripts/auto-sync-graphify.py\"",
+            "timeout": 45
+          }
+        ]
+      }
+    ]
+  }
+}
