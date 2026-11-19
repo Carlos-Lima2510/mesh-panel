@@ -600,6 +600,7 @@ body {
   width: max-content;
   min-width: 100%;
   box-sizing: border-box;
+  transform-origin: top left;
 }
 
 .classroom-headers {
@@ -628,7 +629,7 @@ body {
 
 .col-header-block {
   display: grid;
-  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(140px, 1fr));
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
@@ -647,7 +648,7 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 135px;
+  min-width: 140px;
   box-sizing: border-box;
 }
 
@@ -699,15 +700,15 @@ body {
 
 .row-block {
   display: grid;
-  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(140px, 1fr));
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .row-block > * {
-  min-width: 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .aisle-divider {
@@ -759,7 +760,7 @@ body {
   min-height: 148px;
   height: 100%;
   box-sizing: border-box;
-  min-width: 135px;
+  min-width: 140px;
   width: 100%;
   overflow: hidden;
   cursor: pointer;

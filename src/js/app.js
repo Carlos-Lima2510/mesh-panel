@@ -149,6 +149,9 @@ function actualizarVista() {
     columnas_hilera: labColsHilera,
     columnas: labColumnas
   });
+  requestAnimationFrame(() => {
+    aplicarAjustePantalla();
+  });
 }
 
 function actualizarSelectRangeOptions() {
@@ -873,6 +876,81 @@ window.addEventListener('keydown', (e) => {
     } else if (modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
       cerrarModalDetalle();
     }
+  }
+});
+
+// ==============================================================================
+// MODO AJUSTAR A PANTALLA (FIT TO VIEWPORT - ZOOM PROPORCIONAL)
+// ==============================================================================
+let modoAjustarPantalla = true;
+const btnFitScreen = document.getElementById('btn-fit-screen');
+const btnFitScreenIcon = document.getElementById('btn-fit-screen-icon');
+const btnFitScreenText = document.getElementById('btn-fit-screen-text');
+
+function aplicarAjustePantalla() {
+  const container = document.querySelector('.classroom-container');
+  const canvas = document.querySelector('.classroom-canvas');
+  if (!container || !canvas) return;
+
+  if (!modoAjustarPantalla) {
+    canvas.style.zoom = '1';
+    canvas.style.transform = 'none';
+    if (btnFitScreen) {
+      btnFitScreen.classList.remove('active');
+      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '⛶';
+      if (btnFitScreenText) btnFitScreenText.textContent = 'Ajustar a pantalla';
+      btnFitScreen.title = 'Ajustar automáticamente la cuadrícula al ancho de la ventana sin scroll';
+    }
+    return;
+  }
+
+  // Medir ancho disponible y ancho natural del lienzo reseteando temporalmente el zoom
+  canvas.style.zoom = '1';
+  canvas.style.transform = 'none';
+  void canvas.offsetWidth; // Forzar reflujo síncrono
+
+  const availableWidth = container.clientWidth - 40; // 20px padding a cada lado
+  const naturalWidth = canvas.scrollWidth;
+
+  if (naturalWidth > availableWidth && availableWidth > 200) {
+    const scale = Number((availableWidth / naturalWidth).toFixed(3));
+    if (CSS.supports('zoom', '1')) {
+      canvas.style.zoom = String(scale);
+      canvas.style.transform = 'none';
+    } else {
+      canvas.style.transformOrigin = 'top left';
+      canvas.style.transform = `scale(${scale})`;
+      canvas.style.width = `${naturalWidth}px`;
+    }
+    if (btnFitScreen) {
+      btnFitScreen.classList.add('active');
+      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '🔍';
+      const pct = Math.round(scale * 100);
+      if (btnFitScreenText) btnFitScreenText.textContent = `Ajustado (${pct}%)`;
+      btnFitScreen.title = `Cuadrícula ajustada proporcionalmente al ${pct}% sin scroll. Clic para ver al 100% real.`;
+    }
+  } else {
+    canvas.style.zoom = '1';
+    canvas.style.transform = 'none';
+    if (btnFitScreen) {
+      btnFitScreen.classList.add('active');
+      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '⛶';
+      if (btnFitScreenText) btnFitScreenText.textContent = 'Ajustado (100%)';
+      btnFitScreen.title = 'Cuadrícula en tamaño completo (100%). Clic para alternar.';
+    }
+  }
+}
+
+if (btnFitScreen) {
+  btnFitScreen.addEventListener('click', () => {
+    modoAjustarPantalla = !modoAjustarPantalla;
+    aplicarAjustePantalla();
+  });
+}
+
+window.addEventListener('resize', () => {
+  if (modoAjustarPantalla) {
+    aplicarAjustePantalla();
   }
 });
 
