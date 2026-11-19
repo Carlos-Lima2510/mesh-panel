@@ -1,0 +1,45 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
+
+SISTEMA_DISPONIBLE -[#green]-> cambiarModo
+note on link
+<b>Administrador</b> solicita cambiar modo operativo del laboratorio
+<b>Administrador</b> introduce modo seleccionado (Modo Clase / Modo Práctica)
+end note
+
+state cambiarModo as "cambiarModo()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+
+    c -[#green]-> [*]
+    note on link
+    [Modo operativo válido]
+    <b>Sistema</b> presenta el selector con el modo operativo seleccionado activo
+    <b>Sistema</b> presenta la cuadrícula del laboratorio con los diagnósticos de los puestos actualizados según el nuevo modo
+    <b>Sistema</b> presenta el resumen consolidado de métricas del aula recalculado
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [Fallo de comunicación con el daemon o modo no disponible]
+    <b>Sistema</b> presenta mensaje de advertencia y mantiene el modo actual sin alteraciones
+    end note
+}
+
+cambiarModo -[#green]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+cuadrícula y métricas actualizadas con el nuevo modo operativo
+end note
+
+cambiarModo -[#red]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+aviso de error, modo del aula sin cambios
+end note
+
+@enduml

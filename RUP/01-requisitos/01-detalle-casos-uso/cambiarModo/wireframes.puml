@@ -1,0 +1,134 @@
+@startsalt wireframes
+skinparam dpi 150
+skinparam defaultFontName sans-serif
+{+
+  <b>OpSys</b> - Supervisión de Laboratorio
+  {
+    [ 🎓 Modo Clase ] | [ <back:#7c3aed><color:white><b> 🧪 Modo Práctica </b></color></back> ] | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | [ Asignar a switch ] | [ ⚡ Encender ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
+  }
+  --
+  {
+    <b>Métricas en tiempo real (Modo Práctica):</b> | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | 🟢 Operativos: <b>45</b> | ⚫ Standby: <b>10</b> | 🟡 Prácticas/DHCP: <b>5</b> | 🟠 Desconectados: <b>0</b> | Total: <b>60</b>
+  }
+  --
+  {
+    <i><b>Contexto operacional activo:</b> Modo Práctica. Los enlaces caídos en switch docente se reclasifican como 🟡 RED AISLADA, evitando falsas alarmas de desconexión.</i>
+  }
+  --
+  {/ <b>Disposición Espacial del Aula</b> }
+  {#
+    . | <b>Col 1</b> | <b>Col 2</b> | <b>Col 3</b> | <b> === PASILLO CENTRAL === </b> | <b>Col 4</b> | <b>Col 5</b> | <b>Col 6</b>
+    <b>Fila 1</b> | {
+      <b>🟢 PC-01</b> | [<color:gray>⚡</color>] | <i>#01</i>
+      IP: 10.10.136.101
+      Port: port1 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>🟢 PC-02</b> | [<color:gray>⚡</color>] | <i>#02</i>
+      IP: 10.10.136.102
+      Port: port2 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>⚫ PC-03</b> | [ ⚡ ] | <i>#03</i>
+      IP: ---
+      Port: port3 🟢
+      Switch: Universitario
+      🪟 Desconectado | . | [→]
+    } | <b>            ║  Pasillo  ║</b> | {
+      <b>🟢 PC-04</b> | [<color:gray>⚡</color>] | <i>#04</i>
+      IP: 10.10.136.104
+      Port: port4 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>🟡 PC-05</b> | [ ⚡ ] | <i>#05</i>
+      IP: ---
+      Port: port5 🔴
+      Switch: Prácticas
+      🪟 Desconectado | . | [→]
+    } | {
+      <b>🟢 PC-06</b> | [<color:gray>⚡</color>] | <i>#06</i>
+      IP: 10.10.136.106
+      Port: port6 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    }
+    <b>Fila 2</b> | {
+      <b>🟢 PC-07</b> | [<color:gray>⚡</color>] | <i>#07</i>
+      IP: 10.10.136.107
+      Port: port7 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>🟡 PC-08</b> | [ ⚡ ] | <i>#08</i>
+      IP: 10.10.136.108
+      Port: port8 🟢
+      Switch: Prácticas
+      🪟 Desconectado | . | [→]
+    } | {
+      <b>🟢 PC-09</b> | [<color:gray>⚡</color>] | <i>#09</i>
+      IP: 10.10.136.109
+      Port: port9 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | <b>            ║  Pasillo  ║</b> | {
+      <b>🟢 PC-10</b> | [<color:gray>⚡</color>] | <i>#10</i>
+      IP: 10.10.136.110
+      Port: port10 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>🟢 PC-11</b> | [<color:gray>⚡</color>] | <i>#11</i>
+      IP: 10.10.136.111
+      Port: port11 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>⚫ PC-12</b> | [ ⚡ ] | <i>#12</i>
+      IP: ---
+      Port: port12 🟢
+      Switch: Universitario
+      🪟 Desconectado | . | [→]
+    }
+    <b>Fila 3</b> | {
+      <b>⚫ PC-13</b> | [ ⚡ ] | <i>#13</i>
+      IP: ---
+      Port: port13 🟢
+      Switch: Universitario
+      🪟 Desconectado | . | [→]
+    } | {
+      <b>🟡 PC-14</b> | [ ⚡ ] | <i>#14</i>
+      IP: ---
+      Port: port14 🟢
+      Switch: Universitario
+      🪟 Desconectado | . | [→]
+    } | {
+      <b>🟢 PC-15</b> | [<color:gray>⚡</color>] | <i>#15</i>
+      IP: 10.10.136.115
+      Port: port15 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | <b>            ║  Pasillo  ║</b> | {
+      <b>🟢 PC-16</b> | [<color:gray>⚡</color>] | <i>#16</i>
+      IP: 10.10.136.116
+      Port: port16 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    } | {
+      <b>🟡 PC-17</b> | [ ⚡ ] | <i>#17</i>
+      IP: ---
+      Port: port17 🔴
+      Switch: Prácticas
+      🪟 Desconectado | . | [→]
+    } | {
+      <b>🟢 PC-18</b> | [<color:gray>⚡</color>] | <i>#18</i>
+      IP: 10.10.136.118
+      Port: port18 🟢
+      Switch: Universitario
+      🪟 En línea | . | [→]
+    }
+  }
+}
+@endsalt
