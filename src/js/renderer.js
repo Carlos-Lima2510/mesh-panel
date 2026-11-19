@@ -47,7 +47,7 @@ export class DashboardRenderer {
       headersContainer.innerHTML = `
         <div class="corner-header">Fila</div>
         <div class="col-header-block" style="--cols-hilera: ${this.colsHilera}">${leftColsHtml}</div>
-        <div class="aisle-header">=== PASILLO CENTRAL ===</div>
+        <div class="aisle-header">PASILLO CENTRAL</div>
         <div class="col-header-block" style="--cols-hilera: ${this.colsHilera}">${rightColsHtml}</div>
         <div class="corner-header">Fila</div>
       `;
