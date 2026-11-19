@@ -64,47 +64,6 @@
     </div>
   </header>
 
-  <!-- PANEL DESPLEGABLE DE DIMENSIONES Y RANGO (HERRAMIENTA EXPANDIBLE) -->
-  <section id="drawer-dimensiones" class="drawer-dimensiones" style="display: none;">
-    <div class="drawer-content">
-      <div class="grid-dimension-controls" aria-label="Dimensiones de la Cuadrícula">
-        <span class="toolbar-label">Configurar Cuadrícula:</span>
-        <div class="dim-inputs">
-          <label for="input-filas" class="dim-label">Filas:</label>
-          <input type="number" id="input-filas" class="input-dim" min="1" max="20" value="5" title="Número de filas de mesas" />
-          <span class="dim-sep">&times;</span>
-          <label for="input-columnas" class="dim-label">Cols/Hilera:</label>
-          <input type="number" id="input-columnas" class="input-dim" min="1" max="20" value="4" title="Columnas a cada lado del pasillo central" />
-          <button id="btn-aplicar-cuadricula" class="btn-subtle" type="button" title="Aplicar cuadrícula (pasillo en medio siempre)">
-            📐 Aplicar
-          </button>
-        </div>
-      </div>
-
-      <div class="switch-assign-tool" aria-label="Asignación de Switch por Rango">
-        <span class="toolbar-label">Asignación por Rango:</span>
-        <div class="range-inputs">
-          <span class="range-text">#</span>
-          <input type="number" id="input-range-desde" class="input-dim" min="1" value="1" title="Puesto inicial" />
-          <span class="range-text">a</span>
-          <input type="number" id="input-range-hasta" class="input-dim" min="1" value="20" title="Puesto final" />
-          <select id="select-range-switch" class="select-range-switch" title="Switch destino">
-            <option value="sw-docente">Sw. Docente</option>
-            <option value="sw-practicas" selected>Sw. Prácticas</option>
-          </select>
-          <button id="btn-aplicar-rango-switch" class="btn-subtle" type="button" title="Asignar switch a este rango de puestos">
-            ⚡ Asignar Rango
-          </button>
-        </div>
-      </div>
-
-      <div class="classroom-summary">
-        <span id="total-puestos-badge" class="summary-tag">40 Puestos</span>
-        <span id="grid-dims-badge" class="summary-tag">5 Filas &times; 4+4 Cols</span>
-      </div>
-    </div>
-  </section>
-
   <!-- MÉTRICAS EN TIEMPO REAL (SEGUNDA BANDA DEL WIREFRAME) -->
   <section class="realtime-metrics-bar" aria-label="Métricas en tiempo real">
     <div class="metrics-header-label">
@@ -322,6 +281,68 @@
           Confirmar
         </button>
         <button id="btn-modal-asignar-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DIMENSIONAR CUADRÍCULA (SEGÚN WIREFRAME RUP CU-05 dimensionarCuadricula) -->
+  <div id="modal-dimensionar-cuadricula" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-dim-title">
+    <div class="modal-window modal-window-compact">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">📐</span>
+          <h2 id="modal-dim-title" class="modal-title">Dimensionar Cuadrícula</h2>
+        </div>
+        <button id="btn-modal-dim-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="modal-body">
+        <div class="modal-info-box">
+          <p class="modal-info-text">
+            Configure las dimensiones espaciales del aula. La cuadrícula mantendrá siempre el pasillo central divisorio entre ambas hileras.
+          </p>
+        </div>
+
+        <div class="modal-dim-form">
+          <div class="modal-dim-field">
+            <label for="modal-input-filas" class="modal-label">Filas de mesas:</label>
+            <div class="dim-input-wrapper">
+              <input type="number" id="modal-input-filas" class="modal-dim-input" min="1" max="20" value="5" title="Número de filas de mesas">
+              <span class="dim-hint">Mesas en profundidad</span>
+            </div>
+          </div>
+
+          <div class="modal-dim-field">
+            <label for="modal-input-columnas" class="modal-label">Columnas por hilera:</label>
+            <div class="dim-input-wrapper">
+              <input type="number" id="modal-input-columnas" class="modal-dim-input" min="1" max="15" value="4" title="Columnas a cada lado del pasillo">
+              <span class="dim-hint">Puestos a cada lado del pasillo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-dim-preview-card">
+          <div class="dim-preview-row">
+            <span class="preview-label">Estructura resultante:</span>
+            <span id="modal-dim-preview-structure" class="preview-value mono">5 filas &times; 8 columnas (4 izq + 4 der)</span>
+          </div>
+          <div class="dim-preview-row">
+            <span class="preview-label">Capacidad máxima:</span>
+            <span id="modal-dim-preview-capacity" class="preview-value-highlight">40 puestos físicos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="modal-footer">
+        <button id="btn-modal-dim-apply" type="button" class="btn-modal-action btn-modal-confirm">
+          📐 Aplicar
+        </button>
+        <button id="btn-modal-dim-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
           Cancelar
         </button>
       </div>

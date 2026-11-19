@@ -34,7 +34,16 @@ const btnModalAsignarConfirm = document.getElementById('btn-modal-asignar-confir
 
 const btnDimensionarToggle = document.getElementById('btn-dimensionar-toggle');
 const btnDimensionarLabel = document.getElementById('btn-dimensionar-label');
-const drawerDimensiones = document.getElementById('drawer-dimensiones');
+
+// Modal Dimensionar Cuadrícula (CU-05)
+const modalDimensionarCuadricula = document.getElementById('modal-dimensionar-cuadricula');
+const modalInputFilas = document.getElementById('modal-input-filas');
+const modalInputColumnas = document.getElementById('modal-input-columnas');
+const modalDimPreviewStructure = document.getElementById('modal-dim-preview-structure');
+const modalDimPreviewCapacity = document.getElementById('modal-dim-preview-capacity');
+const btnModalDimClose = document.getElementById('btn-modal-dim-close');
+const btnModalDimCancel = document.getElementById('btn-modal-dim-cancel');
+const btnModalDimApply = document.getElementById('btn-modal-dim-apply');
 
 const btnSelectAll = document.getElementById('btn-select-all');
 const btnLogout = document.getElementById('btn-logout');
@@ -479,59 +488,41 @@ if (btnEncenderSeleccionados) {
   });
 }
 
-// Conmutar panel de dimensionamiento
-if (btnDimensionarToggle && drawerDimensiones) {
-  btnDimensionarToggle.addEventListener('click', () => {
-    const isHidden = drawerDimensiones.style.display === 'none';
-    drawerDimensiones.style.display = isHidden ? 'block' : 'none';
-    btnDimensionarToggle.classList.toggle('active', isHidden);
-  });
-}
+// ==============================================================================
+// GESTIÓN DEL MODAL: DIMENSIONAR CUADRÍCULA (CU-05 según Wireframe RUP)
+// ==============================================================================
+function actualizarPreviewDimensiones() {
+  const filas = parseInt(modalInputFilas?.value, 10) || 0;
+  const colsHilera = parseInt(modalInputColumnas?.value, 10) || 0;
+  const totalCols = colsHilera * 2;
+  const capacidad = filas * totalCols;
 
-// Seleccionar todos los puestos visibles
-if (btnSelectAll) {
-  btnSelectAll.addEventListener('click', () => {
-    const allIds = Array.from(renderer.slotElements.keys());
-    const totalSel = renderer.seleccionarTodos(allIds);
-    actualizarBotonesAsignacion(totalSel);
-    btnSelectAll.textContent = totalSel > 0 ? '☒ Deseleccionar todos' : '☑ Seleccionar todos';
-  });
-}
-
-// Botón Cerrar Sesión
-if (btnLogout) {
-  btnLogout.addEventListener('click', () => {
-    if (confirm('¿Deseas cerrar la sesión de administración de OpSys?')) {
-      setStatusBadge('Sesión finalizada. Recargando...');
-      setTimeout(() => window.location.reload(), 400);
-    }
-  });
-}
-
-window.cambiarSwitchPuesto = async function (puestoId, switchId) {
-  try {
-    setStatusBadge(`Asignando ${puestoId} a ${switchId}...`);
-    const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        puesto_id: puestoId,
-        switch_id: switchId
-      })
-    });
-    const data = await res.json();
-    if (data.success && data.laboratorio) {
-      procesarDatosLaboratorio(data.laboratorio);
-    }
-  } catch (err) {
-    console.error('[-] Error asignando switch a puesto:', err);
-    setStatusBadge('Error al asignar switch', true);
+  if (modalDimPreviewStructure) {
+    modalDimPreviewStructure.textContent = `${filas} filas × ${totalCols} columnas (${colsHilera} izq + ${colsHilera} der)`;
   }
-};
+  if (modalDimPreviewCapacity) {
+    modalDimPreviewCapacity.textContent = `${capacidad} puestos físicos`;
+  }
+}
+
+function abrirModalDimensionar() {
+  if (modalInputFilas) modalInputFilas.value = labFilas;
+  if (modalInputColumnas) modalInputColumnas.value = labColsHilera;
+  actualizarPreviewDimensiones();
+  if (modalDimensionarCuadricula) {
+    modalDimensionarCuadricula.style.display = 'flex';
+  }
+}
+
+function cerrarModalDimensionar() {
+  if (modalDimensionarCuadricula) {
+    modalDimensionarCuadricula.style.display = 'none';
+  }
+}
 
 async function aplicarDimensionesCuadricula() {
-  const filas = parseInt(inputFilas?.value, 10);
-  const colsHilera = parseInt(inputColumnas?.value, 10);
+  const filas = parseInt(modalInputFilas?.value, 10);
+  const colsHilera = parseInt(modalInputColumnas?.value, 10);
   if (!filas || !colsHilera || filas < 1 || colsHilera < 1) {
     alert('Introduce dimensiones válidas (mínimo 1 fila y 1 columna por hilera).');
     return;
@@ -542,21 +533,13 @@ async function aplicarDimensionesCuadricula() {
   labColumnas = colsHilera * 2;
   const total = labFilas * labColumnas;
 
-  if (totalPuestosBadge) {
-    totalPuestosBadge.textContent = `${total} Puestos (${labFilas}F × ${colsHilera}+${colsHilera}C)`;
-  }
-  if (gridDimsBadge) {
-    gridDimsBadge.textContent = `${labFilas} Filas × ${colsHilera}+${colsHilera} Cols`;
-  }
   if (btnDimensionarLabel) {
     btnDimensionarLabel.textContent = `Dimensionar: ${labFilas}×${labColumnas}`;
-  }
-  if (inputRangeHasta) {
-    inputRangeHasta.max = total;
   }
 
   renderer.inicializarEstructuraMapa(labFilas, labColsHilera);
   actualizarVista();
+  cerrarModalDimensionar();
   setStatusBadge(`Cuadrícula: ${labFilas} filas × ${colsHilera}+${colsHilera} cols (${total} puestos)`);
 
   try {
@@ -578,54 +561,76 @@ async function aplicarDimensionesCuadricula() {
   }
 }
 
-async function aplicarRangoSwitch() {
-  const desde = parseInt(inputRangeDesde?.value, 10);
-  const hasta = parseInt(inputRangeHasta?.value, 10);
-  const switchId = selectRangeSwitch?.value || 'sw-docente';
-  if (!desde || !hasta || desde < 1 || hasta < desde) {
-    alert('Introduce un rango válido (desde ≤ hasta).');
-    return;
-  }
-  try {
-    setStatusBadge(`Asignando puestos #${desde} a #${hasta} a ${switchId}...`);
-    const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ desde, hasta, switch_id: switchId })
-    });
-    const data = await res.json();
-    if (data.success && data.laboratorio) {
-      procesarDatosLaboratorio(data.laboratorio);
-    }
-  } catch (err) {
-    console.error('[-] Error asignando rango de switches:', err);
-    setStatusBadge('Error al asignar switch por rango', true);
-  }
+// Abrir modal de dimensionamiento
+if (btnDimensionarToggle) {
+  btnDimensionarToggle.addEventListener('click', abrirModalDimensionar);
 }
 
-if (btnAplicarCuadricula) {
-  btnAplicarCuadricula.addEventListener('click', aplicarDimensionesCuadricula);
+if (btnModalDimApply) {
+  btnModalDimApply.addEventListener('click', aplicarDimensionesCuadricula);
+}
+if (btnModalDimClose) {
+  btnModalDimClose.addEventListener('click', cerrarModalDimensionar);
+}
+if (btnModalDimCancel) {
+  btnModalDimCancel.addEventListener('click', cerrarModalDimensionar);
+}
+if (modalDimensionarCuadricula) {
+  modalDimensionarCuadricula.addEventListener('click', (e) => {
+    if (e.target === modalDimensionarCuadricula) cerrarModalDimensionar();
+  });
 }
 
-[inputFilas, inputColumnas].forEach(inp => {
+[modalInputFilas, modalInputColumnas].forEach(inp => {
   if (inp) {
+    inp.addEventListener('input', actualizarPreviewDimensiones);
     inp.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') aplicarDimensionesCuadricula();
     });
   }
 });
 
-if (btnAplicarRangoSwitch) {
-  btnAplicarRangoSwitch.addEventListener('click', aplicarRangoSwitch);
+// Seleccionar todos los puestos visibles
+if (btnSelectAll) {
+  btnSelectAll.addEventListener('click', () => {
+    const allIds = Array.from(renderer.slotElements.keys());
+    const totalSel = renderer.seleccionarTodos(allIds);
+    actualizarBotonesAsignacion(totalSel);
+    btnSelectAll.textContent = totalSel > 0 ? '☒ Deseleccionar todos' : '☑ Seleccionar todos';
+  });
 }
 
-[inputRangeDesde, inputRangeHasta].forEach(inp => {
-  if (inp) {
-    inp.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') aplicarRangoSwitch();
+// Botón Cerrar Sesión
+if (btnLogout) {
+  btnLogout.addEventListener('click', () => {
+    if (confirm('¿Deseas cerrar la sesión de administración de OpSys?')) {
+      setStatusBadge('Sesión finalizada. Recargando...');
+      setTimeout(() => window.location.reload(), 400);
+    }
+  });
+}
+
+// Cambio individual de switch desde la ficha técnica de detalle (CU-02 / CU-04)
+window.cambiarSwitchPuesto = async function (puestoId, switchId) {
+  try {
+    setStatusBadge(`Asignando ${puestoId} a ${switchId}...`);
+    const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        puesto_id: puestoId,
+        switch_id: switchId
+      })
     });
+    const data = await res.json();
+    if (data.success && data.laboratorio) {
+      procesarDatosLaboratorio(data.laboratorio);
+    }
+  } catch (err) {
+    console.error('[-] Error asignando switch a puesto:', err);
+    setStatusBadge('Error al asignar switch', true);
   }
-});
+};
 
 window.ejecutarWoL = async function (nodeId) {
   try {
@@ -861,7 +866,9 @@ if (modalDetallePuesto) {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (modalAsignarSwitch && modalAsignarSwitch.style.display === 'flex') {
+    if (modalDimensionarCuadricula && modalDimensionarCuadricula.style.display === 'flex') {
+      cerrarModalDimensionar();
+    } else if (modalAsignarSwitch && modalAsignarSwitch.style.display === 'flex') {
       cerrarModalAsignarSwitch();
     } else if (modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
       cerrarModalDetalle();

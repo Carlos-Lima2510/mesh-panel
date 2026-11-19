@@ -571,11 +571,31 @@ body {
   padding: 20px;
   overflow-x: auto;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #090e1a;
+}
+
+.classroom-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.classroom-container::-webkit-scrollbar-track {
+  background: #090e1a;
+  border-radius: 4px;
+}
+
+.classroom-container::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.classroom-container::-webkit-scrollbar-thumb:hover {
+  background: #475569;
 }
 
 .classroom-headers {
   display: grid;
-  grid-template-columns: 60px 1fr 100px 1fr 60px;
+  grid-template-columns: 56px minmax(max-content, 1fr) 90px minmax(max-content, 1fr) 56px;
   align-items: center;
   text-align: center;
   font-size: 0.8rem;
@@ -583,7 +603,9 @@ body {
   color: var(--text-muted);
   margin-bottom: 12px;
   gap: 12px;
-  min-width: 980px;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
 }
 
 .corner-header {
@@ -595,7 +617,7 @@ body {
 
 .col-header-block {
   display: grid;
-  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(130px, 1fr));
   gap: 10px;
 }
 
@@ -609,6 +631,9 @@ body {
   color: #cbd5e1;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .classroom-headers .aisle-header {
@@ -628,14 +653,17 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-width: 980px;
+  width: max-content;
+  min-width: 100%;
+  box-sizing: border-box;
 }
 
 .classroom-row {
   display: grid;
-  grid-template-columns: 60px 1fr 100px 1fr 60px;
+  grid-template-columns: 56px minmax(max-content, 1fr) 90px minmax(max-content, 1fr) 56px;
   align-items: stretch;
   gap: 12px;
+  width: 100%;
 }
 
 .row-label {
@@ -654,7 +682,7 @@ body {
 
 .row-block {
   display: grid;
-  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols-hilera, 4), minmax(130px, 1fr));
   gap: 10px;
 }
 
@@ -703,14 +731,14 @@ body {
   border: 1px solid var(--border);
   border-left: 4px solid var(--border);
   border-radius: 10px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 148px;
   min-height: 148px;
+  height: 100%;
   box-sizing: border-box;
-  min-width: 0;
+  min-width: 130px;
   width: 100%;
   overflow: hidden;
   cursor: pointer;
@@ -764,14 +792,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
 }
 
 .card-compact .card-title {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
   overflow: hidden;
   flex: 1;
@@ -780,7 +808,7 @@ body {
 .card-compact .card-top-right {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -904,8 +932,8 @@ body {
 .card-compact .card-body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 3px;
+  margin-top: 5px;
   min-width: 0;
 }
 
@@ -913,7 +941,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.73rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   line-height: 1.35;
   min-width: 0;
@@ -923,6 +951,7 @@ body {
   color: #64748b;
   font-weight: 600;
   flex-shrink: 0;
+  margin-right: 4px;
 }
 
 .card-compact .row .row-val-text {
@@ -931,15 +960,24 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-left: 6px;
+  margin-left: 4px;
   text-align: right;
+  min-width: 0;
 }
 
 .row-val-port {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   justify-content: flex-end;
+  min-width: 0;
+}
+
+.row-val-port > span:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .port-link-dot {
@@ -969,13 +1007,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 0;
 }
 
 .agent-compact-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.73rem;
+  gap: 5px;
+  font-size: 0.72rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .agent-compact-wrap .agent-icon {
@@ -983,6 +1024,7 @@ body {
   align-items: center;
   justify-content: center;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .icon-windows {
@@ -1007,6 +1049,10 @@ body {
 .agent-status-text {
   font-weight: 700;
   font-size: 0.72rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .agent-status-text.agent-online {
@@ -1203,6 +1249,10 @@ body {
   letter-spacing: 0.3px;
   text-transform: uppercase;
   user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .badge-switch.docente {
@@ -1803,6 +1853,98 @@ body {
   box-shadow: none !important;
   opacity: 0.65;
   transform: none !important;
+}
+
+/* ==============================================================================
+   MODAL COMPACTO: DIMENSIONAR CUADRÍCULA (CU-05)
+   ============================================================================== */
+.modal-info-box {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 9px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.modal-info-text {
+  margin: 0;
+  font-size: 0.81rem;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+
+.modal-dim-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.modal-dim-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.dim-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-dim-input {
+  background: #0b1120;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 8px 12px;
+  width: 90px;
+  text-align: center;
+  transition: all 0.2s ease;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.modal-dim-input:focus {
+  outline: none;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+  background: #0f172a;
+}
+
+.dim-hint {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.modal-dim-preview-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.65);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.dim-preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.preview-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.preview-value {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #cbd5e1;
 }
 
 @keyframes modalFadeIn {

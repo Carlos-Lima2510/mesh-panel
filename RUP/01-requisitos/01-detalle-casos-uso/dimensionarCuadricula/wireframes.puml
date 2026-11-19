@@ -1,0 +1,27 @@
+@startsalt wireframes
+skinparam dpi 150
+skinparam defaultFontName sans-serif
+{+
+  --
+  {^"<b> Dimensionar Cuadrícula </b>"
+    {
+      <b>Configure las dimensiones espaciales del aula:</b>
+      La cuadrícula mantendrá siempre el pasillo central divisorio entre hileras.
+    }
+    --
+    {
+      <b>Filas de mesas:</b> | [ 5       ] | <i>Mesas en profundidad</i>
+      <b>Columnas por hilera:</b> | [ 4       ] | <i>Puestos a cada lado del pasillo</i>
+    }
+    --
+    {
+      <b>Estructura resultante:</b> | 5 filas × 8 columnas (4 izq + 4 der)
+      <b>Capacidad máxima:</b> | <b>40 puestos físicos</b>
+    }
+    --
+    {
+      [ <b>📐 Aplicar</b> ] | <color:transparent>________________________________________</color> | [ Cancelar ]
+    }
+  }
+}
+@endsalt

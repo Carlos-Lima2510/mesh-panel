@@ -1,0 +1,49 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
+
+SISTEMA_DISPONIBLE -[#green]-> dimensionarCuadricula
+note on link
+<b>Administrador</b> solicita dimensionar cuadrícula
+end note
+
+state dimensionarCuadricula as "dimensionarCuadricula()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+    note on link
+    <b>Sistema</b> presenta diálogo modal de dimensionamiento de cuadrícula
+    <b>Administrador</b> introduce número de filas y columnas por hilera
+    <b>Administrador</b> solicita aplicar dimensiones
+    end note
+
+    c -[#green]-> [*]
+    note on link
+    [Dimensiones válidas (> 0 y dentro de límites del aula)]
+    <b>Sistema</b> presenta la cuadrícula del laboratorio reestructurada con las nuevas filas y columnas
+    <b>Sistema</b> presenta la división física del pasillo central preservada entre hileras
+    <b>Sistema</b> presenta el botón de control con las nuevas dimensiones aplicadas
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [Valores no numéricos, fuera de rango o cancelación]
+    <b>Sistema</b> presenta mensaje de advertencia o cancela manteniendo las dimensiones previas
+    end note
+}
+
+dimensionarCuadricula -[#green]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+cuadrícula del aula reestructurada con las nuevas dimensiones
+end note
+
+dimensionarCuadricula -[#red]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+aviso de advertencia o cancelación, dimensiones previas preservadas
+end note
+
+@enduml
