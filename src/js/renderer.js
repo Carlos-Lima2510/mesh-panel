@@ -113,7 +113,7 @@ export class DashboardRenderer {
 
     // Al hacer clic en la tarjeta: selección rápida sin checkboxes según wireframe RUP
     slotCard.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-card-detail')) return;
+      if (e.target.closest('.btn-card-arrow-detail, .btn-card-wol, .btn-card-detail')) return;
       const targetPuestoId = slotCard.dataset.puestoId || slotCard.dataset.slot;
       window.togglePuestoSeleccionado(targetPuestoId);
     });
@@ -251,7 +251,7 @@ export class DashboardRenderer {
           <span class="host-name text-muted">Libre</span>
         </div>
         <div class="card-top-right">
-          <button type="button" class="btn-card-detail" title="Ver detalle del puesto ${escapeHtml(puestoId)}" onclick="event.stopPropagation(); window.abrirDetallePuesto(null, '${escapeHtml(puestoId)}')">ℹ️</button>
+          <button type="button" class="btn-card-wol disabled" title="Puesto libre sin host" disabled>⚡</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
       </div>
@@ -276,6 +276,9 @@ export class DashboardRenderer {
             <span class="agent-icon">${ICON_WINDOWS_SVG}</span>
             <span class="agent-status-text agent-offline">Sin Host</span>
           </div>
+          <button type="button" class="btn-card-arrow-detail" title="Ver detalle del puesto ${escapeHtml(puestoId)}" onclick="event.stopPropagation(); window.abrirDetallePuesto(null, '${escapeHtml(puestoId)}')">
+            <span class="arrow-symbol">→</span>
+          </button>
         </div>
       </div>
     `;
@@ -301,6 +304,7 @@ export class DashboardRenderer {
     const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
 
     const ipText = p.telemetria?.ip_reportada || p.ip || '---';
+    const canWake = (p.estado === 'GRIS' || p.estado === 'AMARILLO') && p.soporta_wol !== false;
 
     return `
       <div class="card-top">
@@ -309,7 +313,7 @@ export class DashboardRenderer {
           <span class="host-name" title="${escapeHtml(p.nombre || 'PC-???')}">${escapeHtml(p.nombre || 'PC-???')}</span>
         </div>
         <div class="card-top-right">
-          <button type="button" class="btn-card-detail" title="Ver detalle de ${escapeHtml(p.nombre || 'puesto')}" onclick="event.stopPropagation(); window.abrirDetallePuesto('${escapeHtml(p.node_id)}', '${escapeHtml(puestoId)}')">ℹ️</button>
+          <button type="button" class="btn-card-wol ${canWake ? '' : 'disabled'}" title="${canWake ? 'Encender equipo (Wake-on-LAN)' : (p.estado === 'VERDE' ? 'Equipo ya operativo' : 'Sin enlace físico para WoL')}" ${canWake ? `onclick="event.stopPropagation(); window.ejecutarWoL('${escapeHtml(p.node_id)}')"` : 'disabled'}>⚡</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
       </div>
@@ -334,6 +338,9 @@ export class DashboardRenderer {
             <span class="agent-icon">${ICON_WINDOWS_SVG}</span>
             <span class="agent-status-text ${agenteClass}">${escapeHtml(agenteText)}</span>
           </div>
+          <button type="button" class="btn-card-arrow-detail" title="Ver detalle de ${escapeHtml(p.nombre || 'puesto')}" onclick="event.stopPropagation(); window.abrirDetallePuesto('${escapeHtml(p.node_id)}', '${escapeHtml(puestoId)}')">
+            <span class="arrow-symbol">→</span>
+          </button>
         </div>
       </div>
     `;

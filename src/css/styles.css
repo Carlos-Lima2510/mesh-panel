@@ -238,6 +238,35 @@ body {
   box-shadow: 0 0 14px rgba(37, 99, 235, 0.55);
 }
 
+.btn-action-wol {
+  background: rgba(30, 41, 59, 0.8);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.83rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-action-wol:hover {
+  background: rgba(37, 99, 235, 0.25);
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-action-wol.has-selection {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.6);
+}
+
 .btn-scan {
   background: #1e293b;
   color: #f1f5f9;
@@ -777,6 +806,41 @@ body {
   transform: scale(1.15);
 }
 
+/* Botón compacto de encendido Wake-on-LAN en la cabecera de la tarjeta */
+.btn-card-wol {
+  background: rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.45);
+  border-radius: 5px;
+  color: #93c5fd;
+  cursor: pointer;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  line-height: 1;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-card-wol:hover:not(:disabled) {
+  background: #2563eb;
+  border-color: #60a5fa;
+  color: #ffffff;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(37, 99, 235, 0.5);
+}
+
+.btn-card-wol:disabled,
+.btn-card-wol.disabled {
+  background: transparent;
+  border-color: rgba(51, 65, 85, 0.5);
+  color: #475569;
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+
 .slot-badge {
   font-size: 0.68rem;
   font-weight: 800;
@@ -897,14 +961,14 @@ body {
   box-shadow: 0 0 5px rgba(239, 68, 68, 0.65);
 }
 
-/* Fila de Agente Minimalista (Sin label 'Agente:', icono + status) */
+/* Fila de Agente Minimalista (Icono Windows + status a la izquierda, flecha de detalle a la derecha) */
 .card-compact .row.row-agent {
   margin-top: 3px;
   padding-top: 4px;
   border-top: 1px dashed rgba(51, 65, 85, 0.45);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
 }
 
 .agent-compact-wrap {
@@ -951,6 +1015,35 @@ body {
 
 .agent-status-text.agent-offline {
   color: #94a3b8;
+}
+
+/* Flecha compacta interactiva a la derecha para ver detalle de puesto */
+.btn-card-arrow-detail {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.76rem;
+  padding: 1px 6px;
+  line-height: 1.1;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.btn-card-arrow-detail:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateX(2px);
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.4);
+}
+
+.arrow-symbol {
+  font-weight: 800;
 }
 
 /* Mesa disponible / sin PC */

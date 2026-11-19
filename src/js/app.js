@@ -23,6 +23,8 @@ const btnAsignarPracticas = document.getElementById('btn-asignar-practicas');
 const btnAsignarPracticasText = document.getElementById('btn-asignar-practicas-text');
 const btnAsignarDocente = document.getElementById('btn-asignar-docente');
 const btnAsignarDocenteText = document.getElementById('btn-asignar-docente-text');
+const btnEncenderSeleccionados = document.getElementById('btn-encender-seleccionados');
+const btnEncenderSeleccionadosText = document.getElementById('btn-encender-seleccionados-text');
 
 const btnDimensionarToggle = document.getElementById('btn-dimensionar-toggle');
 const btnDimensionarLabel = document.getElementById('btn-dimensionar-label');
@@ -113,6 +115,16 @@ function actualizarBotonesAsignacion(totalSel) {
     } else {
       btnAsignarDocenteText.textContent = 'Reasignar a switch normal';
       btnAsignarDocente.classList.remove('has-selection');
+    }
+  }
+
+  if (btnEncenderSeleccionados && btnEncenderSeleccionadosText) {
+    if (totalSel > 0) {
+      btnEncenderSeleccionadosText.textContent = `Encender (${totalSel})`;
+      btnEncenderSeleccionados.classList.add('has-selection');
+    } else {
+      btnEncenderSeleccionadosText.textContent = 'Encender';
+      btnEncenderSeleccionados.classList.remove('has-selection');
     }
   }
 }
@@ -355,6 +367,50 @@ if (btnAsignarDocente) {
     } catch (err) {
       console.error('[-] Error reasignando puestos a switch docente:', err);
       setStatusBadge('Error al reasignar switch', true);
+    }
+  });
+}
+
+// Acción Granular conjunta: [ ⚡ Encender ] para encendido masivo de puestos seleccionados en Standby
+if (btnEncenderSeleccionados) {
+  btnEncenderSeleccionados.addEventListener('click', async () => {
+    const seleccionados = renderer.obtenerPuestosSeleccionados();
+    if (!seleccionados || seleccionados.length === 0) {
+      alert('Selecciona primero uno o más puestos haciendo clic sobre sus tarjetas para encenderlos con Wake-on-LAN.');
+      return;
+    }
+
+    const nodosAEncender = [];
+    for (const puestoId of seleccionados) {
+      for (const h of puestos.values()) {
+        if (h.puesto_id === puestoId || `puesto-${h.slot}` === puestoId) {
+          if ((h.estado === 'GRIS' || h.estado === 'AMARILLO') && h.soporta_wol !== false) {
+            nodosAEncender.push(h);
+          }
+          break;
+        }
+      }
+    }
+
+    if (nodosAEncender.length === 0) {
+      alert('Ninguno de los puestos seleccionados se encuentra en Standby o listo para recibir Wake-on-LAN.');
+      return;
+    }
+
+    try {
+      setStatusBadge(`Enviando Wake-on-LAN a ${nodosAEncender.length} equipos...`);
+      for (const h of nodosAEncender) {
+        await fetch(`${DAEMON_URL}/api/power/wake`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ node_id: h.node_id })
+        });
+      }
+      setStatusBadge(`Paquetes Wake-on-LAN emitidos hacia ${nodosAEncender.length} puestos.`);
+      setTimeout(fetchDevices, 1000);
+    } catch (err) {
+      console.error('[-] Error encendiendo puestos seleccionados:', err);
+      setStatusBadge('Error al emitir Wake-on-LAN masivo', true);
     }
   });
 }
