@@ -1,6 +1,13 @@
 import { DashboardRenderer } from './renderer.js';
 import { SseClient } from './sse-client.js';
 
+const SVG_SCAN_IDLE = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
+const SVG_SCAN_SPIN = `<svg class="ui-icon icon-spin" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
+const SVG_SELECT_ALL = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`;
+const SVG_DESELECT_ALL = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>`;
+const SVG_FIT_SCREEN = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>`;
+const SVG_ZOOM_MAGNIFIER = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>`;
+
 const puestos = new Map();
 let puestosFisicos = [];
 let switchesDisponibles = [];
@@ -226,7 +233,7 @@ function procesarDatosLaboratorio(lab) {
 export async function fetchDevices() {
   if (btnScan) {
     btnScan.disabled = true;
-    if (scanIcon) scanIcon.textContent = '⏳';
+    if (scanIcon) scanIcon.innerHTML = SVG_SCAN_SPIN;
     if (scanText) scanText.textContent = 'Consultando...';
   }
 
@@ -244,7 +251,7 @@ export async function fetchDevices() {
   } finally {
     if (btnScan) {
       btnScan.disabled = false;
-      if (scanIcon) scanIcon.textContent = '🔄';
+      if (scanIcon) scanIcon.innerHTML = SVG_SCAN_IDLE;
       if (scanText) scanText.textContent = 'Consultar estado';
     }
   }
@@ -599,7 +606,17 @@ if (btnSelectAll) {
     const allIds = Array.from(renderer.slotElements.keys());
     const totalSel = renderer.seleccionarTodos(allIds);
     actualizarBotonesAsignacion(totalSel);
-    btnSelectAll.textContent = totalSel > 0 ? '☒ Deseleccionar todos' : '☑ Seleccionar todos';
+    const iconEl = document.getElementById('btn-select-all-icon');
+    const textEl = document.getElementById('btn-select-all-text');
+    if (totalSel > 0) {
+      if (iconEl) iconEl.innerHTML = SVG_DESELECT_ALL;
+      if (textEl) textEl.textContent = 'Deseleccionar todos';
+      btnSelectAll.title = 'Deseleccionar todos los puestos';
+    } else {
+      if (iconEl) iconEl.innerHTML = SVG_SELECT_ALL;
+      if (textEl) textEl.textContent = 'Seleccionar todos';
+      btnSelectAll.title = 'Seleccionar todos los puestos visibles';
+    }
   });
 }
 
@@ -897,7 +914,7 @@ function aplicarAjustePantalla() {
     canvas.style.transform = 'none';
     if (btnFitScreen) {
       btnFitScreen.classList.remove('active');
-      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '⛶';
+      if (btnFitScreenIcon) btnFitScreenIcon.innerHTML = SVG_FIT_SCREEN;
       if (btnFitScreenText) btnFitScreenText.textContent = 'Ajustar a pantalla';
       btnFitScreen.title = 'Ajustar automáticamente la cuadrícula al ancho de la ventana sin scroll';
     }
@@ -924,7 +941,7 @@ function aplicarAjustePantalla() {
     }
     if (btnFitScreen) {
       btnFitScreen.classList.add('active');
-      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '🔍';
+      if (btnFitScreenIcon) btnFitScreenIcon.innerHTML = SVG_ZOOM_MAGNIFIER;
       const pct = Math.round(scale * 100);
       if (btnFitScreenText) btnFitScreenText.textContent = `Ajustado (${pct}%)`;
       btnFitScreen.title = `Cuadrícula ajustada proporcionalmente al ${pct}% sin scroll. Clic para ver al 100% real.`;
@@ -934,7 +951,7 @@ function aplicarAjustePantalla() {
     canvas.style.transform = 'none';
     if (btnFitScreen) {
       btnFitScreen.classList.add('active');
-      if (btnFitScreenIcon) btnFitScreenIcon.textContent = '⛶';
+      if (btnFitScreenIcon) btnFitScreenIcon.innerHTML = SVG_FIT_SCREEN;
       if (btnFitScreenText) btnFitScreenText.textContent = 'Ajustado (100%)';
       btnFitScreen.title = 'Cuadrícula en tamaño completo (100%). Clic para alternar.';
     }

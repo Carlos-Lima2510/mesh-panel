@@ -30,6 +30,45 @@ body {
 }
 
 /* ==============================================================================
+   ICONOS VECTORIALES PROFESIONALES SVG
+   ============================================================================== */
+.ui-icon {
+  display: inline-block;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-wol {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.arrow-svg {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.icon-spin {
+  animation: spin-icon 1s linear infinite;
+}
+
+@keyframes spin-icon {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==============================================================================
    HEADER PRINCIPAL (ESTRUCTURA WIREFRAME OpSys)
    ============================================================================== */
 .app-header {
@@ -121,6 +160,9 @@ body {
   cursor: pointer;
   background: transparent;
   color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   transition: all 0.2s ease;
 }
 

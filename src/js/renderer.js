@@ -9,6 +9,8 @@ function escapeHtml(str) {
 }
 
 const ICON_WINDOWS_SVG = `<svg class="icon-windows" viewBox="0 0 16 16" width="13" height="13" fill="currentColor" aria-hidden="true"><path d="M6.555 1.375 0 2.237v5.45h6.555zM0 8.313l6.555.863v5.449l-6.555-.862zm7.278-6.945L16 0v7.688H7.278zm0 7.848L16 16V8.313H7.278z"/></svg>`;
+const ICON_WOL_SVG = `<svg class="icon-wol" viewBox="0 0 24 24" width="10" height="10" fill="currentColor" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
+const ICON_CHEVRON_RIGHT_SVG = `<svg class="arrow-svg" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>`;
 
 export class DashboardRenderer {
   constructor(containerId = 'classroom-grid') {
@@ -251,7 +253,7 @@ export class DashboardRenderer {
           <span class="host-name text-muted">Libre</span>
         </div>
         <div class="card-top-right">
-          <button type="button" class="btn-card-wol disabled" title="Puesto libre sin host" disabled>⚡</button>
+          <button type="button" class="btn-card-wol disabled" title="Puesto libre sin host" disabled>${ICON_WOL_SVG}</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
       </div>
@@ -277,7 +279,7 @@ export class DashboardRenderer {
             <span class="agent-status-text agent-offline">Sin Host</span>
           </div>
           <button type="button" class="btn-card-arrow-detail" title="Ver detalle del puesto ${escapeHtml(puestoId)}" onclick="event.stopPropagation(); window.abrirDetallePuesto(null, '${escapeHtml(puestoId)}')">
-            <span class="arrow-symbol">→</span>
+            ${ICON_CHEVRON_RIGHT_SVG}
           </button>
         </div>
       </div>
@@ -313,7 +315,7 @@ export class DashboardRenderer {
           <span class="host-name" title="${escapeHtml(p.nombre || 'PC-???')}">${escapeHtml(p.nombre || 'PC-???')}</span>
         </div>
         <div class="card-top-right">
-          <button type="button" class="btn-card-wol ${canWake ? '' : 'disabled'}" title="${canWake ? 'Encender equipo (Wake-on-LAN)' : (p.estado === 'VERDE' ? 'Equipo ya operativo' : 'Sin enlace físico para WoL')}" ${canWake ? `onclick="event.stopPropagation(); window.ejecutarWoL('${escapeHtml(p.node_id)}')"` : 'disabled'}>⚡</button>
+          <button type="button" class="btn-card-wol ${canWake ? '' : 'disabled'}" title="${canWake ? 'Encender equipo (Wake-on-LAN)' : (p.estado === 'VERDE' ? 'Equipo ya operativo' : 'Sin enlace físico para WoL')}" ${canWake ? `onclick="event.stopPropagation(); window.ejecutarWoL('${escapeHtml(p.node_id)}')"` : 'disabled'}>${ICON_WOL_SVG}</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
       </div>
@@ -339,7 +341,7 @@ export class DashboardRenderer {
             <span class="agent-status-text ${agenteClass}">${escapeHtml(agenteText)}</span>
           </div>
           <button type="button" class="btn-card-arrow-detail" title="Ver detalle de ${escapeHtml(p.nombre || 'puesto')}" onclick="event.stopPropagation(); window.abrirDetallePuesto('${escapeHtml(p.node_id)}', '${escapeHtml(puestoId)}')">
-            <span class="arrow-symbol">→</span>
+            ${ICON_CHEVRON_RIGHT_SVG}
           </button>
         </div>
       </div>
