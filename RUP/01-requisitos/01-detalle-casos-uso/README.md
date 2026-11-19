@@ -36,7 +36,7 @@ Cada caso de uso se documenta en su propia carpeta bajo una estructura formal un
 | **CU-01** | `consultarEstadoPuestos()` | `SISTEMA_DISPONIBLE` | `Administrador` | [Ficha](consultarEstadoPuestos/README.md) | [wireframes.svg](../../../images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg) | 🟢 Completado |
 | **CU-02** | `consultarDetallePuesto()` | `PUESTO_ABIERTO` | `Administrador` | [Ficha](consultarDetallePuesto/README.md) | [wireframes.svg](../../../images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg) | 🟢 Completado |
 | **CU-03** | **`cambiarModo()`** | `SISTEMA_DISPONIBLE` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
-| **CU-04** | **`asignarPuestosASwitch()`** | `SISTEMA_DISPONIBLE` / `PUESTO_ABIERTO` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
+| **CU-04** | **`asignarPuestosASwitch()`** | `SISTEMA_DISPONIBLE` / `PUESTO_ABIERTO` | `Administrador` | [Ficha](asignarPuestosASwitch/README.md) | [wireframes.svg](../../../images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg) | 🟢 Completado |
 | **CU-05** | **`dimensionarCuadricula()`** | `SISTEMA_DISPONIBLE` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
 | **CU-06** | **`encenderPuesto()`** | `SISTEMA_DISPONIBLE` / `PUESTO_ABIERTO` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
 | **CU-07** | **`iniciarSesion()`** | `SESION_CERRADA` | `UsuarioNoLogueado` | *Pendiente* | *Pendiente* | ⚪ Pendiente |

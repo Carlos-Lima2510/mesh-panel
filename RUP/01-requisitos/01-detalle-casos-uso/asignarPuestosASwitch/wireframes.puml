@@ -1,0 +1,24 @@
+@startsalt wireframes
+skinparam dpi 150
+skinparam defaultFontName sans-serif
+{+
+  --
+  {^"<b> Asignar Puestos a Switch </b>"
+    {
+      <b>Puestos seleccionados:</b> | <b>4 puestos</b> (PC-02, PC-04, PC-11, PC-15)
+    }
+    --
+    {
+      <b>Seleccione el switch de destino:</b>
+      {
+        (X) <b>Switch Universitario</b> (Red de la Universidad)
+        () <b>Switch de Prácticas</b> (Red Aislada)
+      }
+    }
+    --
+    {
+      [ <b>Confirmar</b> ] | <color:transparent>________________________________________</color> | [ Cancelar ]
+    }
+  }
+}
+@endsalt

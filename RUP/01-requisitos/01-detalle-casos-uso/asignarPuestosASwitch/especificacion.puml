@@ -1,0 +1,64 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state PUESTO_ABIERTO
+state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
+state PUESTO_ABIERTO_SALIDA as "PUESTO_ABIERTO"
+
+SISTEMA_DISPONIBLE -[#green]-> asignarPuestosASwitch
+note on link
+<b>Administrador</b> solicita asignar puestos a switch
+end note
+
+PUESTO_ABIERTO -[#green]-> asignarPuestosASwitch
+note on link
+<b>Administrador</b> solicita asignar switch al puesto (inspección individual)
+end note
+
+state asignarPuestosASwitch as "asignarPuestosASwitch()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+
+    c -[#green]-> [*]
+    note on link
+    [Puestos previamente seleccionados en cuadrícula / Puesto abierto]
+    <b>Sistema</b> presenta modal de selección de switch de destino
+    <b>Sistema</b> permite introducir switch de destino
+    <b>Administrador</b> introduce switch de destino
+    <b>Administrador</b> solicita confirmar asignación
+    <b>Sistema</b> presenta los puestos con el switch asignado actualizado
+    <b>Sistema</b> presenta el diagnóstico determinista recalculado
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [Sin puestos seleccionados previamente en cuadrícula o cancelación]
+    <b>Sistema</b> presenta aviso bloqueando acceso al modal o cancela sin cambios
+    end note
+}
+
+asignarPuestosASwitch -[#green]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+puestos reasignados y actualizados en cuadrícula
+end note
+
+asignarPuestosASwitch -[#red]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+aviso de advertencia (selección previa requerida) o cancelación
+end note
+
+asignarPuestosASwitch -[#green]-> PUESTO_ABIERTO_SALIDA
+note on link
+puesto individual reasignado, ficha técnica actualizada
+end note
+
+asignarPuestosASwitch -[#red]-> PUESTO_ABIERTO_SALIDA
+note on link
+cancelación, ficha técnica sin cambios
+end note
+
+@enduml

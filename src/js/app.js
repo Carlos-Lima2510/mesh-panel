@@ -19,12 +19,18 @@ const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
 const btnModeCableado = document.getElementById('btn-mode-cableado');
 
-const btnAsignarPracticas = document.getElementById('btn-asignar-practicas');
-const btnAsignarPracticasText = document.getElementById('btn-asignar-practicas-text');
-const btnAsignarDocente = document.getElementById('btn-asignar-docente');
-const btnAsignarDocenteText = document.getElementById('btn-asignar-docente-text');
+const btnAsignarSwitch = document.getElementById('btn-asignar-switch');
+const btnAsignarSwitchText = document.getElementById('btn-asignar-switch-text');
 const btnEncenderSeleccionados = document.getElementById('btn-encender-seleccionados');
 const btnEncenderSeleccionadosText = document.getElementById('btn-encender-seleccionados-text');
+
+// Modal Asignar Puestos a Switch (CU-04)
+const modalAsignarSwitch = document.getElementById('modal-asignar-switch');
+const modalAsignarCount = document.getElementById('modal-asignar-count');
+const modalAsignarChips = document.getElementById('modal-asignar-chips');
+const btnModalAsignarClose = document.getElementById('btn-modal-asignar-close');
+const btnModalAsignarCancel = document.getElementById('btn-modal-asignar-cancel');
+const btnModalAsignarConfirm = document.getElementById('btn-modal-asignar-confirm');
 
 const btnDimensionarToggle = document.getElementById('btn-dimensionar-toggle');
 const btnDimensionarLabel = document.getElementById('btn-dimensionar-label');
@@ -98,23 +104,13 @@ function actualizarBotonesModo(modo) {
 }
 
 function actualizarBotonesAsignacion(totalSel) {
-  if (btnAsignarPracticas && btnAsignarPracticasText) {
+  if (btnAsignarSwitch && btnAsignarSwitchText) {
     if (totalSel > 0) {
-      btnAsignarPracticasText.textContent = `A Switch Prácticas (${totalSel})`;
-      btnAsignarPracticas.classList.add('has-selection');
+      btnAsignarSwitchText.textContent = `Asignar a switch (${totalSel})`;
+      btnAsignarSwitch.classList.add('has-selection');
     } else {
-      btnAsignarPracticasText.textContent = 'Asignar a switch de prácticas';
-      btnAsignarPracticas.classList.remove('has-selection');
-    }
-  }
-
-  if (btnAsignarDocente && btnAsignarDocenteText) {
-    if (totalSel > 0) {
-      btnAsignarDocenteText.textContent = `A Switch Normal (${totalSel})`;
-      btnAsignarDocente.classList.add('has-selection');
-    } else {
-      btnAsignarDocenteText.textContent = 'Reasignar a switch normal';
-      btnAsignarDocente.classList.remove('has-selection');
+      btnAsignarSwitchText.textContent = 'Asignar a switch';
+      btnAsignarSwitch.classList.remove('has-selection');
     }
   }
 
@@ -305,69 +301,137 @@ if (btnModeCableado) {
   btnModeCableado.addEventListener('click', () => cambiarModo('CABLEADO'));
 }
 
-// Acción Granular conjunta: [ Asignar a switch de prácticas ] según wireframe
-if (btnAsignarPracticas) {
-  btnAsignarPracticas.addEventListener('click', async () => {
-    const seleccionados = renderer.obtenerPuestosSeleccionados();
-    if (!seleccionados || seleccionados.length === 0) {
-      alert('Marca primero uno o más puestos usando sus casillas [ ] para asignarlos al switch de prácticas.');
-      return;
-    }
+// ==============================================================================
+// GESTIÓN DEL MODAL: ASIGNAR PUESTOS A SWITCH (CU-04 según Wireframe RUP)
+// ==============================================================================
+function abrirModalAsignarSwitch() {
+  const seleccionados = renderer.obtenerPuestosSeleccionados();
+  if (!seleccionados || seleccionados.length === 0) {
+    alert('Selecciona primero uno o más puestos en la cuadrícula para asignarlos a un switch.');
+    return;
+  }
 
-    try {
-      setStatusBadge(`Asignando ${seleccionados.length} puestos a Switch de Prácticas...`);
-      const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          puesto_ids: seleccionados,
-          switch_id: 'sw-practicas'
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.laboratorio) {
-        renderer.limpiarSeleccion();
-        actualizarBotonesAsignacion(0);
-        procesarDatosLaboratorio(data.laboratorio);
-        setStatusBadge(`${seleccionados.length} puestos asignados a Switch de Prácticas.`);
+  const nombres = seleccionados.map(id => {
+    const pf = puestosFisicos.find(x => x.id === id || String(x.slot) === String(id));
+    if (pf && pf.etiqueta) return pf.etiqueta;
+    for (const h of puestos.values()) {
+      if (h.puesto_id === id || String(h.slot) === String(id)) {
+        return h.nombre || h.etiqueta || `PC-${id}`;
       }
-    } catch (err) {
-      console.error('[-] Error asignando puestos a switch de prácticas:', err);
-      setStatusBadge('Error al asignar switch', true);
     }
+    return `Puesto #${id}`;
   });
+
+  if (modalAsignarCount) {
+    modalAsignarCount.textContent = seleccionados.length === 1 ? '1 puesto' : `${seleccionados.length} puestos`;
+  }
+
+  if (modalAsignarChips) {
+    modalAsignarChips.innerHTML = '';
+    const MAX_VISIBLES = 8;
+    const visibles = nombres.slice(0, MAX_VISIBLES);
+    const restantes = nombres.length - MAX_VISIBLES;
+
+    visibles.forEach(nom => {
+      const chip = document.createElement('span');
+      chip.className = 'chip-puesto';
+      chip.textContent = nom;
+      modalAsignarChips.appendChild(chip);
+    });
+
+    if (restantes > 0) {
+      const moreChip = document.createElement('span');
+      moreChip.className = 'chip-more';
+      moreChip.textContent = `+${restantes} más`;
+      moreChip.title = nombres.slice(MAX_VISIBLES).join(', ');
+      modalAsignarChips.appendChild(moreChip);
+    }
+  }
+
+  const radioDocente = document.getElementById('radio-switch-docente');
+  if (radioDocente) radioDocente.checked = true;
+
+  if (modalAsignarSwitch) {
+    modalAsignarSwitch.style.display = 'flex';
+  }
 }
 
-// Acción Granular conjunta complementaria: [ Reasignar a switch normal ]
-if (btnAsignarDocente) {
-  btnAsignarDocente.addEventListener('click', async () => {
-    const seleccionados = renderer.obtenerPuestosSeleccionados();
-    if (!seleccionados || seleccionados.length === 0) {
-      alert('Marca primero uno o más puestos usando sus casillas [ ] para reasignarlos al switch normal.');
-      return;
+function cerrarModalAsignarSwitch() {
+  if (modalAsignarSwitch) {
+    modalAsignarSwitch.style.display = 'none';
+  }
+}
+
+async function confirmarAsignarSwitch() {
+  const seleccionados = renderer.obtenerPuestosSeleccionados();
+  if (!seleccionados || seleccionados.length === 0) {
+    cerrarModalAsignarSwitch();
+    return;
+  }
+
+  const selectedRadio = document.querySelector('input[name="target-switch"]:checked');
+  const targetSwitch = selectedRadio ? selectedRadio.value : 'sw-docente';
+  const switchLabel = targetSwitch === 'sw-practicas' ? 'Switch de Prácticas' : 'Switch Universitario';
+
+  try {
+    setStatusBadge(`Asignando ${seleccionados.length} puestos a ${switchLabel}...`);
+    if (btnModalAsignarConfirm) {
+      btnModalAsignarConfirm.disabled = true;
+      btnModalAsignarConfirm.textContent = 'Asignando...';
     }
 
-    try {
-      setStatusBadge(`Reasignando ${seleccionados.length} puestos a Switch Normal (Docente)...`);
-      const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          puesto_ids: seleccionados,
-          switch_id: 'sw-docente'
-        })
-      });
-      const data = await res.json();
-      if (data.success && data.laboratorio) {
-        renderer.limpiarSeleccion();
-        actualizarBotonesAsignacion(0);
-        procesarDatosLaboratorio(data.laboratorio);
-        setStatusBadge(`${seleccionados.length} puestos reasignados a Switch Normal.`);
-      }
-    } catch (err) {
-      console.error('[-] Error reasignando puestos a switch docente:', err);
-      setStatusBadge('Error al reasignar switch', true);
+    const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        puesto_ids: seleccionados,
+        switch_id: targetSwitch
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Fallo al asignar puestos al switch.');
     }
+
+    renderer.limpiarSeleccion();
+    actualizarBotonesAsignacion(0);
+    cerrarModalAsignarSwitch();
+
+    if (data.laboratorio) {
+      procesarDatosLaboratorio(data.laboratorio);
+    } else {
+      await fetchDevices();
+    }
+
+    setStatusBadge(`✓ ${seleccionados.length} puestos asignados a ${switchLabel}`);
+  } catch (err) {
+    console.error('[-] Error al asignar switch:', err);
+    alert(`Error al asignar switch: ${err.message}`);
+    setStatusBadge('Error al asignar switch', true);
+  } finally {
+    if (btnModalAsignarConfirm) {
+      btnModalAsignarConfirm.disabled = false;
+      btnModalAsignarConfirm.textContent = 'Confirmar';
+    }
+  }
+}
+
+if (btnAsignarSwitch) {
+  btnAsignarSwitch.addEventListener('click', abrirModalAsignarSwitch);
+}
+if (btnModalAsignarClose) {
+  btnModalAsignarClose.addEventListener('click', cerrarModalAsignarSwitch);
+}
+if (btnModalAsignarCancel) {
+  btnModalAsignarCancel.addEventListener('click', cerrarModalAsignarSwitch);
+}
+if (btnModalAsignarConfirm) {
+  btnModalAsignarConfirm.addEventListener('click', confirmarAsignarSwitch);
+}
+if (modalAsignarSwitch) {
+  modalAsignarSwitch.addEventListener('click', (e) => {
+    if (e.target === modalAsignarSwitch) cerrarModalAsignarSwitch();
   });
 }
 
@@ -796,8 +860,12 @@ if (modalDetallePuesto) {
 }
 
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
-    cerrarModalDetalle();
+  if (e.key === 'Escape') {
+    if (modalAsignarSwitch && modalAsignarSwitch.style.display === 'flex') {
+      cerrarModalAsignarSwitch();
+    } else if (modalDetallePuesto && modalDetallePuesto.style.display === 'flex') {
+      cerrarModalDetalle();
+    }
   }
 });
 

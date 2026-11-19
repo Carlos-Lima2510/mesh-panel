@@ -36,14 +36,9 @@
       </div>
 
       <div class="header-right-actions">
-        <!-- [ Asignar a switch de prácticas ] según wireframe -->
-        <button id="btn-asignar-practicas" class="btn-action-primary" type="button" title="Asignar los puestos seleccionados al switch de prácticas">
-          <span class="btn-icon">⚡</span> <span id="btn-asignar-practicas-text">Asignar a switch de prácticas</span>
-        </button>
-
-        <!-- [ Reasignar a switch normal ] para resolver la vuelta al switch docente -->
-        <button id="btn-asignar-docente" class="btn-action-secondary" type="button" title="Reasignar los puestos seleccionados al switch normal (Docente)">
-          <span class="btn-icon">🎓</span> <span id="btn-asignar-docente-text">Reasignar a switch normal</span>
+        <!-- [ Asignar a switch ] según wireframe RUP CU-04 -->
+        <button id="btn-asignar-switch" class="btn-action-primary" type="button" title="Asignar los puestos seleccionados a un switch">
+          <span class="btn-icon">🔀</span> <span id="btn-asignar-switch-text">Asignar a switch</span>
         </button>
 
         <!-- [ ⚡ Encender ] según wireframe para encendido masivo de puestos seleccionados -->
@@ -270,6 +265,64 @@
         </button>
         <button id="btn-modal-dismiss" type="button" class="btn-modal-action btn-modal-dismiss">
           ✖ Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ASIGNAR PUESTOS A SWITCH (SEGÚN WIREFRAME RUP CU-04 asignarPuestosASwitch) -->
+  <div id="modal-asignar-switch" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-asignar-title">
+    <div class="modal-window modal-window-compact">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">🔀</span>
+          <h2 id="modal-asignar-title" class="modal-title">Asignar Puestos a Switch</h2>
+        </div>
+        <button id="btn-modal-asignar-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <!-- Cuerpo del Modal Minimalista -->
+      <div class="modal-body">
+        <div class="modal-selection-card">
+          <div class="modal-selection-header">
+            <span class="modal-label">Puestos seleccionados</span>
+            <span id="modal-asignar-count" class="modal-count-pill">0 puestos</span>
+          </div>
+          <div id="modal-asignar-chips" class="modal-chips-container">
+            <!-- Chips inyectados dinámicamente -->
+          </div>
+        </div>
+
+        <div class="modal-field-group">
+          <label class="modal-label">Seleccione el switch de destino:</label>
+          <div class="switch-radio-options">
+            <label class="switch-radio-card" for="radio-switch-docente">
+              <input type="radio" id="radio-switch-docente" name="target-switch" value="sw-docente" checked>
+              <div class="switch-radio-content">
+                <span class="switch-radio-title">🎓 Switch Universitario</span>
+                <span class="switch-radio-desc">Red Docente (10.10.136.0/24)</span>
+              </div>
+            </label>
+
+            <label class="switch-radio-card" for="radio-switch-practicas">
+              <input type="radio" id="radio-switch-practicas" name="target-switch" value="sw-practicas">
+              <div class="switch-radio-content">
+                <span class="switch-radio-title">🧪 Switch de Prácticas</span>
+                <span class="switch-radio-desc">Red Aislada de Laboratorio</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Modal: Acciones según Wireframe RUP -->
+      <div class="modal-footer">
+        <button id="btn-modal-asignar-confirm" type="button" class="btn-modal-action btn-modal-confirm">
+          Confirmar
+        </button>
+        <button id="btn-modal-asignar-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
+          Cancelar
         </button>
       </div>
     </div>
