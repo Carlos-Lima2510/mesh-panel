@@ -179,11 +179,12 @@ class LaboratorioService {
     this.asignacionSwitches = new Map();
   }
 
-  establecerModo(modo) {
+  establecerModo(modo, alcance = 'COMPLETO') {
     const modosValidos = ['CLASE', 'PRACTICA', 'CABLEADO'];
     this.modoActual = modosValidos.includes(modo) ? modo : 'CLASE';
+    this.alcanceActual = ['COMPLETO', 'IZQUIERDA', 'DERECHA'].includes(alcance) ? alcance : 'COMPLETO';
     if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.establecerModo(this.modoActual);
+      this.ultimoLaboratorio.establecerModo(this.modoActual, this.alcanceActual);
       return this.ultimoLaboratorio;
     }
     return this.obtenerLaboratorio({ forzar: true });

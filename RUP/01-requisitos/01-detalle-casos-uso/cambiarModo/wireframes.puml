@@ -4,15 +4,15 @@ skinparam defaultFontName sans-serif
 {+
   <b>OpSys</b> - Supervisión de Laboratorio
   {
-    [ 🎓 Modo Clase ] | [ <back:#7c3aed><color:white><b> 🧪 Modo Práctica </b></color></back> ] | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | [ Asignar a switch ] | [ ⚡ Encender ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
+    [ 🎓 Modo Clase ] | [ <back:#7c3aed><color:white><b> 🧪 Práctica: Hilera Izq. </b></color></back> ] | [ 🧪 Práctica: Hilera Der. ] | [ 🧪 Práctica: Todo ] | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | [ Asignar a switch ] | [ ⚡ Encender ] | [Dimensionar: 6x10] | [Consultar estado] | [🚪 Cerrar sesión]
   }
   --
   {
-    <b>Métricas en tiempo real (Modo Práctica):</b> | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | 🟢 Operativos: <b>45</b> | ⚫ Standby: <b>10</b> | 🟡 Prácticas/DHCP: <b>5</b> | 🟠 Desconectados: <b>0</b> | Total: <b>60</b>
+    <b>Métricas en tiempo real (Modo Práctica - Hilera Izquierda):</b> | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | 🟢 Operativos: <b>45</b> | ⚫ Standby: <b>10</b> | 🟡 Prácticas/DHCP: <b>4</b> | 🟠 Desconectados: <b>1</b> | Total: <b>60</b>
   }
   --
   {
-    <i><b>Contexto operacional activo:</b> Modo Práctica. Los enlaces caídos en switch docente se reclasifican como 🟡 RED AISLADA, evitando falsas alarmas de desconexión.</i>
+    <i><b>Contexto operacional activo:</b> Modo Práctica (Hilera Izquierda). Puestos de la mitad izquierda con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad derecha mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</i>
   }
   --
   {/ <b>Disposición Espacial del Aula</b> }
@@ -31,9 +31,9 @@ skinparam defaultFontName sans-serif
       Switch: Universitario
       🪟 En línea | . | [→]
     } | {
-      <b>⚫ PC-03</b> | [ ⚡ ] | <i>#03</i>
+      <b>🟡 PC-03</b> | [ ⚡ ] | <i>#03</i>
       IP: ---
-      Port: port3 🟢
+      Port: port3 🔴
       Switch: Universitario
       🪟 Desconectado | . | [→]
     } | <b>            ║  Pasillo  ║</b> | {
@@ -43,17 +43,17 @@ skinparam defaultFontName sans-serif
       Switch: Universitario
       🪟 En línea | . | [→]
     } | {
-      <b>🟡 PC-05</b> | [ ⚡ ] | <i>#05</i>
+      <b>⚫ PC-05</b> | [ ⚡ ] | <i>#05</i>
       IP: ---
-      Port: port5 🔴
-      Switch: Prácticas
+      Port: port5 🟢
+      Switch: Universitario
       🪟 Desconectado | . | [→]
     } | {
-      <b>🟢 PC-06</b> | [<color:gray>⚡</color>] | <i>#06</i>
-      IP: 10.10.136.106
-      Port: port6 🟢
+      <b>🟠 PC-06</b> | [<color:gray>⚡</color>] | <i>#06</i>
+      IP: ---
+      Port: port6 🔴
       Switch: Universitario
-      🪟 En línea | . | [→]
+      🪟 Desconectado | . | [→]
     }
     <b>Fila 2</b> | {
       <b>🟢 PC-07</b> | [<color:gray>⚡</color>] | <i>#07</i>

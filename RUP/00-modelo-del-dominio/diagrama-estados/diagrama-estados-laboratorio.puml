@@ -9,12 +9,32 @@ state EN_CLASE {
 }
 
 state EN_PRACTICA {
-    EN_PRACTICA : Contexto: Sesión de prácticas en red aislada
-    EN_PRACTICA : Política de red: Puestos conectados al switch secundario
-    EN_PRACTICA : Interpretación de enlace DOWN: Esperado (Trabajando en red aislada)
+    [*] --> PRACTICA_TOTAL
+
+    state PRACTICA_TOTAL {
+        PRACTICA_TOTAL : Alcance: Toda el aula
+        PRACTICA_TOTAL : Política: Todos los puestos en red aislada
+    }
+
+    state PRACTICA_HILERA_IZQUIERDA {
+        PRACTICA_HILERA_IZQUIERDA : Alcance: Hilera Izquierda
+        PRACTICA_HILERA_IZQUIERDA : Política: Mitad izquierda en red aislada; mitad derecha en red docente
+    }
+
+    state PRACTICA_HILERA_DERECHA {
+        PRACTICA_HILERA_DERECHA : Alcance: Hilera Derecha
+        PRACTICA_HILERA_DERECHA : Política: Mitad derecha en red aislada; mitad izquierda en red docente
+    }
+
+    PRACTICA_TOTAL --> PRACTICA_HILERA_IZQUIERDA : Conmutar a hilera izquierda
+    PRACTICA_TOTAL --> PRACTICA_HILERA_DERECHA : Conmutar a hilera derecha
+    PRACTICA_HILERA_IZQUIERDA --> PRACTICA_TOTAL : Conmutar a toda el aula
+    PRACTICA_HILERA_DERECHA --> PRACTICA_TOTAL : Conmutar a toda el aula
+    PRACTICA_HILERA_IZQUIERDA --> PRACTICA_HILERA_DERECHA : Alternar hilera
+    PRACTICA_HILERA_DERECHA --> PRACTICA_HILERA_IZQUIERDA : Alternar hilera
 }
 
-EN_CLASE --> EN_PRACTICA : Iniciar práctica
+EN_CLASE --> EN_PRACTICA : Iniciar práctica [alcance]
 
 EN_PRACTICA --> EN_CLASE : Finalizar práctica
 

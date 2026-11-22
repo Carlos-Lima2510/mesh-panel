@@ -28,10 +28,31 @@
           <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           <span>Modo Clase</span>
         </button>
-        <button id="btn-mode-practica" class="btn-mode" type="button" title="Modo Práctica (Red Aislada)">
-          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
-          <span>Modo Práctica</span>
-        </button>
+
+        <!-- Dropdown de Modo Práctica con Selección de Alcance (Aula Híbrida) -->
+        <div class="mode-dropdown-container">
+          <button id="btn-mode-practica" class="btn-mode" type="button" title="Modo Práctica (Red Aislada de Prácticas)">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+            <span id="btn-mode-practica-text">Modo Práctica</span>
+            <svg class="ui-icon dropdown-chevron" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="dropdown-practica-menu" class="mode-dropdown-menu" style="display: none;">
+            <button id="opt-practica-izq" class="dropdown-item" type="button" title="Poner en práctica la Hilera Izquierda (mitad izquierda)">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Hilera Izquierda</span>
+              <span class="dropdown-item-badge">Recomendado</span>
+            </button>
+            <button id="opt-practica-der" class="dropdown-item" type="button" title="Poner en práctica la Hilera Derecha (mitad derecha)">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Hilera Derecha</span>
+            </button>
+            <button id="opt-practica-todo" class="dropdown-item" type="button" title="Poner en práctica toda el aula">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Toda el aula</span>
+            </button>
+          </div>
+        </div>
+
         <button id="btn-mode-cableado" class="btn-mode" type="button" title="Modo Verificación de Cableado (Pre-despliegue)">
           <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M9 22v-4M15 22v-4M8 8h8a2 2 0 0 1 2 2v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4v-4a2 2 0 0 1 2-2z"/></svg>
           <span>Verif. Cableado</span>
@@ -119,6 +140,16 @@
       </div>
     </div>
   </section>
+
+  <!-- BANNER DE CONTEXTO OPERACIONAL ACTIVO (SEGÚN WIREFRAME RUP CU-03 cambiarModo) -->
+  <div id="banner-contexto-operacional" class="operational-context-banner clase" role="status" aria-live="polite">
+    <span class="context-banner-icon">
+      <svg class="ui-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    </span>
+    <span id="banner-contexto-texto" class="context-banner-text">
+      <em><strong>Contexto operacional activo:</strong> Modo Clase. Todos los puestos en monitorización ordinaria (enlaces caídos = 🟠 DESCONECTADO).</em>
+    </span>
+  </div>
 
   <!-- PESTAÑA DE SECCIÓN Y BARRA DE HERRAMIENTAS (TERCERA BANDA DEL WIREFRAME) -->
   <section class="spatial-layout-section">

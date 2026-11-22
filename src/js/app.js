@@ -24,7 +24,16 @@ const scanIcon = document.getElementById('btn-scan-icon');
 
 const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
+const btnModePracticaText = document.getElementById('btn-mode-practica-text');
 const btnModeCableado = document.getElementById('btn-mode-cableado');
+const modeDropdownContainer = document.querySelector('.mode-dropdown-container');
+const dropdownPracticaMenu = document.getElementById('dropdown-practica-menu');
+const optPracticaIzq = document.getElementById('opt-practica-izq');
+const optPracticaDer = document.getElementById('opt-practica-der');
+const optPracticaTodo = document.getElementById('opt-practica-todo');
+
+const bannerContexto = document.getElementById('banner-contexto-operacional');
+const bannerContextoTexto = document.getElementById('banner-contexto-texto');
 
 const btnAsignarSwitch = document.getElementById('btn-asignar-switch');
 const btnAsignarSwitchText = document.getElementById('btn-asignar-switch-text');
@@ -104,7 +113,7 @@ function setStatusBadge(text, isOffline = false) {
   if (span) span.textContent = text;
 }
 
-function actualizarBotonesModo(modo) {
+function actualizarBotonesModo(modo, alcance = 'COMPLETO') {
   if (!btnModeClase || !btnModePractica) return;
   btnModeClase.classList.remove('active-clase');
   btnModePractica.classList.remove('active-practica');
@@ -112,10 +121,35 @@ function actualizarBotonesModo(modo) {
 
   if (modo === 'PRACTICA') {
     btnModePractica.classList.add('active-practica');
+    if (btnModePracticaText) {
+      if (alcance === 'IZQUIERDA') btnModePracticaText.textContent = 'Práctica (Hilera Izq)';
+      else if (alcance === 'DERECHA') btnModePracticaText.textContent = 'Práctica (Hilera Der)';
+      else btnModePracticaText.textContent = 'Práctica (Toda el aula)';
+    }
+    if (bannerContexto && bannerContextoTexto) {
+      bannerContexto.className = 'operational-context-banner practica';
+      if (alcance === 'IZQUIERDA') {
+        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Hilera Izquierda). Puestos de la mitad izquierda con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad derecha mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</em>';
+      } else if (alcance === 'DERECHA') {
+        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Hilera Derecha). Puestos de la mitad derecha con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad izquierda mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</em>';
+      } else {
+        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Toda el aula). Todos los puestos con enlace caído en switch docente se reclasifican como 🟡 RED AISLADA, evitando falsas alarmas de desconexión.</em>';
+      }
+    }
   } else if (modo === 'CABLEADO') {
     if (btnModeCableado) btnModeCableado.classList.add('active-cableado');
+    if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
+    if (bannerContexto && bannerContextoTexto) {
+      bannerContexto.className = 'operational-context-banner cableado';
+      bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Verificación de Cableado (Pre-despliegue). Enlaces UP se consideran operativos antes de instalar MeshAgent.</em>';
+    }
   } else {
     btnModeClase.classList.add('active-clase');
+    if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
+    if (bannerContexto && bannerContextoTexto) {
+      bannerContexto.className = 'operational-context-banner clase';
+      bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Clase. Todos los puestos en monitorización ordinaria (enlaces caídos en switch docente = 🟠 DESCONECTADO).</em>';
+    }
   }
 }
 
@@ -217,7 +251,7 @@ function procesarDatosLaboratorio(lab) {
     inputRangeHasta.max = totalCalculado;
   }
 
-  actualizarBotonesModo(lab.modo);
+  actualizarBotonesModo(lab.modo, lab.alcance_practica);
   lastMetricas = lab.metricas;
   actualizarVista();
 
@@ -257,13 +291,14 @@ export async function fetchDevices() {
   }
 }
 
-async function cambiarModo(modo) {
+async function cambiarModo(modo, alcance = 'COMPLETO') {
   try {
-    setStatusBadge(`Cambiando a Modo ${modo}...`);
+    const alcanceStr = modo === 'PRACTICA' ? ` (${alcance})` : '';
+    setStatusBadge(`Cambiando a Modo ${modo}${alcanceStr}...`);
     const res = await fetch(`${DAEMON_URL}/api/laboratorio/modo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modo })
+      body: JSON.stringify({ modo, alcance })
     });
     const data = await res.json();
     if (data.success && data.laboratorio) {
@@ -308,17 +343,70 @@ if (btnScan) {
   btnScan.addEventListener('click', fetchDevices);
 }
 
+function togglePracticaDropdown() {
+  if (!dropdownPracticaMenu) return;
+  const isShown = dropdownPracticaMenu.style.display === 'flex';
+  dropdownPracticaMenu.style.display = isShown ? 'none' : 'flex';
+  if (modeDropdownContainer) {
+    modeDropdownContainer.classList.toggle('open', !isShown);
+  }
+}
+
+function closePracticaDropdown() {
+  if (dropdownPracticaMenu) dropdownPracticaMenu.style.display = 'none';
+  if (modeDropdownContainer) modeDropdownContainer.classList.remove('open');
+}
+
 if (btnModeClase) {
-  btnModeClase.addEventListener('click', () => cambiarModo('CLASE'));
+  btnModeClase.addEventListener('click', () => {
+    closePracticaDropdown();
+    cambiarModo('CLASE');
+  });
 }
 
 if (btnModePractica) {
-  btnModePractica.addEventListener('click', () => cambiarModo('PRACTICA'));
+  btnModePractica.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePracticaDropdown();
+  });
+}
+
+if (optPracticaIzq) {
+  optPracticaIzq.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'IZQUIERDA');
+  });
+}
+
+if (optPracticaDer) {
+  optPracticaDer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'DERECHA');
+  });
+}
+
+if (optPracticaTodo) {
+  optPracticaTodo.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'COMPLETO');
+  });
 }
 
 if (btnModeCableado) {
-  btnModeCableado.addEventListener('click', () => cambiarModo('CABLEADO'));
+  btnModeCableado.addEventListener('click', () => {
+    closePracticaDropdown();
+    cambiarModo('CABLEADO');
+  });
 }
+
+document.addEventListener('click', (e) => {
+  if (modeDropdownContainer && !modeDropdownContainer.contains(e.target)) {
+    closePracticaDropdown();
+  }
+});
 
 // ==============================================================================
 // GESTIÓN DEL MODAL: ASIGNAR PUESTOS A SWITCH (CU-04 según Wireframe RUP)

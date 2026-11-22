@@ -56,11 +56,17 @@ class Puesto {
     return this.switchAsignado;
   }
 
-  esperaEstarAislado() {
-    if (this.switchAsignado) {
-      return !this.switchAsignado.esperaMeshCentral();
+  estaEnModoPractica(modoLab, alcanceLab = 'COMPLETO') {
+    if (modoLab !== 'PRACTICA') return false;
+    if (!alcanceLab || alcanceLab === 'COMPLETO') return true;
+    return this.hilera === alcanceLab;
+  }
+
+  esperaEstarAislado(modoLab = 'CLASE', alcanceLab = 'COMPLETO') {
+    if (this.switchAsignado && !this.switchAsignado.esperaMeshCentral()) {
+      return true;
     }
-    return this.red ? this.red.esAislada : false;
+    return this.estaEnModoPractica(modoLab, alcanceLab);
   }
 
   conectarRed(red) {

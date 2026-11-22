@@ -230,6 +230,37 @@ assert.strictEqual(metricas.verde, 1);
 assert.strictEqual(metricas.naranja, 0);
 assert.strictEqual(metricas.amarillo, 2);
 
+// Verificación de Modo Práctica con Alcance (Aulas Híbridas: Hilera Izquierda vs Hilera Derecha)
+const puestoIzq = new Puesto({ id: 'p-izq', fila: 1, columna: 2, hilera: 'IZQUIERDA' });
+const puestoDer = new Puesto({ id: 'p-der', fila: 1, columna: 7, hilera: 'DERECHA' });
+assert.strictEqual(puestoIzq.estaEnModoPractica('PRACTICA', 'IZQUIERDA'), true);
+assert.strictEqual(puestoDer.estaEnModoPractica('PRACTICA', 'IZQUIERDA'), false);
+assert.strictEqual(puestoIzq.estaEnModoPractica('PRACTICA', 'DERECHA'), false);
+assert.strictEqual(puestoDer.estaEnModoPractica('PRACTICA', 'DERECHA'), true);
+assert.strictEqual(puestoIzq.estaEnModoPractica('PRACTICA', 'COMPLETO'), true);
+assert.strictEqual(puestoDer.estaEnModoPractica('PRACTICA', 'COMPLETO'), true);
+assert.strictEqual(puestoIzq.estaEnModoPractica('CLASE', 'IZQUIERDA'), false);
+
+const estIzqEnPractica = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 10, link: 'DOWN' },
+  osOnline: false,
+  modoLaboratorio: 'PRACTICA',
+  alcancePractica: 'IZQUIERDA',
+  puesto: puestoIzq
+});
+assert.strictEqual(estIzqEnPractica instanceof EstadoRedAislada, true);
+assert.strictEqual(estIzqEnPractica.color, 'AMARILLO');
+
+const estDerEnClase = EvaluadorEstado.evaluar({
+  enlaceFisico: { port: 20, link: 'DOWN' },
+  osOnline: false,
+  modoLaboratorio: 'PRACTICA',
+  alcancePractica: 'IZQUIERDA',
+  puesto: puestoDer
+});
+assert.strictEqual(estDerEnClase instanceof EstadoDesconectado, true);
+assert.strictEqual(estDerEnClase.color, 'NARANJA');
+
 // 6. Verificación de LaboratorioService y mapa fijo de 40 puestos
 const mockMeshAdapter = {
   listarDispositivos: async () => [

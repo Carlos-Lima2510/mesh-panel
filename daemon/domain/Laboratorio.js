@@ -2,6 +2,7 @@ class Laboratorio {
   constructor({
     nombre = 'Laboratorio General',
     modo = 'CLASE',
+    alcancePractica = 'COMPLETO',
     filas = 5,
     columnas = 8,
     columnasHilera = null,
@@ -9,6 +10,7 @@ class Laboratorio {
   } = {}) {
     this.nombre = nombre;
     this.modo = modo;
+    this.alcancePractica = alcancePractica;
     this.filas = filas;
     this.columnas = columnas;
     this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
@@ -35,9 +37,11 @@ class Laboratorio {
     return Array.from(this.switches.values());
   }
 
-  establecerModo(modo) {
+  establecerModo(modo, alcance = 'COMPLETO') {
     const modos = ['CLASE', 'PRACTICA', 'CABLEADO'];
     this.modo = modos.includes(modo) ? modo : 'CLASE';
+    const alcances = ['COMPLETO', 'IZQUIERDA', 'DERECHA'];
+    this.alcancePractica = alcances.includes(alcance) ? alcance : 'COMPLETO';
     for (const host of this.hosts) {
       if (host.telemetria) {
         const puesto = this.obtenerPuestoDeHost(host.id);
@@ -47,6 +51,7 @@ class Laboratorio {
           pwr: host.telemetria.pwr,
           conn: host.telemetria.conn,
           modoLaboratorio: this.modo,
+          alcancePractica: this.alcancePractica,
           puesto: puesto,
           switchAsignado: puesto ? puesto.obtenerSwitch() : null,
           modoDespliegue: this.modoDespliegue
@@ -231,6 +236,7 @@ class Laboratorio {
     return {
       nombre: this.nombre,
       modo: this.modo,
+      alcance_practica: this.alcancePractica || 'COMPLETO',
       modo_despliegue: this.modoDespliegue,
       filas: this.filas,
       columnas: this.columnas,

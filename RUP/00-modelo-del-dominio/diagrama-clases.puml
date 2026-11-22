@@ -11,6 +11,7 @@ class Puesto {
     etiqueta
     fila
     columna
+    hilera
     toma
     puertoSwitch
 }

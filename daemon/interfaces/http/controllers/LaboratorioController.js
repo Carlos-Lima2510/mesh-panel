@@ -17,9 +17,9 @@ class LaboratorioController {
   }
 
   async cambiarModo(req, res) {
-    const modo = req.body.modo;
+    const { modo, alcance } = req.body || {};
     const nuevoModo = (modo === 'PRACTICA' || modo === 'CABLEADO') ? modo : 'CLASE';
-    const lab = this.service.establecerModo(nuevoModo);
+    const lab = this.service.establecerModo(nuevoModo, alcance);
     const datos = lab.toJSON();
     this.broadcaster.difundir('INIT', { laboratorio: datos });
     return res.json({ success: true, laboratorio: datos });
