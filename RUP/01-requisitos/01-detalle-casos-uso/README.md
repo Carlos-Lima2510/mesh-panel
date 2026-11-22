@@ -33,7 +33,7 @@ Cada caso de uso se documenta en su propia carpeta bajo una estructura formal un
 | **CU-05** | **`dimensionarCuadricula()`** | `SISTEMA_DISPONIBLE` | `Administrador` | [Ficha](dimensionarCuadricula/README.md) | [wireframes.svg](../../../images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/wireframes.svg) | 🟢 Completado |
 | **CU-06** | **`encenderPuesto()`** | `SISTEMA_DISPONIBLE` / `PUESTO_ABIERTO` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
 | **CU-07** | **`iniciarSesion()`** | `SESION_CERRADA` | `UsuarioNoLogueado` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
-| **CU-08** | **`cerrarSesion()`** | `SISTEMA_DISPONIBLE` / `PUESTO_ABIERTO` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
+| **CU-08** | **`cerrarSesion()`** | `SISTEMA_DISPONIBLE` | `Administrador` | *Pendiente* | *Pendiente* | ⚪ Pendiente |
 
 ---
 
