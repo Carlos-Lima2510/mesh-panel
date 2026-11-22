@@ -336,33 +336,33 @@
     "semantic_hash": "ae6daae07c6659b7da6356221295bb37"
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {
-    "mtime": 1795125102.834852,
-    "seen": 1795129689.317716,
+    "mtime": 1795130480.7321603,
+    "seen": 1795201843.0545275,
     "ast_hash": "8f7d88109f731f7de4ea70dc26fce991",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/especificacion.svg": {
-    "mtime": 1795071139.4110215,
-    "seen": 1795124177.6340551,
+    "mtime": 1795130485.561819,
+    "seen": 1795201843.054576,
     "ast_hash": "7d33a8e16d452adc004bc8397e4d44bd",
     "semantic_hash": "7d33a8e16d452adc004bc8397e4d44bd"
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/especificacion.svg": {
-    "mtime": 1795071139.4112995,
-    "seen": 1795124177.6340575,
+    "mtime": 1795130486.7187395,
+    "seen": 1795201843.0545814,
     "ast_hash": "0b065f79f1ac9cc037068caf2e26fd74",
     "semantic_hash": "0b065f79f1ac9cc037068caf2e26fd74"
   },
   "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/especificacion.svg": {
-    "mtime": 1795129981.190256,
-    "seen": 1795130415.6333132,
+    "mtime": 1795130488.081164,
+    "seen": 1795201843.0545871,
     "ast_hash": "936d7a382f727b806823a4960a22f4af",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795107450.4016194,
-    "seen": 1795125009.3285904,
-    "ast_hash": "29ab686bdc0fd5017cfd2f3ec998c9fb",
+    "mtime": 1795366492.2182531,
+    "seen": 1795366493.6616197,
+    "ast_hash": "2aebb4636c7e7bb2cd38557bc05e04bb",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
@@ -372,15 +372,15 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
-    "mtime": 1795071139.4055865,
-    "seen": 1795125009.3286002,
-    "ast_hash": "8f3bcf63bc7dd03ab3b6b9670217ff40",
+    "mtime": 1795367197.0913897,
+    "seen": 1795367199.3468466,
+    "ast_hash": "a5b48ccd52c85d534542388c8a75a6e5",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
-    "mtime": 1795107450.4029503,
-    "seen": 1795125009.3286035,
-    "ast_hash": "b95f4b4d0d565587649d6d92043704c5",
+    "mtime": 1795366920.5457675,
+    "seen": 1795366923.3091345,
+    "ast_hash": "d1fe8cc4e48a60da665d1e4bf3c2c7af",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md": {
@@ -390,74 +390,74 @@
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg": {
-    "mtime": 1794679347.122069,
-    "seen": 1795125009.3286545,
+    "mtime": 1795130482.0326605,
+    "seen": 1795201843.0545309,
     "ast_hash": "657dc57441bb715549b3a9407b618c77",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg": {
-    "mtime": 1794679347.122105,
-    "seen": 1795125009.328658,
+    "mtime": 1795130481.3712237,
+    "seen": 1795201843.0545344,
     "ast_hash": "d9b7d645fb35442e96777263d40a8d64",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-objetos.svg": {
-    "mtime": 1794945093.011633,
-    "seen": 1795125009.3286614,
-    "ast_hash": "eb00b5923caf24c57df579a0a45f4ea3",
+    "mtime": 1795130480.1578763,
+    "seen": 1795201843.0545373,
+    "ast_hash": "dea22efa14a3696724a69ca1693854c5",
     "semantic_hash": ""
   },
   "images/01-requisitos/00-actores-casos-uso/actoresCasosUsoAdministrador.svg": {
-    "mtime": 1794945093.0118194,
-    "seen": 1795125009.3286648,
-    "ast_hash": "4aa5030f17ecc646744b45d7c8528679",
+    "mtime": 1795130490.4323056,
+    "seen": 1795201843.0545397,
+    "ast_hash": "52bcfed799969a3fffeb1e7533c10f94",
     "semantic_hash": ""
   },
   "images/01-requisitos/00-actores-casos-uso/diagramaContextoAdmin.svg": {
-    "mtime": 1794945093.0120895,
-    "seen": 1795125009.328668,
-    "ast_hash": "fb8bad7bbb0cd5ce3b147ff918fe9e2f",
+    "mtime": 1795130492.0047727,
+    "seen": 1795201843.0545433,
+    "ast_hash": "1d52b3fb21da96de5af9ecc1ea0af0d3",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/especificacion.svg": {
-    "mtime": 1795107450.4039876,
-    "seen": 1795125009.3286715,
-    "ast_hash": "a733cdb0f64196c7b9e2b06c5aeaa1ec",
+    "mtime": 1795366486.1582174,
+    "seen": 1795366493.6616938,
+    "ast_hash": "f7611218c63a6998e3e7c23699411c29",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
-    "mtime": 1795107450.4042895,
-    "seen": 1795125009.3286746,
-    "ast_hash": "e0c6b3de7f030ba170d6ee0d222273ba",
+    "mtime": 1795366445.94495,
+    "seen": 1795366493.661697,
+    "ast_hash": "7cde8d07d0ebf01df4ce60dcebbc65b4",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/especificacion.svg": {
-    "mtime": 1795107450.4046528,
-    "seen": 1795125009.3286774,
+    "mtime": 1795130484.1919339,
+    "seen": 1795201843.0545516,
     "ast_hash": "03a9db564e3779b4398a725cd96a51d5",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/wireframes.svg": {
-    "mtime": 1795107450.4052286,
-    "seen": 1795125009.3286808,
+    "mtime": 1795130484.9757862,
+    "seen": 1795201843.0545728,
     "ast_hash": "c836fb493135ea73cdb78a6471a52b57",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
-    "mtime": 1795071139.4112995,
-    "seen": 1795125009.3286884,
-    "ast_hash": "cf0988b2691f6f9e7081131f10e063a9",
+    "mtime": 1795367119.9259853,
+    "seen": 1795367199.3469257,
+    "ast_hash": "47623bd107129974c37bc8a701e4d67d",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
-    "mtime": 1795107450.4062414,
-    "seen": 1795125009.3286982,
-    "ast_hash": "f71231729174d327e71f72285555860d",
+    "mtime": 1795366941.44189,
+    "seen": 1795367199.3469336,
+    "ast_hash": "29495947b3e4729b62f0d534655e55b2",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/wireframes.svg": {
-    "mtime": 1795129981.9061081,
-    "seen": 1795130415.6333163,
+    "mtime": 1795130510.6008961,
+    "seen": 1795201843.05459,
     "ast_hash": "b3d209577cdcadede90beb3b0b52e595",
     "semantic_hash": ""
   },
@@ -483,6 +483,12 @@
     "mtime": 1795130375.1984825,
     "seen": 1795130415.6331925,
     "ast_hash": "ec8c24a4cf06fe24ed295982fa489817",
+    "semantic_hash": ""
+  },
+  ".agents/skills/rup-auditor/SKILL.md": {
+    "mtime": 1795130832.0672512,
+    "seen": 1795201843.054454,
+    "ast_hash": "9a1569921b227988c563ee3e3bc23108",
     "semantic_hash": ""
   },
   "daemon/package-lock.json": {

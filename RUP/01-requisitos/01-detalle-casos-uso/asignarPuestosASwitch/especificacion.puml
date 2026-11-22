@@ -14,7 +14,7 @@ end note
 
 PUESTO_ABIERTO -[#green]-> asignarPuestosASwitch
 note on link
-<b>Administrador</b> solicita asignar switch al puesto (inspección individual)
+<b>Administrador</b> solicita asignar switch al puesto
 end note
 
 state asignarPuestosASwitch as "asignarPuestosASwitch()" {
@@ -25,30 +25,40 @@ state asignarPuestosASwitch as "asignarPuestosASwitch()" {
 
     c -[#green]-> [*]
     note on link
-    [Puestos previamente seleccionados en cuadrícula / Puesto abierto]
-    <b>Sistema</b> presenta modal de selección de switch de destino
+    [puestos seleccionados y switch especificado]
+    <b>Sistema</b> presenta diálogo modal con switches del rack y bocas detectadas por SNMP
     <b>Sistema</b> permite introducir switch de destino
-    <b>Administrador</b> introduce switch de destino
-    <b>Administrador</b> solicita confirmar asignación
-    <b>Sistema</b> presenta los puestos con el switch asignado actualizado
-    <b>Sistema</b> presenta el diagnóstico determinista recalculado
+    <b>Administrador</b> introduce switch gestionado
+    <b>Administrador</b> solicita guardar mapeo
+    <b>Sistema</b> presenta las tarjetas de puestos con la línea informativa de switch y boca actualizadas
     end note
 
     c -[#red]-> [*]
     note on link
-    [Sin puestos seleccionados previamente en cuadrícula o cancelación]
-    <b>Sistema</b> presenta aviso bloqueando acceso al modal o cancela sin cambios
+    [sin puestos seleccionados previamente en cuadrícula]
+    <b>Sistema</b> presenta aviso indicando que se requiere seleccionar puestos antes de mapear
+    end note
+
+    c -[#orange]-> [*]
+    note on link
+    [solicitud cancelada por el usuario]
+    <b>Sistema</b> presenta pantalla de origen manteniendo el mapeo previo sin cambios
     end note
 }
 
 asignarPuestosASwitch -[#green]-> SISTEMA_DISPONIBLE_SALIDA
 note on link
-puestos reasignados y actualizados en cuadrícula
+puestos reasignados, tarjetas de puestos actualizadas con switch y boca
 end note
 
 asignarPuestosASwitch -[#red]-> SISTEMA_DISPONIBLE_SALIDA
 note on link
-aviso de advertencia (selección previa requerida) o cancelación
+aviso de advertencia presentado, retorno a cuadrícula general
+end note
+
+asignarPuestosASwitch -[#orange]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+solicitud cancelada, retorno a cuadrícula sin cambios
 end note
 
 asignarPuestosASwitch -[#green]-> PUESTO_ABIERTO_SALIDA
@@ -57,6 +67,11 @@ puesto individual reasignado, ficha técnica actualizada
 end note
 
 asignarPuestosASwitch -[#red]-> PUESTO_ABIERTO_SALIDA
+note on link
+aviso de advertencia presentado, retorno a ficha técnica
+end note
+
+asignarPuestosASwitch -[#orange]-> PUESTO_ABIERTO_SALIDA
 note on link
 cancelación, ficha técnica sin cambios
 end note

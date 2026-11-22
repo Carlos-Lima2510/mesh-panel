@@ -1,23 +1,31 @@
-@startsalt wireframes
+@startsalt asignarPuestosASwitch-wireframe
 skinparam dpi 150
 skinparam defaultFontName sans-serif
 {+
   --
-  {^"<b> Asignar Puestos a Switch </b>"
+  {^"<b> Mapeo Físico de Puestos a Switch de Red </b>"
     {
-      <b>Puestos seleccionados:</b> | <b>4 puestos</b> (PC-02, PC-04, PC-11, PC-15)
+      <b>Puestos seleccionados:</b> | <b>4 puestos</b> (M01, M02, M03, M04)
     }
     --
     {
-      <b>Seleccione el switch de destino:</b>
-      {
-        (X) <b>Switch Universitario</b> (Red de la Universidad)
-        () <b>Switch de Prácticas</b> (Red Aislada)
-      }
+      <b>Switch gestionado de destino:</b> | ^SW-01 -- 10.10.136.11^
+    }
+    --
+    {#
+      <b>Puesto Físico</b> | <b>Switch Asignado (IP)</b> | <b>Boca Detectada (SNMP)</b>
+      M01 | SW-01 (10.10.136.11) | port01
+      M02 | SW-01 (10.10.136.11) | port02
+      M03 | SW-01 (10.10.136.11) | port03
+      M04 | SW-01 (10.10.136.11) | port04
     }
     --
     {
-      [ <b>Confirmar</b> ] | <color:transparent>________________________________________</color> | [ Cancelar ]
+      <i>Línea informativa en tarjeta:</i> | <color:#1A5F7A><b>Switch: 10.10.136.11 - Boca: port01</b></color>
+    }
+    --
+    {
+      [ <b>Guardar Mapeo</b> ] | <color:transparent>________________________________________</color> | [ Cancelar ]
     }
   }
 }

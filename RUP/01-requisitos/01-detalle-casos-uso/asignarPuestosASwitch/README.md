@@ -33,38 +33,51 @@
 | Atributo | Valor |
 | :--- | :--- |
 | **Actor** | Administrador |
-| **Objetivo** | Asignar o conmutar el conmutador de red (`Switch Docente` o `Switch de Prácticas`) vinculado a uno o varios puestos de trabajo físicos (`Puesto`), permitiendo la parametrización individualizada del contexto de supervisión (según ADR-004) para soportar dinámicas de aulas híbridas y garantizar la exactitud del diagnóstico determinista sin falsos positivos ni falsos negativos |
+| **Objetivo** | Mapear y registrar la infraestructura física de red asignando imperativamente cada puesto de trabajo (`Puesto`) a un conmutador gestionado (`Switch`), vinculando la boca física detectada por telemetría SNMP (`puertoSwitch`, ej. `port14`), manteniendo documentada la topología de cableado para su visualización informativa en la tarjeta de cada puesto (`Switch: 10.10.136.13 - Boca: port14`) y permitiendo al daemon dirigir las consultas SNMP de estado de enlace (`ifOperStatus`) al conmutador e interfaz correspondientes (según ADR-004). |
 | **Tipo** | Primario, esencial |
 | **Nivel** | Objetivo de usuario (User-Goal Level) |
 
 ### Descripción del caso de uso
 
-El caso de uso permite al Administrador asociar puestos físicos a su conmutador correspondiente bajo dos modalidades operativas según el contexto de origen:
+El caso de uso permite al Administrador establecer el mapeo físico imperativo entre las mesas del aula y los conmutadores del rack. Dado que la boca física es detectada y provista automáticamente por el sistema vía SNMP (`port14`, `port01`...), **no es necesario introducir ni seleccionar la boca manualmente**; el sistema presenta la boca detectada para cada puesto y el Administrador selecciona el conmutador gestionado al que están conectados:
 
-1. **Contexto 1: Asignación por lote desde el cuadro general (`SISTEMA_DISPONIBLE`)**:
-   * **Precondición estricta:** El Administrador debe haber seleccionado previamente uno o varios puestos en la cuadrícula general del aula.
-   * **Bloqueo si no hay selección:** Si no existe ningún puesto seleccionado previamente, el sistema **no permite acceder al modal** de asignación a switch, presentando un aviso de que se requiere seleccionar puestos antes de proceder.
-   * **Apertura de modal minimalista:** Con puestos seleccionados, el Administrador solicita asignar a switch mediante el botón de la barra de acciones (`[ Asignar a switch ]`). El sistema presenta un **modal minimalista** enfocado exclusivamente en la elección del destino:
-     * Resumen conciso de los puestos seleccionados (ej. `4 puestos (PC-02, PC-04, PC-11, PC-15)`).
-     * Selector mutuamente excluyente entre uno u otro switch:
-       * `(X) Switch Universitario (Red Docente)`
-       * `( ) Switch de Prácticas (Red Aislada)`
-   * **Confirmación:** El Administrador introduce su elección y solicita confirmar. El sistema actualiza en memoria los puestos reasignados y recalcula inmediatamente el diagnóstico determinista en la cuadrícula panorámica.
+1. **Contexto 1: Asignación por lote desde la vista general (`SISTEMA_DISPONIBLE`)**:
+   * **Precondición:** El Administrador debe haber seleccionado previamente uno o varios puestos en la cuadrícula general del aula.
+   * **Bloqueo preventivo si no hay selección:** Si no existe ningún puesto seleccionado previamente, el sistema no permite acceder al modal y presenta un aviso de advertencia indicando que se requiere seleccionar puestos antes de proceder.
+   * **Apertura de modal de asignación:** Con puestos seleccionados, el Administrador solicita asignar a switch. El sistema presenta el diálogo modal de infraestructura de red:
+     * Resumen de puestos seleccionados (ej. `4 puestos (M01, M02, M03, M04)`).
+     * Selector del conmutador gestionado destino del rack del aula (ej. `SW-01 (10.10.136.11)`, `SW-02 (10.10.136.12)`, `SW-03 (10.10.136.13)`).
+     * Tabla con los puestos y la boca física detectada por SNMP para cada uno (`port01`, `port02`, `port03`, `port04`).
+     * Muestra previa de la línea informativa resultante para la tarjeta (`Switch: 10.10.136.11 - Boca: port01`).
+   * **Confirmación:** El Administrador introduce el conmutador gestionado de destino y solicita guardar el mapeo. El sistema actualiza en memoria el inventario físico de los puestos y presenta en la cuadrícula general las tarjetas de los puestos con su información de switch y boca actualizada.
 
-2. **Contexto 2: Asignación individual desde la ficha técnica de detalle (`PUESTO_ABIERTO`)**:
-   * El Administrador inspecciona un puesto individual en su modal de detalle y solicita cambiar el conmutador asignado mediante el selector interactivo (`Switch asignado: [ Switch Universitario |v| ]`).
-   * El Administrador introduce el conmutador de destino deseado (`Switch Universitario` o `Switch de Prácticas`) y solicita la confirmación.
-   * El sistema actualiza el puesto en memoria, recalculando de inmediato el diagnóstico individualizado y presentando la ficha técnica actualizada.
+2. **Contexto 2: Asignación o edición individual desde la ficha técnica de detalle (`PUESTO_ABIERTO`)**:
+   * El Administrador inspecciona un puesto individual y solicita reasignar su conmutador de enlace.
+   * El sistema presenta el selector con los switches gestionados disponibles y la boca detectada vía SNMP para ese puesto (ej. `port14`).
+   * El Administrador introduce el nuevo conmutador gestionado.
+   * El Administrador solicita guardar cambios.
+   * El sistema actualiza el puesto en memoria y presenta la ficha técnica y su tarjeta con los datos de red actualizados informativamente.
 
-3. **Flujos alternativos y excepcionales**:
-   * **Sin puestos seleccionados:** Si el Administrador acciona la opción sin puestos marcados en cuadrícula, el sistema no abre el modal y presenta un aviso preventivo.
-   * **Cancelación de la solicitud:** Si el Administrador cancela el diálogo (`[ Cancelar ]`), el sistema retorna al contexto de origen sin aplicar ninguna modificación.
+3. **Flujos alternativos y de excepción**:
+   * **Sin puestos seleccionados:** Si el Administrador solicita la asignación sin puestos marcados en la cuadrícula panorámica, el sistema no abre el diálogo y presenta un aviso informativo de selección requerida.
+   * **Cancelación de la solicitud:** Si el Administrador solicita cancelar el diálogo, el sistema retorna a la pantalla de origen (cuadrícula general o ficha técnica) sin modificar el mapeo existente.
+
+### Precondiciones
+* El Administrador ha iniciado sesión en el sistema (`SISTEMA_DISPONIBLE` o `PUESTO_ABIERTO`).
+* Para la asignación por lote, debe existir al menos un puesto físico seleccionado en la cuadrícula.
+* Existen switches gestionados registrados en el catálogo del aula con sus respectivas direcciones IP de gestión y bocas detectadas vía SNMP.
+
+### Postcondiciones
+* Los puestos físicos seleccionados quedan mapeados al conmutador gestionado con su boca física detectada por SNMP.
+* La tarjeta visual de cada puesto refleja informativamente la dirección y puerto del switch (`Switch: 10.10.136.xx - Boca: port14`).
+* El motor de telemetría SNMP enruta las consultas de estado de enlace (`ifOperStatus`) a la IP y boca del switch mapeado.
+* El mapeo físico no altera el modo operativo global del aula (`CLASE` vs `PRACTICA`).
 
 ### Referencias
 * **Diagrama de contexto de Admin:** 
   * `SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : asignarPuestosASwitch()`
   * `PUESTO_ABIERTO --> PUESTO_ABIERTO : asignarPuestosASwitch()`
-* **Modelo del dominio:** `Laboratorio`, `Puesto`, `Host`, `Switch`, `Red`, `Estado`, `EvaluadorEstado`
+* **Modelo del dominio:** `Laboratorio`, `Puesto`, `Host`, `Switch`, `Red`
 * **Decisiones arquitectónicas:**
   * [ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)
   * [ADR-004: Inclusión de la Entidad Switch, Disposición Espacial de Puestos en Cuadrícula y Aulas Híbridas](../../../../docs/adr/ADR-004-inclusion-switch-asignacion-distribuciones.md)
