@@ -52,7 +52,7 @@ El caso de uso modela la conmutación del contexto operacional del aula, permiti
    * El Administrador introduce el modo deseado (`Modo Clase` o `Modo Práctica`) y, en caso de seleccionar práctica, introduce el alcance de aplicación (`Toda el aula`, `Hilera Izquierda` o `Hilera Derecha`).
    * El sistema valida la solicitud y actualiza el contexto operacional del laboratorio y el alcance de la práctica.
    * El sistema re-evalúa el estado de los puestos de trabajo del aula en función de su ubicación física respecto al pasillo central y del alcance seleccionado.
-   * El sistema presenta el selector con el modo y alcance seleccionados activos, presenta la cuadrícula del laboratorio con los diagnósticos actualizados, presenta el banner contextual reflejando el alcance operacional del aula y presenta el resumen consolidado de métricas recalculado.
+   * El sistema presenta el selector con el modo y alcance seleccionados activos, presenta la cuadrícula del laboratorio con los diagnósticos actualizados según el nuevo modo y alcance y presenta el resumen consolidado de métricas recalculado.
 
 3. **Flujos Alternativos y Excepcionales:**
    * **Parámetros inválidos o error de comunicación:** Si se produce un error de comunicación o los parámetros introducidos son inválidos, el sistema presenta un aviso visual de advertencia y mantiene el contexto operacional previo sin modificaciones.

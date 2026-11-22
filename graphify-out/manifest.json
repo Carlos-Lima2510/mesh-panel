@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
-    "mtime": 1795384489.2863238,
-    "seen": 1795384510.303576,
-    "ast_hash": "031231d0426dc51d6bfa8b5ae51462b3",
+    "mtime": 1795385283.0132685,
+    "seen": 1795385284.7307782,
+    "ast_hash": "ddc361d07bc71dc558fba150110f2cd2",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
@@ -438,9 +438,9 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/wireframes.svg": {
-    "mtime": 1795384308.5270247,
-    "seen": 1795384510.3036568,
-    "ast_hash": "cc2de75679ccd6737164ee67f1000ae5",
+    "mtime": 1795385242.7044914,
+    "seen": 1795385284.7308664,
+    "ast_hash": "998942e52afbafc562909ab3d9385b50",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {

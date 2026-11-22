@@ -11,10 +11,6 @@ skinparam defaultFontName sans-serif
     <b>Métricas en tiempo real (Modo Práctica - Hilera Izquierda):</b> | <color:transparent>__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________</color> | 🟢 Operativos: <b>45</b> | ⚫ Standby: <b>10</b> | 🟡 Prácticas/DHCP: <b>4</b> | 🟠 Desconectados: <b>1</b> | Total: <b>60</b>
   }
   --
-  {
-    <i><b>Contexto operacional activo:</b> Modo Práctica (Hilera Izquierda). Puestos de la mitad izquierda con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad derecha mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</i>
-  }
-  --
   {/ <b>Disposición Espacial del Aula</b> }
   {#
     . | <b>Col 1</b> | <b>Col 2</b> | <b>Col 3</b> | <b> === PASILLO CENTRAL === </b> | <b>Col 4</b> | <b>Col 5</b> | <b>Col 6</b>
