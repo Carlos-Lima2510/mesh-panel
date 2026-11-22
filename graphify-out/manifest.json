@@ -210,15 +210,15 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795386540.003259,
-    "seen": 1795386541.8525991,
-    "ast_hash": "a123336d17b80545b76a97bc0f1fd1f3",
+    "mtime": 1795386650.6067564,
+    "seen": 1795386653.086349,
+    "ast_hash": "e9a7d41f3abf3f3d5c30d5aafd44efbe",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
-    "mtime": 1795386243.012923,
-    "seen": 1795386245.5721154,
-    "ast_hash": "e86721dd419f77d881fdadaeaa6ebf48",
+    "mtime": 1795386657.653788,
+    "seen": 1795386659.2986107,
+    "ast_hash": "da09234a2a59757bc0325174391af35e",
     "semantic_hash": ""
   },
   "src/js/sse-client.js": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795386312.386235,
-    "seen": 1795386541.8526974,
-    "ast_hash": "c8f8ce9f274562aed35773645f106db0",
+    "mtime": 1795386574.3284132,
+    "seen": 1795386653.0864384,
+    "ast_hash": "170cb784df076fa27830e2c9e3026c42",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {

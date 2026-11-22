@@ -1,17 +1,17 @@
 # Graph Report - mesh-panel  (2026-11-22)
 
 ## Corpus Check
-- 69 files · ~68,997 words
+- 69 files · ~69,027 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 21 file(s) not represented in the graph (top: .puml 16, .example 1, (none) 1)
 
 ## Summary
-- 571 nodes · 825 edges · 43 communities (20 shown, 23 thin omitted)
+- 572 nodes · 826 edges · 47 communities (21 shown, 26 thin omitted)
 - Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 63 edges (avg confidence: 0.9)
 - Token cost: 177,006 input · 6,991 output
 
 ## Graph Freshness
-- Built from commit: `ec6575cc`
+- Built from commit: `3e14a5c3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,6 +31,7 @@
 - auto-compile-plantuml.py
 - Host
 - ADR-004: Inclusión de la Entidad Switch
+- package.json
 - Estado
 - Switch
 - SseClient
@@ -42,7 +43,7 @@
 - abrirModalDimensionar
 - Guía de Modelado RUP y Reglas del Agente
 - Información del caso de uso
-- Estado
+- Referencias
 - Diagrama de Clases de Dominio
 - Microsoft-Windows-DHCP Client Events/Operational
 - Zero-Touch Architecture
@@ -50,8 +51,10 @@
 - Red
 - rup-auditor.md
 - Auditoría de Red SNMPwalk: Estado de Bocas (UP/DOWN) y Velocidades de Negociación
+- OpSys > dimensionarCuadricula
 - Referencias
 - Host
+- abrirModalAsignarSwitch
 - Proceso Unificado RUP · OpSys
 
 ## God Nodes (most connected - your core abstractions)
@@ -75,8 +78,8 @@
   RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md → daemon/domain/Host.js
 - `Referencias` --references--> `Host`  [INFERRED]
   RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md → daemon/domain/Host.js
-- `Información del caso de uso` --references--> `Switch`  [INFERRED]
-  RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md → daemon/domain/Switch.js
+- `Referencias` --references--> `Host`  [INFERRED]
+  RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md → daemon/domain/Host.js
 
 ## Import Cycles
 - None detected.
@@ -88,7 +91,7 @@
 - **Rationale for Discarding OOB/Agent-based Shutdown** — ref_02_wijekoon_2011, ref_09_agarwal_2009, ref_10_ruan_2014, opsys_zero_touch_architecture [EXTRACTED 1.00]
 - **Observability and Diagnosis Flow** — domain_estado_evaluadorestado, cu_consultarestadopuestos, cu_consultardetallepuesto [INFERRED 0.85]
 
-## Communities (43 total, 23 thin omitted)
+## Communities (47 total, 26 thin omitted)
 
 ### Community 0 - "app.js"
 Cohesion: 0.03
@@ -111,16 +114,12 @@ Cohesion: 0.07
 Nodes (29): context, dockerfile, networks, tfg-net, services, telemetry-daemon, virtual-switch, web (+21 more)
 
 ### Community 6 - "SnmpSwitchProvider"
-Cohesion: 0.08
-Nodes (16): NetworkProvider, SimulatedSwitchProvider, snmp, SnmpSwitchProvider, dependencies, net-snmp@^3.29.2, description, main (+8 more)
+Cohesion: 0.13
+Nodes (6): NetworkProvider, SimulatedSwitchProvider, snmp, SnmpSwitchProvider, assert, testSnmpSwitchProvider()
 
 ### Community 7 - "procesarDatosLaboratorio"
 Cohesion: 0.20
 Nodes (14): actualizarBotonesAsignacion(), actualizarBotonesModo(), actualizarSelectRangeOptions(), actualizarVista(), aplicarAjustePantalla(), aplicarDimensionesCuadricula(), cambiarModo(), cerrarModalAsignarSwitch() (+6 more)
-
-### Community 9 - "DashboardRenderer"
-Cohesion: 0.21
-Nodes (4): abrirModalAsignarSwitch(), actualizarTablaModalAsignar(), DashboardRenderer, escapeHtml()
 
 ### Community 11 - "2. Auditoría Física de Enlace por Switch (SNMP Directo)"
 Cohesion: 0.25
@@ -135,8 +134,12 @@ Cohesion: 0.29
 Nodes (7): Guía de Contexto, Arquitectura y Reglas del Proyecto, EvaluadorEstado, Host, Laboratorio, Puesto, Switch, Arquitectura de Telemetría SNMP y Observabilidad Física
 
 ### Community 14 - "ADR-004: Inclusión de la Entidad Switch"
-Cohesion: 0.12
-Nodes (28): Administrador, DOC-MS-02: Wake on LAN behavior in Windows 10/11, ADR-001: Justificación y Acotamiento de Acciones, ADR-002: Acotamiento de Control de Energía, ADR-003: Arquitectura de Remediación de Red, ADR-004: Inclusión de la Entidad Switch, Catálogo de Decisiones, Registros de Decisiones Arquitectónicas (ADR) (+20 more)
+Cohesion: 0.14
+Nodes (25): Administrador, DOC-MS-02: Wake on LAN behavior in Windows 10/11, ADR-001: Justificación y Acotamiento de Acciones, ADR-002: Acotamiento de Control de Energía, ADR-003: Arquitectura de Remediación de Red, ADR-004: Inclusión de la Entidad Switch, Catálogo de Decisiones, Registros de Decisiones Arquitectónicas (ADR) (+17 more)
+
+### Community 15 - "package.json"
+Cohesion: 0.20
+Nodes (10): dependencies, net-snmp@^3.29.2, description, main, name, scripts, start, test (+2 more)
 
 ### Community 16 - "Estado"
 Cohesion: 0.33
@@ -150,21 +153,25 @@ Nodes (14): 1. El Núcleo Metodológico: La Rúbrica de Requisitos (30% - 40% - 
 Cohesion: 0.25
 Nodes (8): Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > asignarPuestosASwitch(), Postcondiciones, Precondiciones, Prototipo (Wireframe), Referencias
 
-### Community 33 - "Estado"
-Cohesion: 0.29
-Nodes (4): Estado, Descripción del caso de uso, Información del caso de uso, Referencias
+### Community 33 - "Referencias"
+Cohesion: 0.33
+Nodes (6): Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > consultarEstadoPuestos(), Prototipo (Wireframe), Referencias
 
 ### Community 40 - "Auditoría de Red SNMPwalk: Estado de Bocas (UP/DOWN) y Velocidades de Negociación"
 Cohesion: 0.33
 Nodes (5): Auditoría de Red SNMPwalk: Estado de Bocas (UP/DOWN) y Velocidades de Negociación, Resumen Consolidado de Velocidades Negociadas, Switch `10.10.136.13` -- Switch Principal Rack (sw13), Switch `10.10.136.39` -- Switch Auxiliar Laboratorio (sw39), Switch `10.10.136.42` -- Switch Auxiliar Laboratorio (sw42)
 
-### Community 43 - "Referencias"
+### Community 42 - "OpSys > dimensionarCuadricula"
 Cohesion: 0.33
-Nodes (6): Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > cambiarModo(), Prototipo (Wireframe), Referencias
+Nodes (6): Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > dimensionarCuadricula(), Prototipo (Wireframe), Referencias
 
-### Community 44 - "Host"
-Cohesion: 0.15
-Nodes (7): Host, Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > dimensionarCuadricula(), Prototipo (Wireframe), Referencias
+### Community 43 - "Referencias"
+Cohesion: 0.20
+Nodes (7): Estado, Descripción del caso de uso, Especificación, Información del caso de uso, OpSys > cambiarModo(), Prototipo (Wireframe), Referencias
+
+### Community 45 - "abrirModalAsignarSwitch"
+Cohesion: 0.50
+Nodes (3): abrirModalAsignarSwitch(), actualizarTablaModalAsignar(), escapeHtml()
 
 ### Community 46 - "Proceso Unificado RUP · OpSys"
 Cohesion: 0.40
@@ -173,12 +180,12 @@ Nodes (4): 1. Disciplinas y Fases RUP, 2. Trazabilidad de Casos de Uso, Informac
 ## Knowledge Gaps
 - **17 isolated node(s):** `ADR-0004`, `OpSys - Supervisión de Laboratorio`, `Modal: Detalle de Puesto`, `Button: Consultar estado`, `Button: Dimensionar` (+12 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 313 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **26 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Puesto` connect `Puesto` to `Información del caso de uso`, `Estado`, `test-domain.js`, `Referencias`, `Host`, `Estado`?**
+- **Why does `Puesto` connect `Puesto` to `Información del caso de uso`, `Referencias`, `test-domain.js`, `LaboratorioService.js`, `OpSys > dimensionarCuadricula`, `Referencias`, `Estado`?**
   _High betweenness centrality (0.060) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `Laboratorio` (e.g. with `Referencias` and `Referencias`) actually correct?**
   _`Laboratorio` has 5 INFERRED edges - model-reasoned connections that need verification._
