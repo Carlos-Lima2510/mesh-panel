@@ -503,8 +503,8 @@ function abrirModalAsignarSwitch() {
   // Cargar switches gestionados de destino en el select
   if (modalAsignarSwitchSelect) {
     modalAsignarSwitchSelect.innerHTML = '';
-    const lista = (switchesCatalogo && switchesCatalogo.length > 0)
-      ? switchesCatalogo.filter(s => s.tipo === 'GESTIONADO' || s.es_gestionado || s.id.startsWith('sw-0'))
+    const lista = (switchesDisponibles && switchesDisponibles.length > 0)
+      ? switchesDisponibles.filter(s => s.tipo === 'GESTIONADO' || s.es_gestionado || s.id.startsWith('sw-0') || s.id === 'sw-docente')
       : [
           { id: 'sw-01', nombre: 'SW-01 -- 10.10.136.11', ip_gestion: '10.10.136.11' },
           { id: 'sw-02', nombre: 'SW-02 -- 10.10.136.12', ip_gestion: '10.10.136.12' },

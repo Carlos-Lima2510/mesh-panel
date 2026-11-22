@@ -210,9 +210,9 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795386296.8271651,
-    "seen": 1795386299.4700234,
-    "ast_hash": "9c3ae5e63935382ac556283a6f9aa5e4",
+    "mtime": 1795386540.003259,
+    "seen": 1795386541.8525991,
+    "ast_hash": "a123336d17b80545b76a97bc0f1fd1f3",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795386195.3917086,
-    "seen": 1795386236.7857409,
-    "ast_hash": "6486a19f241ac041c90275c50b164817",
+    "mtime": 1795386312.386235,
+    "seen": 1795386541.8526974,
+    "ast_hash": "c8f8ce9f274562aed35773645f106db0",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {
