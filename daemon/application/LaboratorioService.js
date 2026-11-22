@@ -161,26 +161,26 @@ class LaboratorioService {
     this.switchesPorDefecto = [
       new Switch({
         id: 'sw-01',
-        nombre: 'SW-01 -- 10.10.136.11',
+        nombre: 'SW-01 -- 10.10.136.13',
         tipo: 'GESTIONADO',
         totalPuertos: 48,
-        ipGestion: '10.10.136.11',
+        ipGestion: '10.10.136.13',
         red: this.redesPorDefecto[0]
       }),
       new Switch({
         id: 'sw-02',
-        nombre: 'SW-02 -- 10.10.136.12',
+        nombre: 'SW-02 -- 10.10.136.42',
         tipo: 'GESTIONADO',
         totalPuertos: 48,
-        ipGestion: '10.10.136.12',
+        ipGestion: '10.10.136.42',
         red: this.redesPorDefecto[0]
       }),
       new Switch({
         id: 'sw-03',
-        nombre: 'SW-03 -- 10.10.136.13',
+        nombre: 'SW-03 -- 10.10.136.39',
         tipo: 'GESTIONADO',
         totalPuertos: 48,
-        ipGestion: '10.10.136.13',
+        ipGestion: '10.10.136.39',
         red: this.redesPorDefecto[0]
       }),
       new Switch({
@@ -188,7 +188,7 @@ class LaboratorioService {
         nombre: 'Switch Principal Docente',
         tipo: 'GESTIONADO',
         totalPuertos: parseInt(process.env.SWITCH_TOTAL_PUERTOS, 10) || 96,
-        ipGestion: process.env.SNMP_HOST || '10.0.0.2',
+        ipGestion: process.env.SNMP_HOST || '10.10.136.13',
         red: this.redesPorDefecto[0]
       }),
       new Switch({

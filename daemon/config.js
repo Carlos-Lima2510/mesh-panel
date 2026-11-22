@@ -23,7 +23,7 @@ module.exports = {
   // Modo pre-despliegue / verificación física de cableado
   modoDespliegue: process.env.MODO_DESPLIEGUE === 'true' || process.env.MODO_DESPLIEGUE === 'cableado',
 
-  snmpSwitches: (process.env.SNMP_SWITCHES || '10.10.136.13,10.10.136.39,10.10.136.42')
+  snmpSwitches: (process.env.SNMP_SWITCHES || '10.10.136.13,10.10.136.42,10.10.136.39')
     .split(',')
     .map(s => s.trim())
     .filter(Boolean)

@@ -461,7 +461,7 @@ function actualizarTablaModalAsignar(seleccionados, targetSwitchObj) {
   });
 
   if (modalAsignarPreviewLine) {
-    const ipOrName = targetSwitchObj?.ip_gestion || targetSwitchObj?.nombre || '10.10.136.11';
+    const ipOrName = targetSwitchObj?.ip_gestion || targetSwitchObj?.nombre || '10.10.136.13';
     modalAsignarPreviewLine.textContent = `Switch: ${ipOrName} - Boca: ${primerBoca || 'port01'}`;
   }
 }
@@ -516,9 +516,9 @@ function abrirModalAsignarSwitch() {
     const lista = (switchesDisponibles && switchesDisponibles.length > 0)
       ? switchesDisponibles.filter(s => s.tipo === 'GESTIONADO' || s.es_gestionado || s.id.startsWith('sw-0') || s.id === 'sw-docente')
       : [
-          { id: 'sw-01', nombre: 'SW-01 -- 10.10.136.11', ip_gestion: '10.10.136.11' },
-          { id: 'sw-02', nombre: 'SW-02 -- 10.10.136.12', ip_gestion: '10.10.136.12' },
-          { id: 'sw-03', nombre: 'SW-03 -- 10.10.136.13', ip_gestion: '10.10.136.13' }
+          { id: 'sw-01', nombre: 'SW-01 -- 10.10.136.13', ip_gestion: '10.10.136.13' },
+          { id: 'sw-02', nombre: 'SW-02 -- 10.10.136.42', ip_gestion: '10.10.136.42' },
+          { id: 'sw-03', nombre: 'SW-03 -- 10.10.136.39', ip_gestion: '10.10.136.39' }
         ];
 
     lista.forEach(sw => {

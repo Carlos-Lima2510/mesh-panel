@@ -42,7 +42,7 @@ El Administrador selecciona una tarjeta de puesto en el cuadro de mando general 
      * **Dirección MAC:** Identificador físico de la tarjeta de red (`20:88:10:71:F8:E3`).
      * **Agente Windows:** Estado de comunicación representado directamente mediante el icono de sistema y texto conciso (`🪟 En línea` o `🪟 Fuera de línea`), sin etiquetas intermedias superfluas.
    * **Bloque derecho (Infraestructura de Red y Switch):**
-     * **Switch asignado:** Dirección IP y conmutador gestionado del rack (`10.10.136.11 (SW-01)`).
+     * **Switch asignado:** Dirección IP y conmutador gestionado del rack (`10.10.136.13 (SW-01)`).
      * **Puerto de switch:** Boca física detectada por SNMP y enlace eléctrico Capa 1 (`port02 (1000 Mbps - UP)`).
 3. **Desglose del diagnóstico determinista:**
    * Justificación técnica clara y comprensible del porqué del estado resultante según la correlación de Capa 1 y Capa 7 con el modo operativo del aula.

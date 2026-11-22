@@ -1,15 +1,15 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795386129.0754104,
-    "seen": 1795386131.7875452,
-    "ast_hash": "d9949aff33e3741fbf36468be30a72e4",
+    "mtime": 1795387008.9473684,
+    "seen": 1795387010.8543963,
+    "ast_hash": "ff756eb3d5504fad3fd97260e0817fc8",
     "semantic_hash": ""
   },
   "daemon/config.js": {
-    "mtime": 1795374316.4778001,
-    "seen": 1795383805.07198,
-    "ast_hash": "1ac26f408d34cd66d04ee6633edba6d4",
-    "semantic_hash": "1ac26f408d34cd66d04ee6633edba6d4"
+    "mtime": 1795387021.9064267,
+    "seen": 1795387023.504572,
+    "ast_hash": "62066cc41c2b66fff29e7b4f87c5f40e",
+    "semantic_hash": ""
   },
   "daemon/daemon.js": {
     "mtime": 1795374316.4780238,
@@ -210,9 +210,9 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795386650.6067564,
-    "seen": 1795386653.086349,
-    "ast_hash": "e9a7d41f3abf3f3d5c30d5aafd44efbe",
+    "mtime": 1795387043.2425227,
+    "seen": 1795387045.0229104,
+    "ast_hash": "56de70b4089cc4fecf7ba4df978fb1c8",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795386574.3284132,
-    "seen": 1795386653.0864384,
-    "ast_hash": "170cb784df076fa27830e2c9e3026c42",
+    "mtime": 1795386673.3888588,
+    "seen": 1795387010.854636,
+    "ast_hash": "a7327f95877e3c671cb39e911686f73d",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {
@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795386049.213089,
-    "seen": 1795386050.780645,
-    "ast_hash": "8b2f202ab9e10b28e2b5bda394a6652e",
+    "mtime": 1795387072.215653,
+    "seen": 1795387073.698157,
+    "ast_hash": "61fe0e093875f6c6cb81c37407fdf610",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
@@ -372,15 +372,15 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
-    "mtime": 1795374316.4745567,
-    "seen": 1795383805.072131,
-    "ast_hash": "8fd70cb8df18d394590e0ae7ac266e60",
+    "mtime": 1795387129.999913,
+    "seen": 1795387131.5257823,
+    "ast_hash": "38185c012c4bb7b25b125f6eee0a3a4e",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
-    "mtime": 1795374316.4753258,
-    "seen": 1795383805.0721338,
-    "ast_hash": "10086be26aa0318b617e4aec22b5abf2",
+    "mtime": 1795387158.3480403,
+    "seen": 1795387160.0990586,
+    "ast_hash": "25aa583653efa93131241564a32067d5",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md": {
@@ -426,9 +426,9 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
-    "mtime": 1795386040.551161,
-    "seen": 1795386050.7807367,
-    "ast_hash": "06028ed801f73b76e7f2913e29a5cf84",
+    "mtime": 1795387061.1248813,
+    "seen": 1795387073.6982465,
+    "ast_hash": "6943dae1172808e7a2f81b28d7a10320",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/especificacion.svg": {
@@ -444,15 +444,15 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
-    "mtime": 1795374316.493771,
-    "seen": 1795383805.0722127,
-    "ast_hash": "fca304afbc4c53bf15c39a7cefa4fb3b",
+    "mtime": 1795387085.4820042,
+    "seen": 1795387131.525877,
+    "ast_hash": "bfa1d8399aa5cb992a83182a3d8334cb",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
-    "mtime": 1795374316.4949317,
-    "seen": 1795383805.0722182,
-    "ast_hash": "29495947b3e4729b62f0d534655e55b2",
+    "mtime": 1795387147.3950338,
+    "seen": 1795387160.0992036,
+    "ast_hash": "11d7aeb45378555008c60afa6ac25f00",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/wireframes.svg": {

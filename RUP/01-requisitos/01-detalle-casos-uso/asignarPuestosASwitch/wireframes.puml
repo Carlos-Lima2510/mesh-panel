@@ -9,19 +9,19 @@ skinparam defaultFontName sans-serif
     }
     --
     {
-      <b>Switch gestionado de destino:</b> | ^SW-01 -- 10.10.136.11^
+      <b>Switch gestionado de destino:</b> | ^SW-01 -- 10.10.136.13^
     }
     --
     {#
       <b>Puesto Físico</b> | <b>Switch Asignado (IP)</b> | <b>Boca Detectada (SNMP)</b>
-      PC-01 | SW-01 (10.10.136.11) | port01
-      PC-02 | SW-01 (10.10.136.11) | port02
-      PC-03 | SW-01 (10.10.136.11) | port03
-      PC-04 | SW-01 (10.10.136.11) | port04
+      PC-01 | SW-01 (10.10.136.13) | port01
+      PC-02 | SW-01 (10.10.136.13) | port02
+      PC-03 | SW-01 (10.10.136.13) | port03
+      PC-04 | SW-01 (10.10.136.13) | port04
     }
     --
     {
-      <i>Línea informativa en tarjeta:</i> | <color:#1A5F7A><b>Switch: 10.10.136.11 - Boca: port01</b></color>
+      <i>Línea informativa en tarjeta:</i> | <color:#1A5F7A><b>Switch: 10.10.136.13 - Boca: port01</b></color>
     }
     --
     {
