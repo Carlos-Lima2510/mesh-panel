@@ -40,7 +40,7 @@ state dimensionarCuadricula as "dimensionarCuadricula()" {
     c -[#orange]-> [*]
     note on link
     [Cancelación de la solicitud]
-    <b>Sistema</b> cierra el diálogo manteniendo las dimensiones previas sin cambios
+    <b>Sistema</b> presenta cuadro general manteniendo las dimensiones previas sin cambios
     end note
 }
 

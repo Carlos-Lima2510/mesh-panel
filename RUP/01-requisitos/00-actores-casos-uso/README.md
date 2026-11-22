@@ -96,7 +96,7 @@ El catálogo consta de **8 casos de uso** a nivel de objetivo de usuario (*User-
 * **Descripción:** Envía un paquete de difusión Ethernet de Capa 2 (*Magic Packet* / *Wake-on-LAN*) dirigido a la dirección MAC del puesto de trabajo en estado de reposo (`STANDBY`), activando la fuente de alimentación a través de la interfaz de red para preparar el equipo antes de la clase.
 * **Precondición:** El puesto físico cuenta con un host asignado y se encuentra en estado `STANDBY` (chip PHY energizado en reposo $S5$).
 * **Postcondición:** Se emite el paquete *Magic Packet* y el equipo inicia su secuencia de arranque.
-* **Nota de Alcance ([ADR-002](../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md)):** Se excluye intencionadamente el apagado remoto interactivo debido a la ausencia física de procesador fuera de banda Intel AMT en las máquinas Dell OptiPlex (FPF fundidos de fábrica) y la inviabilidad por destino compartido (*fate sharing*) en puestos desconfigurados.
+* **Nota de Alcance ([ADR-002](../../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md)):** Se excluye intencionadamente el apagado remoto interactivo debido a la ausencia física de procesador fuera de banda Intel AMT en las máquinas Dell OptiPlex (FPF fundidos de fábrica) y la inviabilidad por destino compartido (*fate sharing*) en puestos desconfigurados.
 
 ---
 
