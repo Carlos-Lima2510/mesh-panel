@@ -1,10 +1,23 @@
-<div align=right>
+<h1 align="center">OpSys · Supervisión de Laboratorios</h1>
 
-<sub>[Al inicio](/README.md) / [Modelo del dominio](/RUP/00-modelo-del-dominio/README.md) / [Requisitos](/RUP/01-requisitos/README.md) / Análisis / Diseño / Desarrollo</sub><br><sub>OpSys -- Plataforma de supervisión y observabilidad en tiempo real de puestos de trabajo en laboratorios docentes compartidos.</sub>
+<p align="center">
+  <b>Plataforma de Supervisión y Observabilidad en Tiempo Real de Puestos de Trabajo en Laboratorios Docentes Compartidos</b><br>
+  <i>Ingeniería del Software · UNEATLANTICO</i>
+</p>
+
+<div align="center">
+
+[![](https://img.shields.io/badge/-Inicio-24292e?style=for-the-badge&logo=github&logoColor=white)](/README.md)
+[![](https://img.shields.io/badge/-RUP-24292e?style=for-the-badge&logo=Elsevier&logoColor=white)](/RUP/README.md)
+[![](https://img.shields.io/badge/-Modelo_del_Dominio-24292e?style=for-the-badge&logo=diagramsdotnet&logoColor=white)](/RUP/00-modelo-del-dominio/README.md)
+[![](https://img.shields.io/badge/-Requisitos-24292e?style=for-the-badge&logo=crewunited&logoColor=white)](/RUP/01-requisitos/README.md)
+[![](https://img.shields.io/badge/-Detalle_Casos_de_Uso-24292e?style=for-the-badge&logo=buffer&logoColor=white)](/RUP/01-requisitos/01-detalle-casos-uso/README.md)
+[![](https://img.shields.io/badge/-Matriz_Documental-24292e?style=for-the-badge&logo=gitbook&logoColor=white)](/docs/matriz-documental-general.md)
+[![](https://img.shields.io/badge/-Decisiones_ADR-24292e?style=for-the-badge&logo=gitbook&logoColor=white)](/docs/adr/README.md)
 
 </div>
 
-# OpSys
+---
 
 Página concentradora de los artefactos RUP de OpSys: desde aquí se llega a cada fase y a la trazabilidad completa por caso de uso.
 

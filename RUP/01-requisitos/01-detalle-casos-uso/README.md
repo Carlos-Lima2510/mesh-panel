@@ -1,20 +1,13 @@
 <div align=right>
 
-<sub>[Al inicio](/README.md) / [Modelo del dominio](/RUP/00-modelo-del-dominio/README.md) / [Requisitos](/RUP/01-requisitos/README.md) / [Actores y Contexto](/RUP/01-requisitos/00-actores-casos-uso/README.md) / Análisis / Diseño / Desarrollo</sub><br><sub>OpSys -- Plataforma de supervisión y observabilidad en tiempo real de puestos de trabajo en laboratorios docentes compartidos.</sub>
+|[![](https://img.shields.io/badge/-Inicio-24292e?style=flat&logo=github&logoColor=white)](/README.md) [![](https://img.shields.io/badge/-RUP-24292e?style=flat&logo=Elsevier&logoColor=white)](/RUP/README.md) [![](https://img.shields.io/badge/-Modelo_del_dominio-24292e?style=flat&logo=diagramsdotnet&logoColor=white)](/RUP/00-modelo-del-dominio/README.md) [![](https://img.shields.io/badge/-Requisitos-24292e?style=flat&logo=crewunited&logoColor=white)](/RUP/01-requisitos/README.md) [![](https://img.shields.io/badge/-Detalle_Casos_de_Uso-24292e?style=flat&logo=buffer&logoColor=white)](/RUP/01-requisitos/01-detalle-casos-uso/README.md) [![](https://img.shields.io/badge/-Matriz_Documental-24292e?style=flat&logo=gitbook&logoColor=white)](/docs/matriz-documental-general.md) [![](https://img.shields.io/badge/-Decisiones_ADR-24292e?style=flat&logo=gitbook&logoColor=white)](/docs/adr/README.md)
+|-:
 
 </div>
 
 # OpSys - Detalle y Prototipado de Casos de Uso
 
 Índice concentrador de las especificaciones detalladas y prototipos de interfaz de usuario para cada uno de los casos de uso del sistema.
-
-<div align=center>
-
-|🏠️|DdC|Detalle|Análisis|Diseño|Desarrollo|Pruebas|
-|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|[Inicio](/README.md)|[DdC](/RUP/01-requisitos/00-actores-casos-uso/README.md#2-diagrama-de-contexto)|[Detalle](README.md)|Pendiente|Pendiente|Pendiente|Pendiente|
-
-</div>
 
 ---
 
