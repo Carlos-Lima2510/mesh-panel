@@ -1,4 +1,4 @@
-function escapeHtml(str) {
+export function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str
     .replace(/&/g, '&amp;')
@@ -241,10 +241,18 @@ export class DashboardRenderer {
   generarEmptySlotHtml(num, puestoFisico = null, switchesList = []) {
     const slotStr = String(num).padStart(2, '0');
     const puestoId = puestoFisico?.id || `puesto-${num}`;
-    const swIdActual = puestoFisico?.switch_id || 'sw-docente';
+    const swIdActual = puestoFisico?.switch_id || 'sw-01';
     const isSwPracticas = swIdActual === 'sw-practicas';
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
+    const swObj = switchesList.find(s => s.id === swIdActual);
+    let swLabel = 'Universitario';
+    if (isSwPracticas) {
+      swLabel = 'Prácticas';
+    } else if (swObj) {
+      swLabel = swObj.ip_gestion || (swObj.nombre && swObj.nombre.startsWith('SW-') ? swObj.nombre.split(' -- ')[0] : swObj.nombre);
+    } else if (puestoFisico?.switch_nombre) {
+      swLabel = puestoFisico.switch_nombre.startsWith('SW-') ? puestoFisico.switch_nombre.split(' -- ')[0] : puestoFisico.switch_nombre;
+    }
 
     return `
       <div class="card-top">
@@ -300,10 +308,18 @@ export class DashboardRenderer {
     const agenteClass = isConnAgent ? 'agent-online' : 'agent-offline';
 
     const puestoId = p.puesto_id || puestoFisico?.id || `puesto-${slotNum}`;
-    const swIdActual = puestoFisico?.switch_id || (p.telemetria?.switch_asignado?.toLowerCase().includes('práctica') ? 'sw-practicas' : 'sw-docente');
+    const swIdActual = puestoFisico?.switch_id || (p.telemetria?.switch_asignado?.toLowerCase().includes('práctica') ? 'sw-practicas' : 'sw-01');
     const isSwPracticas = swIdActual === 'sw-practicas' || (p.red?.es_aislada === true);
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
+    const swObj = switchesList.find(s => s.id === swIdActual);
+    let swLabel = 'Universitario';
+    if (isSwPracticas) {
+      swLabel = 'Prácticas';
+    } else if (swObj) {
+      swLabel = swObj.ip_gestion || (swObj.nombre && swObj.nombre.startsWith('SW-') ? swObj.nombre.split(' -- ')[0] : swObj.nombre);
+    } else if (puestoFisico?.switch_nombre) {
+      swLabel = puestoFisico.switch_nombre.startsWith('SW-') ? puestoFisico.switch_nombre.split(' -- ')[0] : puestoFisico.switch_nombre;
+    }
 
     const ipText = p.telemetria?.ip_reportada || p.ip || '---';
     const canWake = (p.estado === 'GRIS' || p.estado === 'AMARILLO') && p.soporta_wol !== false;

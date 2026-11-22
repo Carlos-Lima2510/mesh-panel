@@ -16,19 +16,19 @@
       <b>🟢 PC-01</b> | [<color:gray>⚡</color>] | <i>#01</i>
       IP: 10.10.136.101
       Port: port1 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 En línea | . | [→]
     } | {
       <back:#bfdbfe><b>🟢 PC-02</b></back> | <back:#bfdbfe>[<color:gray>⚡</color>]</back> | <back:#bfdbfe><i>#02</i></back>
       <back:#bfdbfe>IP: 10.10.136.102</back>
       <back:#bfdbfe>Port: port2 🟢</back>
-      <back:#bfdbfe>Switch: 10.10.136.11</back>
+      <back:#bfdbfe>Switch: 10.10.136.13</back>
       <back:#bfdbfe>🪟 En línea</back> | <back:#bfdbfe>.</back> | <back:#bfdbfe>[→]</back>
     } | {
       <b>⚫ PC-03</b> | [ ⚡ ] | <i>#03</i>
       IP: ---
       Port: port3 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 Desconectado | . | [→]
     } | <b>            ║  Pasillo  ║</b> | {
       <back:#bfdbfe><b>🟢 PC-04</b></back> | <back:#bfdbfe>[<color:gray>⚡</color>]</back> | <back:#bfdbfe><i>#04</i></back>
@@ -53,19 +53,19 @@
       <b>🟢 PC-07</b> | [<color:gray>⚡</color>] | <i>#07</i>
       IP: 10.10.136.107
       Port: port7 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 En línea | . | [→]
     } | {
       <b>🟡 PC-08</b> | [ ⚡ ] | <i>#08</i>
       IP: 10.10.136.108
       Port: port8 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 Desconectado | . | [→]
     } | {
       <b>🟢 PC-09</b> | [<color:gray>⚡</color>] | <i>#09</i>
       IP: 10.10.136.109
       Port: port9 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 En línea | . | [→]
     } | <b>            ║  Pasillo  ║</b> | {
       <b>🟢 PC-10</b> | [<color:gray>⚡</color>] | <i>#10</i>
@@ -90,19 +90,19 @@
       <b>⚫ PC-13</b> | [ ⚡ ] | <i>#13</i>
       IP: ---
       Port: port13 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 Desconectado | . | [→]
     } | {
       <b>🟡 PC-14</b> | [ ⚡ ] | <i>#14</i>
       IP: ---
       Port: port14 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 Desconectado | . | [→]
     } | {
       <b>🟢 PC-15</b> | [<color:gray>⚡</color>] | <i>#15</i>
       IP: 10.10.136.115
       Port: port15 🟢
-      Switch: 10.10.136.11
+      Switch: 10.10.136.13
       🪟 En línea | . | [→]
     } | <b>            ║  Pasillo  ║</b> | {
       <b>🟢 PC-16</b> | [<color:gray>⚡</color>] | <i>#16</i>

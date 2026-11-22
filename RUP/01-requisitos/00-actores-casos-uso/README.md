@@ -116,9 +116,9 @@ El catálogo consta de **8 casos de uso** a nivel de objetivo de usuario (*User-
 
 #### `cambiarModo()`
 * **Actor Principal:** `Administrador`.
-* **Descripción:** Conmuta la heurística contextual de interpretación de enlaces a nivel de todo el aula entre **`Modo Clase`** (un puerto `DOWN` indica anomalía física o cable desconectado $\rightarrow$ `DESCONECTADO`) y **`Modo Práctica`** (un puerto `DOWN` indica traslado legítimo del latiguillo al rack de prácticas $\rightarrow$ `RED_AISLADA`).
+* **Descripción:** Conmuta la heurística contextual de interpretación de enlaces a nivel de todo el aula o por hilera (delimitada por el pasillo central) entre **`Modo Clase`** (un puerto `DOWN` indica anomalía física o cable desconectado $\rightarrow$ `DESCONECTADO`) y **`Modo Práctica`** (un puerto `DOWN` indica traslado legítimo del latiguillo al rack de prácticas $\rightarrow$ `RED_AISLADA`). Permite al operador seleccionar el modo y el alcance de aplicación (`Toda el aula`, `Hilera Izquierda` o `Hilera Derecha`) para dar soporte a escenarios de aulas híbridas con subgrupos de prácticas simultáneos sin generar falsas alarmas de desconexión.
 * **Precondición:** El laboratorio se encuentra activo.
-* **Postcondición:** Se actualiza el atributo `laboratorio.modo` y se reevalúa en memoria en $< 1\text{ ms}$ el estado semafórico de todos los puestos conectados al switch docente.
+* **Postcondición:** Se actualizan los atributos `laboratorio.modo` y `laboratorio.alcancePractica`, reevaluando en memoria en $< 1\text{ ms}$ el estado semafórico de los puestos según el alcance seleccionado y difundiendo el nuevo snapshot vía Server-Sent Events (SSE).
 
 ---
 

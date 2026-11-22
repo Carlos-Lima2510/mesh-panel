@@ -26,32 +26,36 @@
 | Atributo | Valor |
 | :--- | :--- |
 | **Actor** | Administrador |
-| **Objetivo** | Conmutar el contexto operacional global del laboratorio docente entre `Modo Clase` (operación habitual en red docente) y `Modo Práctica` (laboratorio en red aislada de prácticas) para re-evaluar inmediatamente en memoria los diagnósticos deterministas de todos los puestos de trabajo sin generar alarmas erróneas de cable desconectado |
+| **Objetivo** | Conmutar el contexto operacional del laboratorio docente entre `Modo Clase` (operación habitual en red docente) y `Modo Práctica` (laboratorio en red aislada de prácticas), permitiendo delimitar el alcance de la práctica a toda el aula o a una hilera específica (separada por el pasillo central), para re-evaluar inmediatamente en memoria los diagnósticos deterministas de los puestos de trabajo sin generar alarmas erróneas de cable desconectado |
 | **Tipo** | Primario, esencial |
 | **Nivel** | Objetivo de usuario (User-Goal Level) |
 
 ### Descripción del caso de uso
 
-El caso de uso modela la conmutación del contexto operacional global del aula, permitiendo adaptar las reglas de clasificación determinista de la telemetría según la actividad docente que se esté desarrollando:
+El caso de uso modela la conmutación del contexto operacional del aula, permitiendo adaptar las reglas de clasificación determinista de la telemetría según la actividad docente que se esté desarrollando:
 
-1. **Contextos Operacionales del Aula:**
+1. **Contextos y Alcances Operacionales del Aula:**
    * **`Modo Clase` (Operación Normal):**
-     * Todos los puestos deben encontrarse conectados al Switch Principal Docente (`sw-docente`).
+     * Todos los puestos deben encontrarse conectados a la infraestructura docente ordinaria.
      * Si la boca del switch pasa a `DOWN` y el agente no conecta, se diagnostica como una anomalía física $\rightarrow$ **`🟠 DESCONECTADO` (Cable Desconectado)**.
    * **`Modo Práctica` (Sesión de Redes / Switch Aislado):**
-     * Se espera que los alumnos desconecten físicamente el cable de la roseta docente y lo conecten al switch secundario de prácticas (`sw-practicas`), el cual no dispone de gestión SNMP ni salida a Internet/MeshCentral.
-     * Al detectar la boca del switch docente en `DOWN`, el sistema deduce el cambio legítimo de contexto $\rightarrow$ **`🟡 RED AISLADA` (En Red Aislada de Prácticas)**, evitando falsas alarmas de desconexión.
+     * Se espera que los alumnos del subgrupo de prácticas desconecten físicamente el cable de la roseta docente y lo conecten al switch secundario de prácticas (`sw-practicas`), el cual no dispone de gestión SNMP ni salida a Internet/MeshCentral.
+     * El operador puede seleccionar el **alcance** de la práctica:
+       * **`Toda el aula` (`COMPLETO`):** Todos los puestos del aula asumen la política de red aislada.
+       * **`Hilera Izquierda` (`HILERA_IZQUIERDA`):** Únicamente los puestos de la hilera izquierda (columnas $\le \lceil C/2 \rceil$) asumen la política de red aislada; la hilera derecha permanece en monitorización normal de clase.
+       * **`Hilera Derecha` (`HILERA_DERECHA`):** Únicamente los puestos de la hilera derecha (columnas $> \lceil C/2 \rceil$) asumen la política de red aislada; la hilera izquierda permanece en monitorización normal de clase.
+     * En los puestos bajo alcance de práctica, al detectar la boca del switch docente en `DOWN`, el sistema deduce el cambio legítimo de contexto $\rightarrow$ **`🟡 RED AISLADA` (En Red Aislada de Prácticas)**, evitando falsas alarmas de desconexión.
+     * En los puestos fuera del alcance de práctica, una caída de enlace se sigue reportando rigurosamente como **`🟠 DESCONECTADO`**.
 
 2. **Flujo Principal:**
-   * El Administrador solicita cambiar el modo del aula interactuando con los botones del selector de modo en la cabecera superior del cuadro general (`[ 🎓 Modo Clase ]` o `[ 🧪 Modo Práctica ]`).
-   * El Administrador introduce el modo seleccionado.
-   * El sistema valida la solicitud y actualiza en memoria el atributo `modo` del aggregate root `Laboratorio`.
-   * El aggregate root re-evalúa de forma instantánea en memoria (< 1 ms) la matriz determinista de todos los puestos de trabajo del aula sin requerir nuevas consultas de red externas.
-   * El sistema presenta visualmente el botón seleccionado como activo (`.active-clase` o `.active-practica`), actualiza el estado semafórico de las tarjetas de puestos en la cuadrícula y recalcula los contadores consolidados de métricas.
-   * El sistema difunde de forma reactiva el nuevo snapshot del laboratorio a todos los clientes conectados a través del canal Server-Sent Events (SSE).
+   * El Administrador solicita cambiar el modo operativo del aula.
+   * El Administrador introduce el modo deseado (`Modo Clase` o `Modo Práctica`) y, en caso de seleccionar práctica, introduce el alcance de aplicación (`Toda el aula`, `Hilera Izquierda` o `Hilera Derecha`).
+   * El sistema valida la solicitud y actualiza el contexto operacional del laboratorio y el alcance de la práctica.
+   * El sistema re-evalúa el estado de los puestos de trabajo del aula en función de su ubicación física respecto al pasillo central y del alcance seleccionado.
+   * El sistema presenta el selector con el modo y alcance seleccionados activos, presenta la cuadrícula del laboratorio con los diagnósticos actualizados según el nuevo modo y alcance y presenta el resumen consolidado de métricas recalculado.
 
 3. **Flujos Alternativos y Excepcionales:**
-   * **Fallo de comunicación con el daemon:** Si se produce un fallo de red o error HTTP al intentar contactar con el backend, el sistema presenta un aviso visual de advertencia y mantiene el modo operativo previo sin alteraciones.
+   * **Parámetros inválidos o error de comunicación:** Si se produce un error de comunicación o los parámetros introducidos son inválidos, el sistema presenta un aviso visual de advertencia y mantiene el contexto operacional previo sin modificaciones.
 
 ### Referencias
 * **Diagrama de contexto de Admin:** 

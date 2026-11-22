@@ -1,6 +1,16 @@
 import { DashboardRenderer } from './renderer.js';
 import { SseClient } from './sse-client.js';
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 const SVG_SCAN_IDLE = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>`;
 const SVG_SCAN_SPIN = `<svg class="ui-icon icon-spin" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>`;
 const SVG_SELECT_ALL = `<svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>`;
@@ -24,7 +34,13 @@ const scanIcon = document.getElementById('btn-scan-icon');
 
 const btnModeClase = document.getElementById('btn-mode-clase');
 const btnModePractica = document.getElementById('btn-mode-practica');
+const btnModePracticaText = document.getElementById('btn-mode-practica-text');
 const btnModeCableado = document.getElementById('btn-mode-cableado');
+const modeDropdownContainer = document.querySelector('.mode-dropdown-container');
+const dropdownPracticaMenu = document.getElementById('dropdown-practica-menu');
+const optPracticaIzq = document.getElementById('opt-practica-izq');
+const optPracticaDer = document.getElementById('opt-practica-der');
+const optPracticaTodo = document.getElementById('opt-practica-todo');
 
 const btnAsignarSwitch = document.getElementById('btn-asignar-switch');
 const btnAsignarSwitchText = document.getElementById('btn-asignar-switch-text');
@@ -35,6 +51,9 @@ const btnEncenderSeleccionadosText = document.getElementById('btn-encender-selec
 const modalAsignarSwitch = document.getElementById('modal-asignar-switch');
 const modalAsignarCount = document.getElementById('modal-asignar-count');
 const modalAsignarChips = document.getElementById('modal-asignar-chips');
+const modalAsignarSwitchSelect = document.getElementById('modal-asignar-switch-select');
+const modalAsignarTbody = document.getElementById('modal-asignar-tbody');
+const modalAsignarPreviewLine = document.getElementById('modal-asignar-preview-line');
 const btnModalAsignarClose = document.getElementById('btn-modal-asignar-close');
 const btnModalAsignarCancel = document.getElementById('btn-modal-asignar-cancel');
 const btnModalAsignarConfirm = document.getElementById('btn-modal-asignar-confirm');
@@ -104,18 +123,37 @@ function setStatusBadge(text, isOffline = false) {
   if (span) span.textContent = text;
 }
 
-function actualizarBotonesModo(modo) {
+function actualizarBotonesModo(modo, alcance = 'COMPLETO') {
   if (!btnModeClase || !btnModePractica) return;
   btnModeClase.classList.remove('active-clase');
   btnModePractica.classList.remove('active-practica');
   if (btnModeCableado) btnModeCableado.classList.remove('active-cableado');
 
+  if (optPracticaIzq) optPracticaIzq.classList.remove('active-item');
+  if (optPracticaDer) optPracticaDer.classList.remove('active-item');
+  if (optPracticaTodo) optPracticaTodo.classList.remove('active-item');
+
   if (modo === 'PRACTICA') {
     btnModePractica.classList.add('active-practica');
+    const alcanceNormalizado = alcance || 'COMPLETO';
+    if (btnModePracticaText) {
+      if (alcanceNormalizado === 'IZQUIERDA') {
+        btnModePracticaText.textContent = 'Práctica (Hilera Izq)';
+        if (optPracticaIzq) optPracticaIzq.classList.add('active-item');
+      } else if (alcanceNormalizado === 'DERECHA') {
+        btnModePracticaText.textContent = 'Práctica (Hilera Der)';
+        if (optPracticaDer) optPracticaDer.classList.add('active-item');
+      } else {
+        btnModePracticaText.textContent = 'Práctica (Toda el aula)';
+        if (optPracticaTodo) optPracticaTodo.classList.add('active-item');
+      }
+    }
   } else if (modo === 'CABLEADO') {
     if (btnModeCableado) btnModeCableado.classList.add('active-cableado');
+    if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
   } else {
     btnModeClase.classList.add('active-clase');
+    if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
   }
 }
 
@@ -217,7 +255,7 @@ function procesarDatosLaboratorio(lab) {
     inputRangeHasta.max = totalCalculado;
   }
 
-  actualizarBotonesModo(lab.modo);
+  actualizarBotonesModo(lab.modo, lab.alcance_practica);
   lastMetricas = lab.metricas;
   actualizarVista();
 
@@ -257,13 +295,14 @@ export async function fetchDevices() {
   }
 }
 
-async function cambiarModo(modo) {
+async function cambiarModo(modo, alcance = 'COMPLETO') {
   try {
-    setStatusBadge(`Cambiando a Modo ${modo}...`);
+    const alcanceStr = modo === 'PRACTICA' ? ` (${alcance})` : '';
+    setStatusBadge(`Cambiando a Modo ${modo}${alcanceStr}...`);
     const res = await fetch(`${DAEMON_URL}/api/laboratorio/modo`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ modo })
+      body: JSON.stringify({ modo, alcance })
     });
     const data = await res.json();
     if (data.success && data.laboratorio) {
@@ -308,21 +347,125 @@ if (btnScan) {
   btnScan.addEventListener('click', fetchDevices);
 }
 
+function togglePracticaDropdown() {
+  if (!dropdownPracticaMenu) return;
+  const isShown = dropdownPracticaMenu.style.display === 'flex';
+  dropdownPracticaMenu.style.display = isShown ? 'none' : 'flex';
+  if (modeDropdownContainer) {
+    modeDropdownContainer.classList.toggle('open', !isShown);
+  }
+}
+
+function closePracticaDropdown() {
+  if (dropdownPracticaMenu) dropdownPracticaMenu.style.display = 'none';
+  if (modeDropdownContainer) modeDropdownContainer.classList.remove('open');
+}
+
 if (btnModeClase) {
-  btnModeClase.addEventListener('click', () => cambiarModo('CLASE'));
+  btnModeClase.addEventListener('click', () => {
+    closePracticaDropdown();
+    cambiarModo('CLASE');
+  });
 }
 
 if (btnModePractica) {
-  btnModePractica.addEventListener('click', () => cambiarModo('PRACTICA'));
+  btnModePractica.addEventListener('click', (e) => {
+    e.stopPropagation();
+    togglePracticaDropdown();
+  });
+}
+
+if (optPracticaIzq) {
+  optPracticaIzq.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'IZQUIERDA');
+  });
+}
+
+if (optPracticaDer) {
+  optPracticaDer.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'DERECHA');
+  });
+}
+
+if (optPracticaTodo) {
+  optPracticaTodo.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closePracticaDropdown();
+    cambiarModo('PRACTICA', 'COMPLETO');
+  });
 }
 
 if (btnModeCableado) {
-  btnModeCableado.addEventListener('click', () => cambiarModo('CABLEADO'));
+  btnModeCableado.addEventListener('click', () => {
+    closePracticaDropdown();
+    cambiarModo('CABLEADO');
+  });
 }
+
+document.addEventListener('click', (e) => {
+  if (modeDropdownContainer && !modeDropdownContainer.contains(e.target)) {
+    closePracticaDropdown();
+  }
+});
 
 // ==============================================================================
 // GESTIÓN DEL MODAL: ASIGNAR PUESTOS A SWITCH (CU-04 según Wireframe RUP)
 // ==============================================================================
+function actualizarTablaModalAsignar(seleccionados, targetSwitchObj) {
+  if (!modalAsignarTbody) return;
+  modalAsignarTbody.innerHTML = '';
+
+  const switchColText = targetSwitchObj
+    ? (targetSwitchObj.ip_gestion
+        ? `${targetSwitchObj.nombre && targetSwitchObj.nombre.startsWith('SW-') ? targetSwitchObj.nombre.split(' -- ')[0] : targetSwitchObj.id.toUpperCase()} (${targetSwitchObj.ip_gestion})`
+        : targetSwitchObj.nombre)
+    : '---';
+
+  let primerBoca = null;
+
+  seleccionados.forEach(id => {
+    const pf = puestosFisicos.find(x => x.id === id || String(x.slot) === String(id));
+    let nombrePuesto = null;
+    let bocaDetectada = null;
+
+    for (const h of puestos.values()) {
+      if (h.puesto_id === id || String(h.slot) === String(id)) {
+        nombrePuesto = h.nombre || h.etiqueta;
+        bocaDetectada = h.boca_switch || (h.telemetria?.switch?.portName) || `port${h.slot || ''}`;
+        break;
+      }
+    }
+
+    if (!nombrePuesto) {
+      const slotNum = pf ? pf.slot : parseInt(String(id).replace(/\D/g, ''), 10) || 1;
+      nombrePuesto = pf?.etiqueta || `PC-${String(slotNum).padStart(2, '0')}`;
+    }
+    if (!bocaDetectada) {
+      const slotNum = pf ? pf.slot : parseInt(String(id).replace(/\D/g, ''), 10) || 1;
+      bocaDetectada = pf?.puerto_switch ? `port${String(pf.puerto_switch).padStart(2, '0')}` : `port${String(slotNum).padStart(2, '0')}`;
+    }
+
+    if (!primerBoca) primerBoca = bocaDetectada;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-puesto">${escapeHtml(nombrePuesto)}</td>
+      <td class="td-switch">${escapeHtml(switchColText)}</td>
+      <td class="td-boca">${escapeHtml(bocaDetectada)}</td>
+    `;
+    modalAsignarTbody.appendChild(tr);
+  });
+
+  if (modalAsignarPreviewLine) {
+    const ipOrName = targetSwitchObj?.ip_gestion || targetSwitchObj?.nombre || '10.10.136.13';
+    modalAsignarPreviewLine.textContent = `Switch: ${ipOrName} - Boca: ${primerBoca || 'port01'}`;
+  }
+}
+
 function abrirModalAsignarSwitch() {
   const seleccionados = renderer.obtenerPuestosSeleccionados();
   if (!seleccionados || seleccionados.length === 0) {
@@ -367,8 +510,35 @@ function abrirModalAsignarSwitch() {
     }
   }
 
-  const radioDocente = document.getElementById('radio-switch-docente');
-  if (radioDocente) radioDocente.checked = true;
+  // Cargar switches gestionados de destino en el select
+  if (modalAsignarSwitchSelect) {
+    modalAsignarSwitchSelect.innerHTML = '';
+    const lista = (switchesDisponibles && switchesDisponibles.length > 0)
+      ? switchesDisponibles.filter(s => s.tipo === 'GESTIONADO' || s.es_gestionado || s.id.startsWith('sw-0') || s.id === 'sw-docente')
+      : [
+          { id: 'sw-01', nombre: 'SW-01 -- 10.10.136.13', ip_gestion: '10.10.136.13' },
+          { id: 'sw-02', nombre: 'SW-02 -- 10.10.136.42', ip_gestion: '10.10.136.42' },
+          { id: 'sw-03', nombre: 'SW-03 -- 10.10.136.39', ip_gestion: '10.10.136.39' }
+        ];
+
+    lista.forEach(sw => {
+      const opt = document.createElement('option');
+      opt.value = sw.id;
+      opt.textContent = sw.nombre || `${sw.id.toUpperCase()} -- ${sw.ip_gestion || ''}`;
+      modalAsignarSwitchSelect.appendChild(opt);
+    });
+
+    const getSelectedSwObj = () => {
+      const val = modalAsignarSwitchSelect.value;
+      return lista.find(s => s.id === val) || lista[0];
+    };
+
+    actualizarTablaModalAsignar(seleccionados, getSelectedSwObj());
+
+    modalAsignarSwitchSelect.onchange = () => {
+      actualizarTablaModalAsignar(seleccionados, getSelectedSwObj());
+    };
+  }
 
   if (modalAsignarSwitch) {
     modalAsignarSwitch.style.display = 'flex';
@@ -388,15 +558,14 @@ async function confirmarAsignarSwitch() {
     return;
   }
 
-  const selectedRadio = document.querySelector('input[name="target-switch"]:checked');
-  const targetSwitch = selectedRadio ? selectedRadio.value : 'sw-docente';
-  const switchLabel = targetSwitch === 'sw-practicas' ? 'Switch de Prácticas' : 'Switch Universitario';
+  const targetSwitch = modalAsignarSwitchSelect ? modalAsignarSwitchSelect.value : 'sw-01';
+  const selectedOptText = modalAsignarSwitchSelect ? modalAsignarSwitchSelect.selectedOptions[0]?.textContent : targetSwitch;
 
   try {
-    setStatusBadge(`Asignando ${seleccionados.length} puestos a ${switchLabel}...`);
+    setStatusBadge(`Guardando mapeo de ${seleccionados.length} puestos a ${selectedOptText}...`);
     if (btnModalAsignarConfirm) {
       btnModalAsignarConfirm.disabled = true;
-      btnModalAsignarConfirm.textContent = 'Asignando...';
+      btnModalAsignarConfirm.textContent = 'Guardando...';
     }
 
     const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
@@ -410,7 +579,7 @@ async function confirmarAsignarSwitch() {
 
     const data = await res.json();
     if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Fallo al asignar puestos al switch.');
+      throw new Error(data.error || 'Fallo al guardar mapeo de puestos a switch.');
     }
 
     renderer.limpiarSeleccion();
@@ -423,15 +592,15 @@ async function confirmarAsignarSwitch() {
       await fetchDevices();
     }
 
-    setStatusBadge(`✓ ${seleccionados.length} puestos asignados a ${switchLabel}`);
+    setStatusBadge(`✓ Mapeo guardado: ${seleccionados.length} puestos asignados a ${selectedOptText}`);
   } catch (err) {
-    console.error('[-] Error al asignar switch:', err);
-    alert(`Error al asignar switch: ${err.message}`);
-    setStatusBadge('Error al asignar switch', true);
+    console.error('[-] Error al guardar mapeo:', err);
+    alert(`Error al guardar mapeo: ${err.message}`);
+    setStatusBadge('Error al guardar mapeo', true);
   } finally {
     if (btnModalAsignarConfirm) {
       btnModalAsignarConfirm.disabled = false;
-      btnModalAsignarConfirm.textContent = 'Confirmar';
+      btnModalAsignarConfirm.textContent = 'Guardar Mapeo';
     }
   }
 }
@@ -789,7 +958,7 @@ window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false)
       }
 
       btnModalToggleSwitch.onclick = async () => {
-        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        const nuevoSwitch = isPracticas ? 'sw-01' : 'sw-practicas';
         btnModalToggleSwitch.disabled = true;
         btnModalToggleSwitch.textContent = 'Cambiando...';
         await window.cambiarSwitchPuesto(puestoId || host.puesto_id, nuevoSwitch);
@@ -847,7 +1016,7 @@ window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false)
       btnModalToggleSwitch.className = `btn-switch-assigned ${isPracticas ? 'practicas' : 'docente'}`;
       btnModalToggleSwitch.textContent = isPracticas ? 'Switch Prácticas' : 'Switch Universitario';
       btnModalToggleSwitch.onclick = async () => {
-        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        const nuevoSwitch = isPracticas ? 'sw-01' : 'sw-practicas';
         await window.cambiarSwitchPuesto(puestoId, nuevoSwitch);
         window.abrirDetallePuesto(null, puestoId, true);
       };

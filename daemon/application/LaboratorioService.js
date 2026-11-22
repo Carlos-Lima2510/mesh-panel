@@ -15,7 +15,8 @@ function crearPuestosCuadricula({
   redPorDefecto = null,
   switchDocente = null,
   switchPracticas = null,
-  asignacionSwitches = new Map()
+  asignacionSwitches = new Map(),
+  switchesCatalog = []
 } = {}) {
   const cHilera = columnasHilera || Math.ceil((columnas || 8) / 2);
   const puestos = [];
@@ -25,8 +26,9 @@ function crearPuestosCuadricula({
     // Hilera Izquierda
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || 'sw-docente';
-      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-01');
+      const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
+        || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
       const p = new Puesto({
         id,
@@ -51,8 +53,9 @@ function crearPuestosCuadricula({
     // Hilera Derecha (mismo número exacto de columnas, pasillo en medio siempre)
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || 'sw-docente';
-      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-01');
+      const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
+        || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
       const p = new Puesto({
         id,
@@ -157,11 +160,27 @@ class LaboratorioService {
 
     this.switchesPorDefecto = [
       new Switch({
-        id: 'sw-docente',
-        nombre: 'Switch Principal Docente',
+        id: 'sw-01',
+        nombre: 'SW-01 -- 10.10.136.13',
         tipo: 'GESTIONADO',
-        totalPuertos: parseInt(process.env.SWITCH_TOTAL_PUERTOS, 10) || 96,
-        ipGestion: process.env.SNMP_HOST || '10.0.0.2',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.13',
+        red: this.redesPorDefecto[0]
+      }),
+      new Switch({
+        id: 'sw-02',
+        nombre: 'SW-02 -- 10.10.136.42',
+        tipo: 'GESTIONADO',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.42',
+        red: this.redesPorDefecto[0]
+      }),
+      new Switch({
+        id: 'sw-03',
+        nombre: 'SW-03 -- 10.10.136.39',
+        tipo: 'GESTIONADO',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.39',
         red: this.redesPorDefecto[0]
       }),
       new Switch({
@@ -175,15 +194,17 @@ class LaboratorioService {
     ];
 
     this.modoActual = this.modoDespliegue ? 'CABLEADO' : 'CLASE';
+    this.alcanceActual = 'COMPLETO';
     this.asignacionPuestos = new Map();
     this.asignacionSwitches = new Map();
   }
 
-  establecerModo(modo) {
+  establecerModo(modo, alcance = 'COMPLETO') {
     const modosValidos = ['CLASE', 'PRACTICA', 'CABLEADO'];
     this.modoActual = modosValidos.includes(modo) ? modo : 'CLASE';
+    this.alcanceActual = ['COMPLETO', 'IZQUIERDA', 'DERECHA'].includes(alcance) ? alcance : 'COMPLETO';
     if (this.ultimoLaboratorio) {
-      this.ultimoLaboratorio.establecerModo(this.modoActual);
+      this.ultimoLaboratorio.establecerModo(this.modoActual, this.alcanceActual);
       return this.ultimoLaboratorio;
     }
     return this.obtenerLaboratorio({ forzar: true });
@@ -216,6 +237,7 @@ class LaboratorioService {
               pwr: host.telemetria.pwr,
               conn: host.telemetria.conn,
               modoLaboratorio: this.modoActual,
+              alcancePractica: this.alcanceActual,
               puesto,
               switchAsignado: swObj
             });
@@ -307,6 +329,7 @@ class LaboratorioService {
     const laboratorio = new Laboratorio({
       nombre: nombreAula,
       modo: this.modoActual,
+      alcancePractica: this.alcanceActual,
       filas: this.filas,
       columnas: this.columnas,
       columnasHilera: this.columnasHilera,
@@ -330,8 +353,9 @@ class LaboratorioService {
       columnasHilera: this.columnasHilera,
       redPorDefecto: this.redesPorDefecto[0],
       switchDocente: this.switchesPorDefecto[0],
-      switchPracticas: this.switchesPorDefecto[1],
-      asignacionSwitches: this.asignacionSwitches
+      switchPracticas: this.switchesPorDefecto.find(s => s.id === 'sw-practicas'),
+      asignacionSwitches: this.asignacionSwitches,
+      switchesCatalog: this.switchesPorDefecto
     });
 
     for (const p of puestosCuadricula) {
@@ -408,6 +432,7 @@ class LaboratorioService {
         pwr,
         conn,
         modoLaboratorio: this.modoActual,
+        alcancePractica: this.alcanceActual,
         puesto: puestoDestino,
         switchAsignado
       });
@@ -481,6 +506,7 @@ class LaboratorioService {
             amtOnline: false,
             conn: 0,
             modoLaboratorio: this.modoActual,
+            alcancePractica: this.alcanceActual,
             puesto: puestoDestino,
             switchAsignado
           });
@@ -531,6 +557,7 @@ class LaboratorioService {
           amtOnline: false,
           conn: 0,
           modoLaboratorio: this.modoActual,
+          alcancePractica: this.alcanceActual,
           puesto: puestoDestino,
           switchAsignado
         });
@@ -582,6 +609,7 @@ class LaboratorioService {
           amtOnline: false,
           conn: 0,
           modoLaboratorio: this.modoActual,
+          alcancePractica: this.alcanceActual,
           puesto: puestoDestino,
           switchAsignado
         });

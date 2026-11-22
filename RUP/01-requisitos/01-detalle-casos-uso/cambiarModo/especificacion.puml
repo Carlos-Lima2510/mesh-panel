@@ -8,7 +8,6 @@ state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
 SISTEMA_DISPONIBLE -[#green]-> cambiarModo
 note on link
 <b>Administrador</b> solicita cambiar modo operativo del laboratorio
-<b>Administrador</b> introduce modo seleccionado (Modo Clase / Modo Práctica)
 end note
 
 state cambiarModo as "cambiarModo()" {
@@ -16,25 +15,27 @@ state cambiarModo as "cambiarModo()" {
     state c <<choice>>
 
     [*] -[#green]-> c
+    note on link
+    <b>Sistema</b> presenta el selector de modo del aula
+    <b>Administrador</b> introduce modo y alcance (Modo Clase / Modo Práctica: Todo, Hilera Izquierda, Hilera Derecha)
+    end note
 
     c -[#green]-> [*]
     note on link
-    [Modo operativo válido]
-    <b>Sistema</b> presenta el selector con el modo operativo seleccionado activo
-    <b>Sistema</b> presenta la cuadrícula del laboratorio con los diagnósticos de los puestos actualizados según el nuevo modo
-    <b>Sistema</b> presenta el resumen consolidado de métricas del aula recalculado
+    [Modo y alcance válidos]
+    <b>Sistema</b> presenta la cuadrícula del laboratorio con los diagnósticos actualizados según el nuevo modo y alcance
     end note
 
     c -[#red]-> [*]
     note on link
-    [Fallo de comunicación con el daemon o modo no disponible]
-    <b>Sistema</b> presenta mensaje de advertencia y mantiene el modo actual sin alteraciones
+    [Fallo de comunicación con el daemon o parámetros inválidos]
+    <b>Sistema</b> presenta mensaje de advertencia
     end note
 }
 
 cambiarModo -[#green]-> SISTEMA_DISPONIBLE_SALIDA
 note on link
-cuadrícula y métricas actualizadas con el nuevo modo operativo
+cuadrícula y métricas actualizadas con el nuevo modo y alcance operativo
 end note
 
 cambiarModo -[#red]-> SISTEMA_DISPONIBLE_SALIDA

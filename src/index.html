@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpSys - Supervisión de Laboratorio</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>">
+  <link rel="stylesheet" href="css/styles.css?v=20261122_05">
 </head>
 
 <body>
@@ -28,10 +29,31 @@
           <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           <span>Modo Clase</span>
         </button>
-        <button id="btn-mode-practica" class="btn-mode" type="button" title="Modo Práctica (Red Aislada)">
-          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
-          <span>Modo Práctica</span>
-        </button>
+
+        <!-- Dropdown de Modo Práctica con Selección de Alcance (Aula Híbrida) -->
+        <div class="mode-dropdown-container">
+          <button id="btn-mode-practica" class="btn-mode" type="button" title="Modo Práctica (Red Aislada de Prácticas)">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+            <span id="btn-mode-practica-text">Modo Práctica</span>
+            <svg class="ui-icon dropdown-chevron" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="dropdown-practica-menu" class="mode-dropdown-menu" style="display: none;">
+            <button id="opt-practica-izq" class="dropdown-item" type="button" title="Poner en práctica la Hilera Izquierda (mitad izquierda)">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Hilera Izquierda</span>
+              <span class="dropdown-item-badge">Recomendado</span>
+            </button>
+            <button id="opt-practica-der" class="dropdown-item" type="button" title="Poner en práctica la Hilera Derecha (mitad derecha)">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Hilera Derecha</span>
+            </button>
+            <button id="opt-practica-todo" class="dropdown-item" type="button" title="Poner en práctica toda el aula">
+              <span class="dropdown-item-icon">🧪</span>
+              <span>Toda el aula</span>
+            </button>
+          </div>
+        </div>
+
         <button id="btn-mode-cableado" class="btn-mode" type="button" title="Modo Verificación de Cableado (Pre-despliegue)">
           <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M9 22v-4M15 22v-4M8 8h8a2 2 0 0 1 2 2v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4v-4a2 2 0 0 1 2-2z"/></svg>
           <span>Verif. Cableado</span>
@@ -266,23 +288,24 @@
 
   <!-- MODAL: ASIGNAR PUESTOS A SWITCH (SEGÚN WIREFRAME RUP CU-04 asignarPuestosASwitch) -->
   <div id="modal-asignar-switch" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-asignar-title">
-    <div class="modal-window modal-window-compact">
+    <div class="modal-window modal-window-mapping">
       <!-- Cabecera del Modal -->
       <div class="modal-header">
         <div class="modal-title-wrap">
           <span class="modal-header-icon">
             <svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/><circle cx="14" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/><path d="M6 16v1M10 16v1M14 16v1M18 16v1"/></svg>
           </span>
-          <h2 id="modal-asignar-title" class="modal-title">Asignar Puestos a Switch</h2>
+          <h2 id="modal-asignar-title" class="modal-title">Mapeo Físico de Puestos a Switch de Red</h2>
         </div>
         <button id="btn-modal-asignar-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
       </div>
 
-      <!-- Cuerpo del Modal Minimalista -->
+      <!-- Cuerpo del Modal según Wireframe RUP -->
       <div class="modal-body">
+        <!-- 1. Puestos seleccionados -->
         <div class="modal-selection-card">
           <div class="modal-selection-header">
-            <span class="modal-label">Puestos seleccionados</span>
+            <span class="modal-label">Puestos seleccionados:</span>
             <span id="modal-asignar-count" class="modal-count-pill">0 puestos</span>
           </div>
           <div id="modal-asignar-chips" class="modal-chips-container">
@@ -290,38 +313,43 @@
           </div>
         </div>
 
+        <!-- 2. Switch gestionado de destino -->
         <div class="modal-field-group">
-          <label class="modal-label">Seleccione el switch de destino:</label>
-          <div class="switch-radio-options">
-            <label class="switch-radio-card" for="radio-switch-docente">
-              <input type="radio" id="radio-switch-docente" name="target-switch" value="sw-docente" checked>
-              <div class="switch-radio-content">
-                <span class="switch-radio-title">
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                  Switch Universitario
-                </span>
-                <span class="switch-radio-desc">Red Docente (10.10.136.0/24)</span>
-              </div>
-            </label>
-
-            <label class="switch-radio-card" for="radio-switch-practicas">
-              <input type="radio" id="radio-switch-practicas" name="target-switch" value="sw-practicas">
-              <div class="switch-radio-content">
-                <span class="switch-radio-title">
-                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
-                  Switch de Prácticas
-                </span>
-                <span class="switch-radio-desc">Red Aislada de Laboratorio</span>
-              </div>
-            </label>
+          <label for="modal-asignar-switch-select" class="modal-label">Switch gestionado de destino:</label>
+          <div class="modal-select-wrap">
+            <select id="modal-asignar-switch-select" class="modal-select">
+              <!-- Opciones inyectadas dinámicamente desde el catálogo de switches -->
+            </select>
           </div>
+        </div>
+
+        <!-- 3. Tabla de Puestos y Bocas Detectadas por SNMP -->
+        <div class="modal-mapping-table-wrap">
+          <table class="modal-mapping-table">
+            <thead>
+              <tr>
+                <th>Puesto Físico</th>
+                <th>Switch Asignado (IP)</th>
+                <th>Boca Detectada (SNMP)</th>
+              </tr>
+            </thead>
+            <tbody id="modal-asignar-tbody">
+              <!-- Filas inyectadas dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 4. Muestra previa de la línea informativa en tarjeta -->
+        <div class="modal-mapping-preview">
+          <span class="preview-label">Línea informativa en tarjeta:</span>
+          <span id="modal-asignar-preview-line" class="preview-line-code">Switch: --- - Boca: ---</span>
         </div>
       </div>
 
       <!-- Pie del Modal: Acciones según Wireframe RUP -->
       <div class="modal-footer">
         <button id="btn-modal-asignar-confirm" type="button" class="btn-modal-action btn-modal-confirm">
-          Confirmar
+          Guardar Mapeo
         </button>
         <button id="btn-modal-asignar-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
           Cancelar
@@ -395,7 +423,7 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20261117_01"></script>
+  <script type="module" src="js/app.js?v=20261122_05"></script>
 </body>
 
 </html>

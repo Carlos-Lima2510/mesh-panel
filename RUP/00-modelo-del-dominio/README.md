@@ -51,7 +51,7 @@ Modela el ciclo de vida operacional y telemático del equipo informático (`STAN
 
 ## 4. Diagrama de Estados del Laboratorio
 
-Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`EN_CLASE`) y sesión de redes en switch secundario (`EN_PRACTICA`).
+Modela la alternancia del contexto operativo del aula entre sesión ordinaria (`EN_CLASE`) y sesión de redes en switch secundario (`EN_PRACTICA`), incluyendo la gestión de alcances para escenarios de aula completa o aulas híbridas delimitadas por el pasillo central (`PRACTICA_TOTAL`, `PRACTICA_HILERA_IZQUIERDA`, `PRACTICA_HILERA_DERECHA`).
 
 <div align="center">
   <img src="../../images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg" alt="Diagrama de Estados del Laboratorio" />

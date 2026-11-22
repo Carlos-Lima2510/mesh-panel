@@ -14,16 +14,22 @@ class EvaluadorEstado {
     pwr = null,
     red = null,
     modoLaboratorio = 'CLASE',
+    alcancePractica = 'COMPLETO',
     switchAsignado = null,
     puesto = null,
     modoDespliegue = false
   }) {
     const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
 
-    // Si el puesto tiene un switch asignado expresamente, su política prima sobre el modo global
-    const esperaAislado = sw
-      ? !sw.esperaMeshCentral()
-      : (puesto && puesto.esperaEstarAislado ? puesto.esperaEstarAislado() : (modoLaboratorio === 'PRACTICA'));
+    // Si el puesto está en modo práctica (según el modo y alcance de hilera del laboratorio)
+    let esperaAislado = false;
+    if (sw && !sw.esperaMeshCentral()) {
+      esperaAislado = true;
+    } else if (puesto && typeof puesto.estaEnModoPractica === 'function') {
+      esperaAislado = puesto.estaEnModoPractica(modoLaboratorio, alcancePractica);
+    } else {
+      esperaAislado = (modoLaboratorio === 'PRACTICA');
+    }
 
     // 0. Si el switch está inalcanzable o no hay enlace físico reportado (sin telemetría de Capa 1)
     const sinTelemetriaSwitch = !enlaceFisico ||
