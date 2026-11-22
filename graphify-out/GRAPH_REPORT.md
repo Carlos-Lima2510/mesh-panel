@@ -1,7 +1,7 @@
 # Graph Report - mesh-panel  (2026-11-22)
 
 ## Corpus Check
-- 69 files · ~68,568 words
+- 69 files · ~68,524 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 21 file(s) not represented in the graph (top: .puml 16, .example 1, (none) 1)
 
@@ -11,7 +11,7 @@
 - Token cost: 177,006 input · 6,991 output
 
 ## Graph Freshness
-- Built from commit: `53b7d8b3`
+- Built from commit: `5c3f0ca0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

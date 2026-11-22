@@ -116,12 +116,24 @@ function actualizarBotonesModo(modo, alcance = 'COMPLETO') {
   btnModePractica.classList.remove('active-practica');
   if (btnModeCableado) btnModeCableado.classList.remove('active-cableado');
 
+  if (optPracticaIzq) optPracticaIzq.classList.remove('active-item');
+  if (optPracticaDer) optPracticaDer.classList.remove('active-item');
+  if (optPracticaTodo) optPracticaTodo.classList.remove('active-item');
+
   if (modo === 'PRACTICA') {
     btnModePractica.classList.add('active-practica');
+    const alcanceNormalizado = alcance || 'COMPLETO';
     if (btnModePracticaText) {
-      if (alcance === 'IZQUIERDA') btnModePracticaText.textContent = 'Práctica (Hilera Izq)';
-      else if (alcance === 'DERECHA') btnModePracticaText.textContent = 'Práctica (Hilera Der)';
-      else btnModePracticaText.textContent = 'Práctica (Toda el aula)';
+      if (alcanceNormalizado === 'IZQUIERDA') {
+        btnModePracticaText.textContent = 'Práctica (Hilera Izq)';
+        if (optPracticaIzq) optPracticaIzq.classList.add('active-item');
+      } else if (alcanceNormalizado === 'DERECHA') {
+        btnModePracticaText.textContent = 'Práctica (Hilera Der)';
+        if (optPracticaDer) optPracticaDer.classList.add('active-item');
+      } else {
+        btnModePracticaText.textContent = 'Práctica (Toda el aula)';
+        if (optPracticaTodo) optPracticaTodo.classList.add('active-item');
+      }
     }
   } else if (modo === 'CABLEADO') {
     if (btnModeCableado) btnModeCableado.classList.add('active-cableado');
