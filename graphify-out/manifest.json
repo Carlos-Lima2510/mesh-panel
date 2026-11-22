@@ -240,39 +240,39 @@
     "semantic_hash": "370e14664da4939a32bb8cc56edd11e6"
   },
   "README.md": {
-    "mtime": 1795371008.8907216,
-    "seen": 1795371024.7814946,
-    "ast_hash": "e2ecdb62e8a7771480a3367773165ccc",
+    "mtime": 1795371560.2282825,
+    "seen": 1795371583.5534437,
+    "ast_hash": "adcc6751a6922c196b811ce9458bc103",
     "semantic_hash": ""
   },
   "RUP/00-modelo-del-dominio/README.md": {
-    "mtime": 1795370209.1647918,
-    "seen": 1795370271.2264297,
-    "ast_hash": "89b951bb7ccf53702bbc1c054dc5ee9c",
+    "mtime": 1795371560.228957,
+    "seen": 1795371583.5534482,
+    "ast_hash": "72256adb4b960262d0e11e89b2e38c2d",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/00-actores-casos-uso/README.md": {
-    "mtime": 1795370227.956902,
-    "seen": 1795370271.2264347,
-    "ast_hash": "2ab4c14f2dc61c59cf2626a2a4a66294",
+    "mtime": 1795371560.2317731,
+    "seen": 1795371583.5534513,
+    "ast_hash": "ca53ff36920162ce809cddb0e442f688",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/FORMATO-DETALLE.md": {
-    "mtime": 1795370848.8864539,
-    "seen": 1795370880.592582,
-    "ast_hash": "c14a00d86e3d56b9c82647f31eea81ba",
+    "mtime": 1795371560.2299607,
+    "seen": 1795371583.5534544,
+    "ast_hash": "ba5286d4e614ceda813991b4510738a6",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/README.md": {
-    "mtime": 1795370840.7374403,
-    "seen": 1795370880.592586,
-    "ast_hash": "fff861da80eea27df42e58b6dc241cc2",
+    "mtime": 1795371560.2295117,
+    "seen": 1795371583.5534573,
+    "ast_hash": "ea4c37dca211d9be8e97a2516685d080",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/README.md": {
-    "mtime": 1795370218.248845,
-    "seen": 1795370271.2264616,
-    "ast_hash": "50e576da481d81a82776a04d034be79c",
+    "mtime": 1795371560.229224,
+    "seen": 1795371583.5534742,
+    "ast_hash": "90d43d5e249b4429bb91288fcfe6d6b3",
     "semantic_hash": ""
   },
   "SNMP.md": {
@@ -282,51 +282,51 @@
     "semantic_hash": "57b027ac7ea33403e97b4cce392c3d93"
   },
   "docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md": {
-    "mtime": 1795370960.4366405,
-    "seen": 1795371024.7815394,
-    "ast_hash": "4db8478db9ba0cde3448aaa2ada6cc51",
+    "mtime": 1795371560.2342956,
+    "seen": 1795371583.5534832,
+    "ast_hash": "0f2d37b159ab75dd7fdbbccdd222fb78",
     "semantic_hash": ""
   },
   "docs/adr/ADR-002-acotamiento-control-energia-hardware.md": {
-    "mtime": 1795370971.3806589,
-    "seen": 1795371024.781542,
-    "ast_hash": "68436352590b3fc6f80dfbf39d668bf1",
+    "mtime": 1795371560.23521,
+    "seen": 1795371583.553486,
+    "ast_hash": "3cba863398c89b6fa7d3e15a82f918f4",
     "semantic_hash": ""
   },
   "docs/adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md": {
-    "mtime": 1795370985.6986828,
-    "seen": 1795371024.7815454,
-    "ast_hash": "94975f071b02a4288036f143819215f8",
+    "mtime": 1795371560.2348897,
+    "seen": 1795371583.5534887,
+    "ast_hash": "922c52a8d5cc0c5efd8891a0b567d885",
     "semantic_hash": ""
   },
   "docs/adr/ADR-004-inclusion-switch-asignacion-distribuciones.md": {
-    "mtime": 1795370997.4017024,
-    "seen": 1795371024.7815483,
-    "ast_hash": "51caa99f5fc275ae0bf00d9c60caf193",
+    "mtime": 1795371560.2339664,
+    "seen": 1795371583.5534914,
+    "ast_hash": "d79232b8e0ce175b4e6900fb55c8494b",
     "semantic_hash": ""
   },
   "docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md": {
-    "mtime": 1795370950.3096235,
-    "seen": 1795371024.7815542,
-    "ast_hash": "e35e2a2b1c5cadf0e17c514106c77c0f",
+    "mtime": 1795371560.2335868,
+    "seen": 1795371583.5534968,
+    "ast_hash": "dd0976078c76a1d814458eb59a9916d6",
     "semantic_hash": ""
   },
   "docs/matrices-documentales/matriz-referencias-apagado.md": {
-    "mtime": 1795370903.306545,
-    "seen": 1795370928.1914012,
-    "ast_hash": "7285d4d79772d05584a9593011b29354",
+    "mtime": 1795371560.2355645,
+    "seen": 1795371583.5535,
+    "ast_hash": "915763fbf2b4c772e7cbea77b5787c41",
     "semantic_hash": ""
   },
   "docs/matrices-documentales/matriz-referencias-plataforma-microsoft.md": {
-    "mtime": 1795370914.9725645,
-    "seen": 1795370928.191405,
-    "ast_hash": "06ef676204874f74218b1bdc34831790",
+    "mtime": 1795371560.235846,
+    "seen": 1795371583.5535033,
+    "ast_hash": "50afd4a74c88c1dc52f0e9e6ab5140bc",
     "semantic_hash": ""
   },
   "docs/matriz-documental-general.md": {
-    "mtime": 1795370891.996526,
-    "seen": 1795370928.1914084,
-    "ast_hash": "01969e35e194db579c07da49fb832b21",
+    "mtime": 1795371560.2331982,
+    "seen": 1795371583.553506,
+    "ast_hash": "aaf9e6b9b504e5a6aa040ed8e982bb44",
     "semantic_hash": ""
   },
   "src/index.html": {
@@ -360,33 +360,33 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795370783.8851612,
-    "seen": 1795370786.1216807,
-    "ast_hash": "ab4e59a76db12a8a4367d0d934c2a74e",
+    "mtime": 1795371560.2303414,
+    "seen": 1795371583.5534606,
+    "ast_hash": "26b0af482b4fd049d10b985a646678bf",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
-    "mtime": 1795370796.5722356,
-    "seen": 1795370798.8550494,
-    "ast_hash": "c07870f6b81a83e46aee505e81a20eb4",
+    "mtime": 1795371560.2306633,
+    "seen": 1795371583.5534635,
+    "ast_hash": "ed83f27d6c5f66e67bc097da1a80b27f",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
-    "mtime": 1795370808.1513033,
-    "seen": 1795370810.5255327,
-    "ast_hash": "89a36f8ded187dca37af314015812eab",
+    "mtime": 1795371560.2309208,
+    "seen": 1795371583.5534663,
+    "ast_hash": "8fd70cb8df18d394590e0ae7ac266e60",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
-    "mtime": 1795370819.0873675,
-    "seen": 1795370821.388591,
-    "ast_hash": "1bf6279e1d06b298d94debd6b7919178",
+    "mtime": 1795371560.2311757,
+    "seen": 1795371583.5534692,
+    "ast_hash": "10086be26aa0318b617e4aec22b5abf2",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md": {
-    "mtime": 1795370829.9594223,
-    "seen": 1795370832.160103,
-    "ast_hash": "5fb20747601fd10ee90b793e31c46d5c",
+    "mtime": 1795371560.231466,
+    "seen": 1795371583.5534718,
+    "ast_hash": "9d68b9a783b306b667b13f8ae05613ff",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg": {
@@ -492,27 +492,27 @@
     "semantic_hash": ""
   },
   "docs/matriz-snmpwalk-switches.md": {
-    "mtime": 1795370937.5536022,
-    "seen": 1795370939.969362,
-    "ast_hash": "14c95112ff0c4421cbfb78a80c98f6c8",
+    "mtime": 1795371560.2327178,
+    "seen": 1795371583.5535088,
+    "ast_hash": "7d631f93979648725c41bcfebb8c87e7",
     "semantic_hash": ""
   },
   "docs/matriz-telemetria-switches.md": {
-    "mtime": 1795370925.908028,
-    "seen": 1795370928.1914306,
-    "ast_hash": "2f2a9c18979a40f88431c9ca0fe077cd",
+    "mtime": 1795371560.2321734,
+    "seen": 1795371583.5535119,
+    "ast_hash": "93240b88738ec59633303544b03ae244",
     "semantic_hash": ""
   },
   "RUP/README.md": {
-    "mtime": 1795371023.0097451,
-    "seen": 1795371024.7815328,
-    "ast_hash": "943c70366c7f7a66ee1cf153ec530707",
+    "mtime": 1795371560.2286775,
+    "seen": 1795371583.5534773,
+    "ast_hash": "742b951459f274f76dea215bb5cb61cc",
     "semantic_hash": ""
   },
   "docs/adr/README.md": {
-    "mtime": 1795370878.137503,
-    "seen": 1795370880.592629,
-    "ast_hash": "719a0f3f2e38022f8098185be10ce3e6",
+    "mtime": 1795371560.2345552,
+    "seen": 1795371583.553494,
+    "ast_hash": "e884f0a22f20403073f05d9f17eac357",
     "semantic_hash": ""
   },
   "daemon/package-lock.json": {
