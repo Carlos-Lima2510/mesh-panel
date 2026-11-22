@@ -1,9 +1,9 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795071139.4066806,
-    "seen": 1795123976.6108627,
-    "ast_hash": "bdfee9ff3e73c3625433f84a88611a86",
-    "semantic_hash": "bdfee9ff3e73c3625433f84a88611a86"
+    "mtime": 1795367334.6299577,
+    "seen": 1795367710.3031316,
+    "ast_hash": "01b6fc94afcc31ee39f34a5815eb8a37",
+    "semantic_hash": ""
   },
   "daemon/config.js": {
     "mtime": 1795071139.4066806,
@@ -342,10 +342,10 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/especificacion.svg": {
-    "mtime": 1795130485.561819,
-    "seen": 1795201843.054576,
-    "ast_hash": "7d33a8e16d452adc004bc8397e4d44bd",
-    "semantic_hash": "7d33a8e16d452adc004bc8397e4d44bd"
+    "mtime": 1795368197.7359247,
+    "seen": 1795368204.3052325,
+    "ast_hash": "78009335f6e0fa112b12de3165ac9774",
+    "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/especificacion.svg": {
     "mtime": 1795130486.7187395,
@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795366492.2182531,
-    "seen": 1795366493.6616197,
-    "ast_hash": "2aebb4636c7e7bb2cd38557bc05e04bb",
+    "mtime": 1795368277.3056562,
+    "seen": 1795368279.6810768,
+    "ast_hash": "c1bcb2c361ca77107bc0906d12a68672",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
@@ -372,9 +372,9 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
-    "mtime": 1795367197.0913897,
-    "seen": 1795367199.3468466,
-    "ast_hash": "a5b48ccd52c85d534542388c8a75a6e5",
+    "mtime": 1795368201.7190812,
+    "seen": 1795368204.3051455,
+    "ast_hash": "e22f7e1de746720f46ee7d8b84194607",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/especificacion.svg": {
-    "mtime": 1795366486.1582174,
-    "seen": 1795366493.6616938,
-    "ast_hash": "f7611218c63a6998e3e7c23699411c29",
+    "mtime": 1795368262.0034404,
+    "seen": 1795368279.681209,
+    "ast_hash": "ad899d73466e629fda3bee65a3a85db7",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
@@ -444,9 +444,9 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
-    "mtime": 1795367119.9259853,
-    "seen": 1795367199.3469257,
-    "ast_hash": "47623bd107129974c37bc8a701e4d67d",
+    "mtime": 1795368155.9211214,
+    "seen": 1795368204.3052366,
+    "ast_hash": "fca304afbc4c53bf15c39a7cefa4fb3b",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
@@ -489,6 +489,18 @@
     "mtime": 1795130832.0672512,
     "seen": 1795201843.054454,
     "ast_hash": "9a1569921b227988c563ee3e3bc23108",
+    "semantic_hash": ""
+  },
+  "docs/matriz-snmpwalk-switches.md": {
+    "mtime": 1795367334.6302814,
+    "seen": 1795367710.3033247,
+    "ast_hash": "a6d48b4c341386c6b9b98d0f75b57ac7",
+    "semantic_hash": ""
+  },
+  "docs/matriz-telemetria-switches.md": {
+    "mtime": 1795367334.630563,
+    "seen": 1795367710.3033285,
+    "ast_hash": "93685fb6fb41ffd0974ba24f13d9e1d2",
     "semantic_hash": ""
   },
   "daemon/package-lock.json": {

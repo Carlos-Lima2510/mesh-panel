@@ -23,7 +23,6 @@ SISTEMA_DISPONIBLE --> PUESTO_ABIERTO : consultarDetallePuesto()
 
 PUESTO_ABIERTO --> SISTEMA_DISPONIBLE : consultarEstadoPuestos()
 PUESTO_ABIERTO --> PUESTO_ABIERTO : encenderPuesto()
-PUESTO_ABIERTO --> PUESTO_ABIERTO : asignarPuestosASwitch()
 PUESTO_ABIERTO --> SESION_CERRADA : cerrarSesion()
 
 @enduml

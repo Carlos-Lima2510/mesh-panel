@@ -3,18 +3,11 @@
 skinparam linetype polyline
 
 state SISTEMA_DISPONIBLE
-state PUESTO_ABIERTO
 state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
-state PUESTO_ABIERTO_SALIDA as "PUESTO_ABIERTO"
 
 SISTEMA_DISPONIBLE -[#green]-> asignarPuestosASwitch
 note on link
 <b>Administrador</b> solicita asignar puestos a switch
-end note
-
-PUESTO_ABIERTO -[#green]-> asignarPuestosASwitch
-note on link
-<b>Administrador</b> solicita asignar switch al puesto
 end note
 
 state asignarPuestosASwitch as "asignarPuestosASwitch()" {
@@ -59,21 +52,6 @@ end note
 asignarPuestosASwitch -[#orange]-> SISTEMA_DISPONIBLE_SALIDA
 note on link
 solicitud cancelada, retorno a cuadrícula sin cambios
-end note
-
-asignarPuestosASwitch -[#green]-> PUESTO_ABIERTO_SALIDA
-note on link
-puesto individual reasignado, ficha técnica actualizada
-end note
-
-asignarPuestosASwitch -[#red]-> PUESTO_ABIERTO_SALIDA
-note on link
-aviso de advertencia presentado, retorno a ficha técnica
-end note
-
-asignarPuestosASwitch -[#orange]-> PUESTO_ABIERTO_SALIDA
-note on link
-cancelación, ficha técnica sin cambios
 end note
 
 @enduml

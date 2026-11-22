@@ -41,7 +41,7 @@
 
 El caso de uso permite al Administrador establecer el mapeo físico imperativo entre las mesas del aula y los conmutadores del rack. Dado que la boca física es detectada y provista automáticamente por el sistema vía SNMP (`port14`, `port01`...), **no es necesario introducir ni seleccionar la boca manualmente**; el sistema presenta la boca detectada para cada puesto y el Administrador selecciona el conmutador gestionado al que están conectados:
 
-1. **Contexto 1: Asignación por lote desde la vista general (`SISTEMA_DISPONIBLE`)**:
+1. **Flujo principal de asignación (`SISTEMA_DISPONIBLE`)**:
    * **Precondición:** El Administrador debe haber seleccionado previamente uno o varios puestos en la cuadrícula general del aula.
    * **Bloqueo preventivo si no hay selección:** Si no existe ningún puesto seleccionado previamente, el sistema no permite acceder al modal y presenta un aviso de advertencia indicando que se requiere seleccionar puestos antes de proceder.
    * **Apertura de modal de asignación:** Con puestos seleccionados, el Administrador solicita asignar a switch. El sistema presenta el diálogo modal de infraestructura de red:
@@ -51,20 +51,13 @@ El caso de uso permite al Administrador establecer el mapeo físico imperativo e
      * Muestra previa de la línea informativa resultante para la tarjeta (`Switch: 10.10.136.11 - Boca: port01`).
    * **Confirmación:** El Administrador introduce el conmutador gestionado de destino y solicita guardar el mapeo. El sistema actualiza en memoria el inventario físico de los puestos y presenta en la cuadrícula general las tarjetas de los puestos con su información de switch y boca actualizada.
 
-2. **Contexto 2: Asignación o edición individual desde la ficha técnica de detalle (`PUESTO_ABIERTO`)**:
-   * El Administrador inspecciona un puesto individual y solicita reasignar su conmutador de enlace.
-   * El sistema presenta el selector con los switches gestionados disponibles y la boca detectada vía SNMP para ese puesto (ej. `port14`).
-   * El Administrador introduce el nuevo conmutador gestionado.
-   * El Administrador solicita guardar cambios.
-   * El sistema actualiza el puesto en memoria y presenta la ficha técnica y su tarjeta con los datos de red actualizados informativamente.
-
-3. **Flujos alternativos y de excepción**:
+2. **Flujos alternativos y de excepción**:
    * **Sin puestos seleccionados:** Si el Administrador solicita la asignación sin puestos marcados en la cuadrícula panorámica, el sistema no abre el diálogo y presenta un aviso informativo de selección requerida.
-   * **Cancelación de la solicitud:** Si el Administrador solicita cancelar el diálogo, el sistema retorna a la pantalla de origen (cuadrícula general o ficha técnica) sin modificar el mapeo existente.
+   * **Cancelación de la solicitud:** Si el Administrador solicita cancelar el diálogo, el sistema retorna a la cuadrícula general sin modificar el mapeo existente.
 
 ### Precondiciones
-* El Administrador ha iniciado sesión en el sistema (`SISTEMA_DISPONIBLE` o `PUESTO_ABIERTO`).
-* Para la asignación por lote, debe existir al menos un puesto físico seleccionado en la cuadrícula.
+* El Administrador ha iniciado sesión en el sistema (`SISTEMA_DISPONIBLE`).
+* Debe existir al menos un puesto físico seleccionado en la cuadrícula general.
 * Existen switches gestionados registrados en el catálogo del aula con sus respectivas direcciones IP de gestión y bocas detectadas vía SNMP.
 
 ### Postcondiciones
@@ -76,7 +69,6 @@ El caso de uso permite al Administrador establecer el mapeo físico imperativo e
 ### Referencias
 * **Diagrama de contexto de Admin:** 
   * `SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : asignarPuestosASwitch()`
-  * `PUESTO_ABIERTO --> PUESTO_ABIERTO : asignarPuestosASwitch()`
 * **Modelo del dominio:** `Laboratorio`, `Puesto`, `Host`, `Switch`, `Red`
 * **Decisiones arquitectónicas:**
   * [ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)

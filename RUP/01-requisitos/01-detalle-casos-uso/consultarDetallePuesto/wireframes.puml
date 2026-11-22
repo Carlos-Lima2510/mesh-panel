@@ -1,7 +1,9 @@
-@startsalt wireframes
+@startsalt consultarDetallePuesto-wireframe
+skinparam dpi 150
+skinparam defaultFontName sans-serif
 {+
   --
-  {^"<b>Detalle de Puesto: PC-02 </b>"
+  {^"<b>Detalle de Puesto: M02 (PC-02) </b>"
     {
       <b>Estado:</b> | 🟢 <b>  OPERATIVO </b>
     }

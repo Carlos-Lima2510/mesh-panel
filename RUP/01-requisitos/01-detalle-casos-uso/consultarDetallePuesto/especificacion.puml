@@ -21,7 +21,6 @@ state consultarDetallePuesto as "consultarDetallePuesto()" {
     [Puesto identificado en el laboratorio]
     <b>Sistema</b> presenta la ficha técnica, cableado y diagnóstico pormenorizado del puesto
     <b>Sistema</b> permite solicitar encender puesto (WoL)
-    <b>Sistema</b> permite solicitar asignar switch
     <b>Sistema</b> permite solicitar cerrar detalle
     end note
 

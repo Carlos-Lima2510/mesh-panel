@@ -61,6 +61,7 @@ El Administrador selecciona una tarjeta de puesto en el cuadro de mando general 
 * **Diagrama de contexto de Admin:** 
   * `SISTEMA_DISPONIBLE --> PUESTO_ABIERTO : consultarDetallePuesto()`
   * `PUESTO_ABIERTO --> SISTEMA_DISPONIBLE : consultarEstadoPuestos()`
+  * `PUESTO_ABIERTO --> PUESTO_ABIERTO : encenderPuesto()`
 * **Modelo del dominio:** `Laboratorio`, `Puesto`, `Host`, `Switch`, `Red`, `Estado`, `Accion`
 * **Decisiones arquitectónicas:**
   * [ADR-001: Justificación y Acotamiento de Acciones, Trazabilidad y Rol Administrador](../../../../docs/adr/ADR-001-acotamiento-acciones-trazabilidad.md)
