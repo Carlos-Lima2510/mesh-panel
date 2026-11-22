@@ -1882,85 +1882,134 @@ body {
   margin-bottom: 6px;
 }
 
-.switch-radio-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.modal-window-mapping {
+  max-width: 580px;
+  width: 95%;
 }
 
-.switch-radio-card {
+.modal-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.modal-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.modal-select:hover {
+  border-color: #64748b;
+  background: #131d35;
+}
+
+.modal-select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+}
+
+.modal-mapping-table-wrap {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid rgba(51, 65, 85, 0.65);
+  border-radius: 8px;
+  margin-top: 12px;
+  margin-bottom: 14px;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.modal-mapping-table-wrap::-webkit-scrollbar {
+  width: 5px;
+}
+.modal-mapping-table-wrap::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.modal-mapping-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+.modal-mapping-table thead {
+  position: sticky;
+  top: 0;
+  background: #1e293b;
+  z-index: 2;
+}
+
+.modal-mapping-table th {
+  padding: 8px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+
+.modal-mapping-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+  color: #e2e8f0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+.modal-mapping-table tbody tr:hover {
+  background: rgba(56, 189, 248, 0.06);
+}
+
+.modal-mapping-table .td-puesto {
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.modal-mapping-table .td-switch {
+  color: #38bdf8;
+}
+
+.modal-mapping-table .td-boca {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.modal-mapping-preview {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 12px 16px;
-  border: 1px solid #334155;
-  border-radius: 10px;
-  background: #0b1120;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  margin-bottom: 4px;
 }
 
-.switch-radio-card:hover {
-  border-color: #64748b;
-  background: #0f172a;
-  transform: translateY(-1px);
-}
-
-.switch-radio-card input[type="radio"] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  border: 2px solid #64748b;
-  border-radius: 50%;
-  margin: 0;
-  display: grid;
-  place-content: center;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.switch-radio-card input[type="radio"]::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  transform: scale(0);
-  transition: 0.15s transform ease-in-out;
-  background-color: #38bdf8;
-}
-
-.switch-radio-card input[type="radio"]:checked {
-  border-color: #38bdf8;
-}
-
-.switch-radio-card input[type="radio"]:checked::before {
-  transform: scale(1);
-}
-
-.switch-radio-card:has(input[type="radio"]:checked) {
-  border-color: #38bdf8;
-  background: rgba(56, 189, 248, 0.08);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35);
-}
-
-.switch-radio-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.switch-radio-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #f1f5f9;
-}
-
-.switch-radio-desc {
+.modal-mapping-preview .preview-label {
   font-size: 0.78rem;
+  font-style: italic;
   color: #94a3b8;
+}
+
+.preview-line-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
 .btn-modal-confirm {

@@ -15,7 +15,8 @@ function crearPuestosCuadricula({
   redPorDefecto = null,
   switchDocente = null,
   switchPracticas = null,
-  asignacionSwitches = new Map()
+  asignacionSwitches = new Map(),
+  switchesCatalog = []
 } = {}) {
   const cHilera = columnasHilera || Math.ceil((columnas || 8) / 2);
   const puestos = [];
@@ -25,8 +26,9 @@ function crearPuestosCuadricula({
     // Hilera Izquierda
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || 'sw-docente';
-      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-docente');
+      const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
+        || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
       const p = new Puesto({
         id,
@@ -51,8 +53,9 @@ function crearPuestosCuadricula({
     // Hilera Derecha (mismo número exacto de columnas, pasillo en medio siempre)
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || 'sw-docente';
-      const switchObj = swId === 'sw-practicas' ? switchPracticas : switchDocente;
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-docente');
+      const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
+        || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
       const p = new Puesto({
         id,
@@ -156,6 +159,30 @@ class LaboratorioService {
     ];
 
     this.switchesPorDefecto = [
+      new Switch({
+        id: 'sw-01',
+        nombre: 'SW-01 -- 10.10.136.11',
+        tipo: 'GESTIONADO',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.11',
+        red: this.redesPorDefecto[0]
+      }),
+      new Switch({
+        id: 'sw-02',
+        nombre: 'SW-02 -- 10.10.136.12',
+        tipo: 'GESTIONADO',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.12',
+        red: this.redesPorDefecto[0]
+      }),
+      new Switch({
+        id: 'sw-03',
+        nombre: 'SW-03 -- 10.10.136.13',
+        tipo: 'GESTIONADO',
+        totalPuertos: 48,
+        ipGestion: '10.10.136.13',
+        red: this.redesPorDefecto[0]
+      }),
       new Switch({
         id: 'sw-docente',
         nombre: 'Switch Principal Docente',
@@ -334,8 +361,9 @@ class LaboratorioService {
       columnasHilera: this.columnasHilera,
       redPorDefecto: this.redesPorDefecto[0],
       switchDocente: this.switchesPorDefecto[0],
-      switchPracticas: this.switchesPorDefecto[1],
-      asignacionSwitches: this.asignacionSwitches
+      switchPracticas: this.switchesPorDefecto.find(s => s.id === 'sw-practicas'),
+      asignacionSwitches: this.asignacionSwitches,
+      switchesCatalog: this.switchesPorDefecto
     });
 
     for (const p of puestosCuadricula) {

@@ -244,7 +244,15 @@ export class DashboardRenderer {
     const swIdActual = puestoFisico?.switch_id || 'sw-docente';
     const isSwPracticas = swIdActual === 'sw-practicas';
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
+    const swObj = switchesList.find(s => s.id === swIdActual);
+    let swLabel = 'Universitario';
+    if (isSwPracticas) {
+      swLabel = 'Prácticas';
+    } else if (swObj) {
+      swLabel = swObj.ip_gestion || (swObj.nombre && swObj.nombre.startsWith('SW-') ? swObj.nombre.split(' -- ')[0] : swObj.nombre);
+    } else if (puestoFisico?.switch_nombre) {
+      swLabel = puestoFisico.switch_nombre.startsWith('SW-') ? puestoFisico.switch_nombre.split(' -- ')[0] : puestoFisico.switch_nombre;
+    }
 
     return `
       <div class="card-top">
@@ -303,7 +311,15 @@ export class DashboardRenderer {
     const swIdActual = puestoFisico?.switch_id || (p.telemetria?.switch_asignado?.toLowerCase().includes('práctica') ? 'sw-practicas' : 'sw-docente');
     const isSwPracticas = swIdActual === 'sw-practicas' || (p.red?.es_aislada === true);
     const swBadgeClass = isSwPracticas ? 'practicas' : 'docente';
-    const swLabel = isSwPracticas ? 'Prácticas' : 'Universitario';
+    const swObj = switchesList.find(s => s.id === swIdActual);
+    let swLabel = 'Universitario';
+    if (isSwPracticas) {
+      swLabel = 'Prácticas';
+    } else if (swObj) {
+      swLabel = swObj.ip_gestion || (swObj.nombre && swObj.nombre.startsWith('SW-') ? swObj.nombre.split(' -- ')[0] : swObj.nombre);
+    } else if (puestoFisico?.switch_nombre) {
+      swLabel = puestoFisico.switch_nombre.startsWith('SW-') ? puestoFisico.switch_nombre.split(' -- ')[0] : puestoFisico.switch_nombre;
+    }
 
     const ipText = p.telemetria?.ip_reportada || p.ip || '---';
     const canWake = (p.estado === 'GRIS' || p.estado === 'AMARILLO') && p.soporta_wol !== false;

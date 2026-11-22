@@ -1,8 +1,8 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795385063.4091222,
-    "seen": 1795385066.0853164,
-    "ast_hash": "049d3937c912e4bce09b634b8cad467b",
+    "mtime": 1795386129.0754104,
+    "seen": 1795386131.7875452,
+    "ast_hash": "d9949aff33e3741fbf36468be30a72e4",
     "semantic_hash": ""
   },
   "daemon/config.js": {
@@ -210,16 +210,16 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795385630.6866255,
-    "seen": 1795385633.510116,
-    "ast_hash": "f3feae04f943ef46a0a723179196a513",
+    "mtime": 1795386296.8271651,
+    "seen": 1795386299.4700234,
+    "ast_hash": "9c3ae5e63935382ac556283a6f9aa5e4",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
-    "mtime": 1795374316.4991195,
-    "seen": 1795383805.0720942,
-    "ast_hash": "6adf4ab596437e373a3090472e13c676",
-    "semantic_hash": "6adf4ab596437e373a3090472e13c676"
+    "mtime": 1795386243.012923,
+    "seen": 1795386245.5721154,
+    "ast_hash": "e86721dd419f77d881fdadaeaa6ebf48",
+    "semantic_hash": ""
   },
   "src/js/sse-client.js": {
     "mtime": 1791390682.2203777,
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795385590.8944862,
-    "seen": 1795385633.5102224,
-    "ast_hash": "87787fc6020788a4fcaa08005b542c57",
+    "mtime": 1795386195.3917086,
+    "seen": 1795386236.7857409,
+    "ast_hash": "6486a19f241ac041c90275c50b164817",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {
@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795374316.473333,
-    "seen": 1795383805.0721254,
-    "ast_hash": "26b0af482b4fd049d10b985a646678bf",
+    "mtime": 1795386049.213089,
+    "seen": 1795386050.780645,
+    "ast_hash": "8b2f202ab9e10b28e2b5bda394a6652e",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
@@ -426,9 +426,9 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
-    "mtime": 1795374316.4924932,
-    "seen": 1795383805.072201,
-    "ast_hash": "d6abe1b475d3d328406f806072b807d7",
+    "mtime": 1795386040.551161,
+    "seen": 1795386050.7807367,
+    "ast_hash": "06028ed801f73b76e7f2913e29a5cf84",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/especificacion.svg": {

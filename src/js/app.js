@@ -41,6 +41,9 @@ const btnEncenderSeleccionadosText = document.getElementById('btn-encender-selec
 const modalAsignarSwitch = document.getElementById('modal-asignar-switch');
 const modalAsignarCount = document.getElementById('modal-asignar-count');
 const modalAsignarChips = document.getElementById('modal-asignar-chips');
+const modalAsignarSwitchSelect = document.getElementById('modal-asignar-switch-select');
+const modalAsignarTbody = document.getElementById('modal-asignar-tbody');
+const modalAsignarPreviewLine = document.getElementById('modal-asignar-preview-line');
 const btnModalAsignarClose = document.getElementById('btn-modal-asignar-close');
 const btnModalAsignarCancel = document.getElementById('btn-modal-asignar-cancel');
 const btnModalAsignarConfirm = document.getElementById('btn-modal-asignar-confirm');
@@ -402,6 +405,57 @@ document.addEventListener('click', (e) => {
 // ==============================================================================
 // GESTIÓN DEL MODAL: ASIGNAR PUESTOS A SWITCH (CU-04 según Wireframe RUP)
 // ==============================================================================
+function actualizarTablaModalAsignar(seleccionados, targetSwitchObj) {
+  if (!modalAsignarTbody) return;
+  modalAsignarTbody.innerHTML = '';
+
+  const switchColText = targetSwitchObj
+    ? (targetSwitchObj.ip_gestion
+        ? `${targetSwitchObj.nombre && targetSwitchObj.nombre.startsWith('SW-') ? targetSwitchObj.nombre.split(' -- ')[0] : targetSwitchObj.id.toUpperCase()} (${targetSwitchObj.ip_gestion})`
+        : targetSwitchObj.nombre)
+    : '---';
+
+  let primerBoca = null;
+
+  seleccionados.forEach(id => {
+    const pf = puestosFisicos.find(x => x.id === id || String(x.slot) === String(id));
+    let nombrePuesto = null;
+    let bocaDetectada = null;
+
+    for (const h of puestos.values()) {
+      if (h.puesto_id === id || String(h.slot) === String(id)) {
+        nombrePuesto = h.nombre || h.etiqueta;
+        bocaDetectada = h.boca_switch || (h.telemetria?.switch?.portName) || `port${h.slot || ''}`;
+        break;
+      }
+    }
+
+    if (!nombrePuesto) {
+      const slotNum = pf ? pf.slot : parseInt(String(id).replace(/\D/g, ''), 10) || 1;
+      nombrePuesto = pf?.etiqueta || `PC-${String(slotNum).padStart(2, '0')}`;
+    }
+    if (!bocaDetectada) {
+      const slotNum = pf ? pf.slot : parseInt(String(id).replace(/\D/g, ''), 10) || 1;
+      bocaDetectada = pf?.puerto_switch ? `port${String(pf.puerto_switch).padStart(2, '0')}` : `port${String(slotNum).padStart(2, '0')}`;
+    }
+
+    if (!primerBoca) primerBoca = bocaDetectada;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-puesto">${escapeHtml(nombrePuesto)}</td>
+      <td class="td-switch">${escapeHtml(switchColText)}</td>
+      <td class="td-boca">${escapeHtml(bocaDetectada)}</td>
+    `;
+    modalAsignarTbody.appendChild(tr);
+  });
+
+  if (modalAsignarPreviewLine) {
+    const ipOrName = targetSwitchObj?.ip_gestion || targetSwitchObj?.nombre || '10.10.136.11';
+    modalAsignarPreviewLine.textContent = `Switch: ${ipOrName} - Boca: ${primerBoca || 'port01'}`;
+  }
+}
+
 function abrirModalAsignarSwitch() {
   const seleccionados = renderer.obtenerPuestosSeleccionados();
   if (!seleccionados || seleccionados.length === 0) {
@@ -446,8 +500,35 @@ function abrirModalAsignarSwitch() {
     }
   }
 
-  const radioDocente = document.getElementById('radio-switch-docente');
-  if (radioDocente) radioDocente.checked = true;
+  // Cargar switches gestionados de destino en el select
+  if (modalAsignarSwitchSelect) {
+    modalAsignarSwitchSelect.innerHTML = '';
+    const lista = (switchesCatalogo && switchesCatalogo.length > 0)
+      ? switchesCatalogo.filter(s => s.tipo === 'GESTIONADO' || s.es_gestionado || s.id.startsWith('sw-0'))
+      : [
+          { id: 'sw-01', nombre: 'SW-01 -- 10.10.136.11', ip_gestion: '10.10.136.11' },
+          { id: 'sw-02', nombre: 'SW-02 -- 10.10.136.12', ip_gestion: '10.10.136.12' },
+          { id: 'sw-03', nombre: 'SW-03 -- 10.10.136.13', ip_gestion: '10.10.136.13' }
+        ];
+
+    lista.forEach(sw => {
+      const opt = document.createElement('option');
+      opt.value = sw.id;
+      opt.textContent = sw.nombre || `${sw.id.toUpperCase()} -- ${sw.ip_gestion || ''}`;
+      modalAsignarSwitchSelect.appendChild(opt);
+    });
+
+    const getSelectedSwObj = () => {
+      const val = modalAsignarSwitchSelect.value;
+      return lista.find(s => s.id === val) || lista[0];
+    };
+
+    actualizarTablaModalAsignar(seleccionados, getSelectedSwObj());
+
+    modalAsignarSwitchSelect.onchange = () => {
+      actualizarTablaModalAsignar(seleccionados, getSelectedSwObj());
+    };
+  }
 
   if (modalAsignarSwitch) {
     modalAsignarSwitch.style.display = 'flex';
@@ -467,15 +548,14 @@ async function confirmarAsignarSwitch() {
     return;
   }
 
-  const selectedRadio = document.querySelector('input[name="target-switch"]:checked');
-  const targetSwitch = selectedRadio ? selectedRadio.value : 'sw-docente';
-  const switchLabel = targetSwitch === 'sw-practicas' ? 'Switch de Prácticas' : 'Switch Universitario';
+  const targetSwitch = modalAsignarSwitchSelect ? modalAsignarSwitchSelect.value : 'sw-01';
+  const selectedOptText = modalAsignarSwitchSelect ? modalAsignarSwitchSelect.selectedOptions[0]?.textContent : targetSwitch;
 
   try {
-    setStatusBadge(`Asignando ${seleccionados.length} puestos a ${switchLabel}...`);
+    setStatusBadge(`Guardando mapeo de ${seleccionados.length} puestos a ${selectedOptText}...`);
     if (btnModalAsignarConfirm) {
       btnModalAsignarConfirm.disabled = true;
-      btnModalAsignarConfirm.textContent = 'Asignando...';
+      btnModalAsignarConfirm.textContent = 'Guardando...';
     }
 
     const res = await fetch(`${DAEMON_URL}/api/puestos/asignar-switch`, {
@@ -489,7 +569,7 @@ async function confirmarAsignarSwitch() {
 
     const data = await res.json();
     if (!res.ok || !data.success) {
-      throw new Error(data.error || 'Fallo al asignar puestos al switch.');
+      throw new Error(data.error || 'Fallo al guardar mapeo de puestos a switch.');
     }
 
     renderer.limpiarSeleccion();
@@ -502,15 +582,15 @@ async function confirmarAsignarSwitch() {
       await fetchDevices();
     }
 
-    setStatusBadge(`✓ ${seleccionados.length} puestos asignados a ${switchLabel}`);
+    setStatusBadge(`✓ Mapeo guardado: ${seleccionados.length} puestos asignados a ${selectedOptText}`);
   } catch (err) {
-    console.error('[-] Error al asignar switch:', err);
-    alert(`Error al asignar switch: ${err.message}`);
-    setStatusBadge('Error al asignar switch', true);
+    console.error('[-] Error al guardar mapeo:', err);
+    alert(`Error al guardar mapeo: ${err.message}`);
+    setStatusBadge('Error al guardar mapeo', true);
   } finally {
     if (btnModalAsignarConfirm) {
       btnModalAsignarConfirm.disabled = false;
-      btnModalAsignarConfirm.textContent = 'Confirmar';
+      btnModalAsignarConfirm.textContent = 'Guardar Mapeo';
     }
   }
 }

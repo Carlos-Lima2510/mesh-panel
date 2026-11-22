@@ -38,7 +38,7 @@ El caso de uso permite al Administrador establecer el mapeo físico imperativo e
    * **Precondición:** El Administrador debe haber seleccionado previamente uno o varios puestos en la cuadrícula general del aula.
    * **Bloqueo preventivo si no hay selección:** Si no existe ningún puesto seleccionado previamente, el sistema no permite acceder al modal y presenta un aviso de advertencia indicando que se requiere seleccionar puestos antes de proceder.
    * **Apertura de modal de asignación:** Con puestos seleccionados, el Administrador solicita asignar a switch. El sistema presenta el diálogo modal de infraestructura de red:
-     * Resumen de puestos seleccionados (ej. `4 puestos (M01, M02, M03, M04)`).
+     * Resumen de puestos seleccionados (ej. `4 puestos (PC-01, PC-02, PC-03, PC-04)`).
      * Selector del conmutador gestionado destino del rack del aula (ej. `SW-01 (10.10.136.11)`, `SW-02 (10.10.136.12)`, `SW-03 (10.10.136.13)`).
      * Tabla con los puestos y la boca física detectada por SNMP para cada uno (`port01`, `port02`, `port03`, `port04`).
      * Muestra previa de la línea informativa resultante para la tarjeta (`Switch: 10.10.136.11 - Boca: port01`).
