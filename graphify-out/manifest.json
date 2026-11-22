@@ -1,8 +1,8 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795384056.0377827,
-    "seen": 1795384058.9112272,
-    "ast_hash": "3de797b1478d829a362dd7e2b150d94a",
+    "mtime": 1795385063.4091222,
+    "seen": 1795385066.0853164,
+    "ast_hash": "049d3937c912e4bce09b634b8cad467b",
     "semantic_hash": ""
   },
   "daemon/config.js": {
@@ -30,10 +30,10 @@
     "semantic_hash": "120ca44ce7c9f69674d5618c953f97a3"
   },
   "daemon/domain/Host.js": {
-    "mtime": 1795374316.478512,
-    "seen": 1795383805.0719967,
-    "ast_hash": "4f773416e680c0343fc5bec868c51e57",
-    "semantic_hash": "4f773416e680c0343fc5bec868c51e57"
+    "mtime": 1795384973.5426137,
+    "seen": 1795384976.0289452,
+    "ast_hash": "e16ea9a37b6d967efbcd83ae7aad4455",
+    "semantic_hash": ""
   },
   "daemon/domain/Laboratorio.js": {
     "mtime": 1795384036.787692,
@@ -210,9 +210,9 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795384783.332504,
-    "seen": 1795384785.8752456,
-    "ast_hash": "5f0b8ec3a544d9ac39239540b5a027fb",
+    "mtime": 1795385104.578353,
+    "seen": 1795385107.1566846,
+    "ast_hash": "7826b99eb73c132dd9b77c442b5cbc07",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795384672.2689269,
-    "seen": 1795384723.5383005,
-    "ast_hash": "350cb027504c22753d794510c9921f79",
+    "mtime": 1795385077.2932,
+    "seen": 1795385093.6253657,
+    "ast_hash": "f6da461a458a9e098effd4cb493e6079",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {

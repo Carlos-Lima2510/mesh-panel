@@ -32,9 +32,6 @@ const optPracticaIzq = document.getElementById('opt-practica-izq');
 const optPracticaDer = document.getElementById('opt-practica-der');
 const optPracticaTodo = document.getElementById('opt-practica-todo');
 
-const bannerContexto = document.getElementById('banner-contexto-operacional');
-const bannerContextoTexto = document.getElementById('banner-contexto-texto');
-
 const btnAsignarSwitch = document.getElementById('btn-asignar-switch');
 const btnAsignarSwitchText = document.getElementById('btn-asignar-switch-text');
 const btnEncenderSeleccionados = document.getElementById('btn-encender-seleccionados');
@@ -126,30 +123,12 @@ function actualizarBotonesModo(modo, alcance = 'COMPLETO') {
       else if (alcance === 'DERECHA') btnModePracticaText.textContent = 'Práctica (Hilera Der)';
       else btnModePracticaText.textContent = 'Práctica (Toda el aula)';
     }
-    if (bannerContexto && bannerContextoTexto) {
-      bannerContexto.className = 'operational-context-banner practica';
-      if (alcance === 'IZQUIERDA') {
-        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Hilera Izquierda). Puestos de la mitad izquierda con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad derecha mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</em>';
-      } else if (alcance === 'DERECHA') {
-        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Hilera Derecha). Puestos de la mitad derecha con enlace caído se reclasifican como 🟡 RED AISLADA. La mitad izquierda mantiene monitorización normal de clase (enlace caído = 🟠 DESCONECTADO).</em>';
-      } else {
-        bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Práctica (Toda el aula). Todos los puestos con enlace caído en switch docente se reclasifican como 🟡 RED AISLADA, evitando falsas alarmas de desconexión.</em>';
-      }
-    }
   } else if (modo === 'CABLEADO') {
     if (btnModeCableado) btnModeCableado.classList.add('active-cableado');
     if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
-    if (bannerContexto && bannerContextoTexto) {
-      bannerContexto.className = 'operational-context-banner cableado';
-      bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Verificación de Cableado (Pre-despliegue). Enlaces UP se consideran operativos antes de instalar MeshAgent.</em>';
-    }
   } else {
     btnModeClase.classList.add('active-clase');
     if (btnModePracticaText) btnModePracticaText.textContent = 'Modo Práctica';
-    if (bannerContexto && bannerContextoTexto) {
-      bannerContexto.className = 'operational-context-banner clase';
-      bannerContextoTexto.innerHTML = '<em><strong>Contexto operacional activo:</strong> Modo Clase. Todos los puestos en monitorización ordinaria (enlaces caídos en switch docente = 🟠 DESCONECTADO).</em>';
-    }
   }
 }
 

@@ -251,43 +251,6 @@ body {
   color: #c4b5fd;
 }
 
-/* Banner de Contexto Operacional Activo */
-.operational-context-banner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 24px 0 24px;
-  padding: 9px 16px;
-  border-radius: 8px;
-  font-size: 0.83rem;
-  line-height: 1.4;
-  transition: all 0.25s ease;
-}
-
-.operational-context-banner.clase {
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px solid rgba(37, 99, 235, 0.25);
-  color: #93c5fd;
-}
-
-.operational-context-banner.practica {
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid rgba(124, 58, 237, 0.35);
-  color: #c4b5fd;
-}
-
-.operational-context-banner.cableado {
-  background: rgba(5, 150, 105, 0.12);
-  border: 1px solid rgba(5, 150, 105, 0.35);
-  color: #6ee7b7;
-}
-
-.context-banner-icon {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
 .header-right-actions {
   display: flex;
   align-items: center;

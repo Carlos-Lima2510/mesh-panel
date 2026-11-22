@@ -1,17 +1,17 @@
 # Graph Report - mesh-panel  (2026-11-22)
 
 ## Corpus Check
-- 69 files · ~68,809 words
+- 69 files · ~68,568 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 21 file(s) not represented in the graph (top: .puml 16, .example 1, (none) 1)
 
 ## Summary
-- 569 nodes · 824 edges · 46 communities (20 shown, 26 thin omitted)
-- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 64 edges (avg confidence: 0.9)
+- 567 nodes · 819 edges · 46 communities (20 shown, 26 thin omitted)
+- Extraction: 92% EXTRACTED · 8% INFERRED · 0% AMBIGUOUS · INFERRED: 63 edges (avg confidence: 0.9)
 - Token cost: 177,006 input · 6,991 output
 
 ## Graph Freshness
-- Built from commit: `de531f29`
+- Built from commit: `53b7d8b3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -94,7 +94,7 @@
 
 ### Community 0 - "app.js"
 Cohesion: 0.03
-Nodes (71): OpSys - Supervisión de Laboratorio, bannerContexto, bannerContextoTexto, btnAplicarCuadricula, btnAplicarRangoSwitch, btnAsignarSwitch, btnAsignarSwitchText, btnClearSearch (+63 more)
+Nodes (69): OpSys - Supervisión de Laboratorio, btnAplicarCuadricula, btnAplicarRangoSwitch, btnAsignarSwitch, btnAsignarSwitchText, btnClearSearch, btnDimensionarLabel, btnDimensionarToggle (+61 more)
 
 ### Community 1 - "Accion"
 Cohesion: 0.07
@@ -174,23 +174,23 @@ Nodes (4): 1. Disciplinas y Fases RUP, 2. Trazabilidad de Casos de Uso, Informac
 
 ## Knowledge Gaps
 - **17 isolated node(s):** `ADR-0004`, `OpSys - Supervisión de Laboratorio`, `Modal: Detalle de Puesto`, `Button: Consultar estado`, `Button: Dimensionar` (+12 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 312 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 310 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **26 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Puesto` connect `Puesto` to `Información del caso de uso`, `Referencias`, `test-domain.js`, `LaboratorioService.js`, `Host`, `Referencias`, `Estado`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
+  _High betweenness centrality (0.061) - this node is a cross-community bridge._
 - **Are the 5 inferred relationships involving `Laboratorio` (e.g. with `Referencias` and `Referencias`) actually correct?**
   _`Laboratorio` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `ADR-0004`, `OpSys - Supervisión de Laboratorio`, `Modal: Detalle de Puesto` to the rest of the system?**
   _17 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `app.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.02666666666666667 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0273972602739726 - nodes in this community are weakly interconnected._
 - **Why does `Información del caso de uso` connect `Información del caso de uso` to `Puesto`, `Switch`?**
   _High betweenness centrality (0.051) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `Puesto` (e.g. with `Información del caso de uso` and `Referencias`) actually correct?**
   _`Puesto` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Accion` be split into smaller, more focused modules?**
-  _Cohesion score 0.06641604010025062 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06688311688311688 - nodes in this community are weakly interconnected._

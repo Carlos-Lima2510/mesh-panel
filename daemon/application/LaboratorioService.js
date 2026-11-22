@@ -175,6 +175,7 @@ class LaboratorioService {
     ];
 
     this.modoActual = this.modoDespliegue ? 'CABLEADO' : 'CLASE';
+    this.alcanceActual = 'COMPLETO';
     this.asignacionPuestos = new Map();
     this.asignacionSwitches = new Map();
   }
@@ -217,6 +218,7 @@ class LaboratorioService {
               pwr: host.telemetria.pwr,
               conn: host.telemetria.conn,
               modoLaboratorio: this.modoActual,
+              alcancePractica: this.alcanceActual,
               puesto,
               switchAsignado: swObj
             });
@@ -308,6 +310,7 @@ class LaboratorioService {
     const laboratorio = new Laboratorio({
       nombre: nombreAula,
       modo: this.modoActual,
+      alcancePractica: this.alcanceActual,
       filas: this.filas,
       columnas: this.columnas,
       columnasHilera: this.columnasHilera,
@@ -409,6 +412,7 @@ class LaboratorioService {
         pwr,
         conn,
         modoLaboratorio: this.modoActual,
+        alcancePractica: this.alcanceActual,
         puesto: puestoDestino,
         switchAsignado
       });
@@ -482,6 +486,7 @@ class LaboratorioService {
             amtOnline: false,
             conn: 0,
             modoLaboratorio: this.modoActual,
+            alcancePractica: this.alcanceActual,
             puesto: puestoDestino,
             switchAsignado
           });
@@ -532,6 +537,7 @@ class LaboratorioService {
           amtOnline: false,
           conn: 0,
           modoLaboratorio: this.modoActual,
+          alcancePractica: this.alcanceActual,
           puesto: puestoDestino,
           switchAsignado
         });
@@ -583,6 +589,7 @@ class LaboratorioService {
           amtOnline: false,
           conn: 0,
           modoLaboratorio: this.modoActual,
+          alcancePractica: this.alcanceActual,
           puesto: puestoDestino,
           switchAsignado
         });

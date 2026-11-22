@@ -48,6 +48,7 @@ class Host {
     pwr = null,
     conn = 0,
     modoLaboratorio = 'CLASE',
+    alcancePractica = 'COMPLETO',
     switchAsignado = null,
     puesto = null,
     modoDespliegue = false
@@ -67,6 +68,7 @@ class Host {
       switch_asignado: sw ? sw.nombre : null,
       red_asignada: this.red ? this.red.nombre : (sw && sw.red ? sw.red.nombre : 'No identificada'),
       modo_laboratorio: modoLaboratorio,
+      alcance_practica: alcancePractica,
       ip_reportada: this.ip,
       mac: this.mac,
       conn,
@@ -80,6 +82,7 @@ class Host {
       pwr,
       red: this.red,
       modoLaboratorio,
+      alcancePractica,
       switchAsignado: sw,
       puesto,
       modoDespliegue
