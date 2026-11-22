@@ -127,15 +127,15 @@ class LaboratorioService {
       'UEA-C421': 'port34',
       'C421': 'port34',
 
-      // Switch .13 port43 (switch de mesa fila 6)
-      'UEA-C271': 'port43',
-      'C271': 'port43',
-      'UEA-C272': 'port43',
-      'C272': 'port43',
+      // Switch .13 fila 6 (rosetas individuales)
+      'UEA-C271': 'port41',
+      'C271': 'port41',
+      'UEA-C272': 'port42',
+      'C272': 'port42',
       'UEA-C273': 'port43',
       'C273': 'port43',
-      'UEA-C277': 'port43',
-      'C277': 'port43',
+      'UEA-C277': 'port44',
+      'C277': 'port44',
 
       ...mapeoBocas
     };
@@ -441,11 +441,11 @@ class LaboratorioService {
         { nombre: 'UEA-C250', boca: 'port34', slot: 36 },
         { nombre: 'UEA-C421', boca: 'port34', slot: 37 },
 
-        // Switch .13 port43 (switch de mesa fila 6)
-        { nombre: 'UEA-C271', boca: 'port43', slot: 41 },
-        { nombre: 'UEA-C272', boca: 'port43', slot: 42 },
+        // Switch .13 fila 6 (rosetas individuales)
+        { nombre: 'UEA-C271', boca: 'port41', slot: 41 },
+        { nombre: 'UEA-C272', boca: 'port42', slot: 42 },
         { nombre: 'UEA-C273', boca: 'port43', slot: 43 },
-        { nombre: 'UEA-C277', boca: 'port43', slot: 44 }
+        { nombre: 'UEA-C277', boca: 'port44', slot: 44 }
       ];
 
       for (const eq of equiposEspeciales) {
