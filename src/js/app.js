@@ -958,7 +958,7 @@ window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false)
       }
 
       btnModalToggleSwitch.onclick = async () => {
-        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        const nuevoSwitch = isPracticas ? 'sw-01' : 'sw-practicas';
         btnModalToggleSwitch.disabled = true;
         btnModalToggleSwitch.textContent = 'Cambiando...';
         await window.cambiarSwitchPuesto(puestoId || host.puesto_id, nuevoSwitch);
@@ -1016,7 +1016,7 @@ window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false)
       btnModalToggleSwitch.className = `btn-switch-assigned ${isPracticas ? 'practicas' : 'docente'}`;
       btnModalToggleSwitch.textContent = isPracticas ? 'Switch Prácticas' : 'Switch Universitario';
       btnModalToggleSwitch.onclick = async () => {
-        const nuevoSwitch = isPracticas ? 'sw-docente' : 'sw-practicas';
+        const nuevoSwitch = isPracticas ? 'sw-01' : 'sw-practicas';
         await window.cambiarSwitchPuesto(puestoId, nuevoSwitch);
         window.abrirDetallePuesto(null, puestoId, true);
       };

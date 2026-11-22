@@ -1,8 +1,8 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795387008.9473684,
-    "seen": 1795387010.8543963,
-    "ast_hash": "ff756eb3d5504fad3fd97260e0817fc8",
+    "mtime": 1795387370.9469967,
+    "seen": 1795387373.613004,
+    "ast_hash": "5922a8263d507bd46cfd9494a5fe6176",
     "semantic_hash": ""
   },
   "daemon/config.js": {
@@ -192,9 +192,9 @@
     "semantic_hash": ""
   },
   "scripts/test-domain.js": {
-    "mtime": 1795384104.2040093,
-    "seen": 1795384107.092696,
-    "ast_hash": "71d5b4e9bbc6c96aae41d713147e21d9",
+    "mtime": 1795387438.3062997,
+    "seen": 1795387440.42815,
+    "ast_hash": "9720b0776a897fe2da9dd1f045f02cf6",
     "semantic_hash": ""
   },
   "scripts/test-snmp.js": {
@@ -210,15 +210,15 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795387043.2425227,
-    "seen": 1795387045.0229104,
-    "ast_hash": "56de70b4089cc4fecf7ba4df978fb1c8",
+    "mtime": 1795387411.69518,
+    "seen": 1795387413.7194736,
+    "ast_hash": "f39d772749580408dd0e9259a5550c8a",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
-    "mtime": 1795386657.653788,
-    "seen": 1795386659.2986107,
-    "ast_hash": "da09234a2a59757bc0325174391af35e",
+    "mtime": 1795387392.8790953,
+    "seen": 1795387394.4818487,
+    "ast_hash": "d6af8f83d3e1cba2781e53a18cf4a7c3",
     "semantic_hash": ""
   },
   "src/js/sse-client.js": {
@@ -402,9 +402,9 @@
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-objetos.svg": {
-    "mtime": 1795374316.4915962,
-    "seen": 1795383805.0721903,
-    "ast_hash": "dea22efa14a3696724a69ca1693854c5",
+    "mtime": 1795387347.4124396,
+    "seen": 1795387363.950064,
+    "ast_hash": "eec7fe0e75765cd45844a06071af283c",
     "semantic_hash": ""
   },
   "images/01-requisitos/00-actores-casos-uso/actoresCasosUsoAdministrador.svg": {
@@ -426,8 +426,8 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
-    "mtime": 1795387061.1248813,
-    "seen": 1795387073.6982465,
+    "mtime": 1795387193.6380007,
+    "seen": 1795387363.9500768,
     "ast_hash": "6943dae1172808e7a2f81b28d7a10320",
     "semantic_hash": ""
   },
@@ -444,14 +444,14 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
-    "mtime": 1795387085.4820042,
-    "seen": 1795387131.525877,
+    "mtime": 1795387194.414166,
+    "seen": 1795387363.9500895,
     "ast_hash": "bfa1d8399aa5cb992a83182a3d8334cb",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
-    "mtime": 1795387147.3950338,
-    "seen": 1795387160.0992036,
+    "mtime": 1795387195.4321847,
+    "seen": 1795387363.9500957,
     "ast_hash": "11d7aeb45378555008c60afa6ac25f00",
     "semantic_hash": ""
   },

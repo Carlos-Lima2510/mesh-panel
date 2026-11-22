@@ -26,7 +26,7 @@ function crearPuestosCuadricula({
     // Hilera Izquierda
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-docente');
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-01');
       const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
         || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
@@ -53,7 +53,7 @@ function crearPuestosCuadricula({
     // Hilera Derecha (mismo número exacto de columnas, pasillo en medio siempre)
     for (let c = 1; c <= cHilera; c++) {
       const id = `puesto-${slotNum}`;
-      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-docente');
+      const swId = asignacionSwitches.get(id) || (switchesCatalog && switchesCatalog[0] ? switchesCatalog[0].id : 'sw-01');
       const switchObj = (switchesCatalog && switchesCatalog.find ? switchesCatalog.find(s => s.id === swId) : null)
         || (swId === 'sw-practicas' ? switchPracticas : switchDocente);
 
@@ -181,14 +181,6 @@ class LaboratorioService {
         tipo: 'GESTIONADO',
         totalPuertos: 48,
         ipGestion: '10.10.136.39',
-        red: this.redesPorDefecto[0]
-      }),
-      new Switch({
-        id: 'sw-docente',
-        nombre: 'Switch Principal Docente',
-        tipo: 'GESTIONADO',
-        totalPuertos: parseInt(process.env.SWITCH_TOTAL_PUERTOS, 10) || 96,
-        ipGestion: process.env.SNMP_HOST || '10.10.136.13',
         red: this.redesPorDefecto[0]
       }),
       new Switch({

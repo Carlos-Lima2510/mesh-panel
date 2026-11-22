@@ -35,11 +35,11 @@ object "pc_02 : Host" as host02 {
     estado = RED_AISLADA
 }
 
-object "swDocente : Switch" as swDocente {
-    nombre = "Switch Principal Docente"
+object "sw01 : Switch" as sw01 {
+    nombre = "SW-01 -- 10.10.136.13"
     tipo = GESTIONADO
     totalPuertos = 48
-    ipGestion = "10.0.0.2"
+    ipGestion = "10.10.136.13"
 }
 
 object "swPracticas : Switch" as swPracticas {
@@ -62,11 +62,11 @@ object "redAislada : Red" as redAislada {
 ' Contención física en el aula
 lab *-- puesto01
 lab *-- puesto02
-lab o-- swDocente
+lab o-- sw01
 lab o-- swPracticas
 
 ' Conexiones de cableado a bocas de switch
-puesto01 -- swDocente
+puesto01 -- sw01
 puesto02 -- swPracticas
 
 ' Alojamiento de hosts en mesas
@@ -74,7 +74,7 @@ puesto01 o-- host01
 puesto02 o-- host02
 
 ' Switches dando servicio a las redes
-swDocente -- redUniversidad
+sw01 -- redUniversidad
 swPracticas -- redAislada
 
 @enduml
