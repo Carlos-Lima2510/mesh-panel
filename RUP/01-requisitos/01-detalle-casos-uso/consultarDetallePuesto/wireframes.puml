@@ -1,0 +1,33 @@
+@startsalt consultarDetallePuesto-wireframe
+skinparam dpi 150
+skinparam defaultFontName sans-serif
+{+
+  --
+  {^"<b>Detalle de Puesto: M02 (PC-02) </b>"
+    {
+      <b>Estado:</b> | 🟢 <b>  OPERATIVO </b>
+    }
+    --
+    {
+      {
+        <b>Dirección IPv4:</b> 10.10.136.102
+        <b>Dirección MAC:</b> 20:88:10:71:F8:E3
+        🪟 En línea
+      } | <color:transparent>_________________________</color> | {
+        <b>Switch Asignado:</b> 10.10.136.11 (SW-01)
+        <b>Puerto de Switch:</b> port02 (1000 Mbps - UP)
+      }
+    }
+    --
+    {
+      <b>Diagnóstico detallado:</b>
+      Enlace eléctrico PHY activo a 1 Gbps en switch 10.10.136.11 (port02) y sesión de agente activa.
+      El puesto se encuentra completamente disponible para la sesión docente.
+    }
+    --
+    {
+      [ <color:gray>⚡ Enviar Wake-on-LAN </color> ] | <color:transparent>____________________________________________________________________________________________________________________________________________________________</color> | [ ✖ Cerrar ]
+    }
+  }
+}
+@endsalt

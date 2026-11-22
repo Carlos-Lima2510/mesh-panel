@@ -1,0 +1,57 @@
+@startuml especificacion
+
+skinparam linetype polyline
+
+state SISTEMA_DISPONIBLE
+state SISTEMA_DISPONIBLE_SALIDA as "SISTEMA_DISPONIBLE"
+
+SISTEMA_DISPONIBLE -[#green]-> asignarPuestosASwitch
+note on link
+<b>Administrador</b> solicita asignar puestos a switch
+end note
+
+state asignarPuestosASwitch as "asignarPuestosASwitch()" {
+
+    state c <<choice>>
+
+    [*] -[#green]-> c
+
+    c -[#green]-> [*]
+    note on link
+    [puestos seleccionados y switch especificado]
+    <b>Sistema</b> presenta diálogo modal con switches del rack y bocas detectadas por SNMP
+    <b>Sistema</b> permite introducir switch de destino
+    <b>Administrador</b> introduce switch gestionado
+    <b>Administrador</b> solicita guardar mapeo
+    <b>Sistema</b> presenta las tarjetas de puestos con la línea informativa de switch y boca actualizadas
+    end note
+
+    c -[#red]-> [*]
+    note on link
+    [sin puestos seleccionados previamente en cuadrícula]
+    <b>Sistema</b> presenta aviso indicando que se requiere seleccionar puestos antes de mapear
+    end note
+
+    c -[#orange]-> [*]
+    note on link
+    [solicitud cancelada por el usuario]
+    <b>Sistema</b> presenta pantalla de origen manteniendo el mapeo previo sin cambios
+    end note
+}
+
+asignarPuestosASwitch -[#green]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+puestos reasignados, tarjetas de puestos actualizadas con switch y boca
+end note
+
+asignarPuestosASwitch -[#red]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+aviso de advertencia presentado, retorno a cuadrícula general
+end note
+
+asignarPuestosASwitch -[#orange]-> SISTEMA_DISPONIBLE_SALIDA
+note on link
+solicitud cancelada, retorno a cuadrícula sin cambios
+end note
+
+@enduml

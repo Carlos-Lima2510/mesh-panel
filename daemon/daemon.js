@@ -21,11 +21,26 @@ const meshAdapter = new MeshCentralAdapter({
 
 const networkProvider = config.switchMode === 'simulado'
   ? new SimulatedSwitchProvider()
-  : new SnmpSwitchProvider({ host: config.switchHost, community: config.switchCommunity });
+  : new SnmpSwitchProvider({
+      version: config.snmpVersion,
+      switches: config.snmpSwitches,
+      user: config.snmpUser,
+      authKey: config.snmpAuthKey,
+      authProto: config.snmpAuthProto,
+      privKey: config.snmpPrivKey,
+      privProto: config.snmpPrivProto,
+      host: config.switchHost,
+      community: config.switchCommunity
+    });
 
 const laboratorioService = new LaboratorioService({
   meshCentralAdapter: meshAdapter,
-  networkProvider: networkProvider
+  networkProvider: networkProvider,
+  filas: 7,
+  columnasHilera: 4,
+  autoCompletarPuertos: config.switchMode === 'snmp',
+  excluirSubred: config.excluirSubnet,
+  modoDespliegue: config.modoDespliegue
 });
 
 const sseBroadcaster = new SseBroadcaster();

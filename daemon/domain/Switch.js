@@ -5,7 +5,8 @@ class Switch {
     tipo = 'GESTIONADO',
     totalPuertos = 48,
     ipGestion = null,
-    red = null
+    red = null,
+    alcanzable = true
   }) {
     if (!id || !nombre) {
       throw new Error('Un Switch requiere obligatoriamente identificador (id) y nombre.');
@@ -17,6 +18,7 @@ class Switch {
     this.totalPuertos = Number.isInteger(totalPuertos) && totalPuertos > 0 ? totalPuertos : 48;
     this.ipGestion = ipGestion;
     this.red = red;
+    this.alcanzable = Boolean(alcanzable);
 
     // Mapa de asignación física: puerto (1..totalPuertos) -> puestoId
     this.puertosOcupados = new Map();
@@ -85,6 +87,7 @@ class Switch {
       ip_gestion: this.ipGestion,
       es_gestionado: this.esGestionado(),
       espera_meshcentral: this.esperaMeshCentral(),
+      alcanzable: this.alcanzable,
       red: this.red ? (this.red.toJSON ? this.red.toJSON() : this.red) : null
     };
   }

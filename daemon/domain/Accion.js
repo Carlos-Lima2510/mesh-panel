@@ -29,6 +29,10 @@ class Accion {
   static inspeccionCable() {
     return new Accion('INSPECCION_CABLE', 'Enlace físico caído. Requiere inspección del cable de red en el puesto o switch.', false);
   }
+
+  static verificarInfraestructura() {
+    return new Accion('VERIFICAR_INFRAESTRUCTURA', 'Switch o canal de telemetría inalcanzable. Verificar conectividad de red con el switch.', false);
+  }
 }
 
 module.exports = Accion;

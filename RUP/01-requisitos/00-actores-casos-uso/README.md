@@ -1,3 +1,10 @@
+<div align=right>
+
+|[![](https://img.shields.io/badge/-Inicio-003366?style=flat&logo=github&logoColor=white)](/README.md) [![](https://img.shields.io/badge/-RUP-003366?style=flat&logo=Elsevier&logoColor=white)](/RUP/README.md) [![](https://img.shields.io/badge/-Modelo_del_dominio-003366?style=flat&logo=diagramsdotnet&logoColor=white)](/RUP/00-modelo-del-dominio/README.md) [![](https://img.shields.io/badge/-Requisitos-003366?style=flat&logo=crewunited&logoColor=white)](/RUP/01-requisitos/README.md) [![](https://img.shields.io/badge/-Detalle_Casos_de_Uso-003366?style=flat&logo=buffer&logoColor=white)](/RUP/01-requisitos/01-detalle-casos-uso/README.md) [![](https://img.shields.io/badge/-Matriz_Documental-003366?style=flat&logo=gitbook&logoColor=white)](/docs/matriz-documental-general.md) [![](https://img.shields.io/badge/-Decisiones_ADR-003366?style=flat&logo=gitbook&logoColor=white)](/docs/adr/README.md)
+|-:
+
+</div>
+
 # OpSys - Identificación de Actores y Casos de Uso
 
 ## Información del artefacto
@@ -89,7 +96,7 @@ El catálogo consta de **8 casos de uso** a nivel de objetivo de usuario (*User-
 * **Descripción:** Envía un paquete de difusión Ethernet de Capa 2 (*Magic Packet* / *Wake-on-LAN*) dirigido a la dirección MAC del puesto de trabajo en estado de reposo (`STANDBY`), activando la fuente de alimentación a través de la interfaz de red para preparar el equipo antes de la clase.
 * **Precondición:** El puesto físico cuenta con un host asignado y se encuentra en estado `STANDBY` (chip PHY energizado en reposo $S5$).
 * **Postcondición:** Se emite el paquete *Magic Packet* y el equipo inicia su secuencia de arranque.
-* **Nota de Alcance ([ADR-002](../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md)):** Se excluye intencionadamente el apagado remoto interactivo debido a la ausencia física de procesador fuera de banda Intel AMT en las máquinas Dell OptiPlex (FPF fundidos de fábrica) y la inviabilidad por destino compartido (*fate sharing*) en puestos desconfigurados.
+* **Nota de Alcance ([ADR-002](../../../docs/adr/ADR-002-acotamiento-control-energia-hardware.md)):** Se excluye intencionadamente el apagado remoto interactivo debido a la ausencia física de procesador fuera de banda Intel AMT en las máquinas Dell OptiPlex (FPF fundidos de fábrica) y la inviabilidad por destino compartido (*fate sharing*) en puestos desconfigurados.
 
 ---
 

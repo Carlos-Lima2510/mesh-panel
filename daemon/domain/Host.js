@@ -49,7 +49,8 @@ class Host {
     conn = 0,
     modoLaboratorio = 'CLASE',
     switchAsignado = null,
-    puesto = null
+    puesto = null,
+    modoDespliegue = false
   }) {
     const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
 
@@ -80,7 +81,8 @@ class Host {
       red: this.red,
       modoLaboratorio,
       switchAsignado: sw,
-      puesto
+      puesto,
+      modoDespliegue
     });
   }
 

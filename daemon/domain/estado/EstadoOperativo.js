@@ -1,14 +1,18 @@
 const Accion = require('../Accion');
 
 class EstadoOperativo {
-  constructor(diagnostico = 'Puesto 100% operativo (MeshAgent conectado al servidor).') {
+  constructor(
+    diagnostico = 'Puesto 100% operativo (MeshAgent conectado al servidor).',
+    accion = null
+  ) {
     this.color = 'VERDE';
     this.categoria = 'OPERATIVO';
     this.diagnostico = diagnostico;
+    this.accion = accion;
   }
 
   obtenerAccion() {
-    return Accion.powerOff();
+    return this.accion || Accion.powerOff();
   }
 
   esOperativo() {

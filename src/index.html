@@ -4,106 +4,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telemetría de Puestos - Panel de Observabilidad</title>
+  <title>OpSys - Supervisión de Laboratorio</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-  <header>
-    <div class="header-brand">
-      <h2>Telemetría del Laboratorio</h2>
-      <div id="conn-status" class="status-badge">
-        <span class="pulse"></span> <span>Consultas a demanda</span>
+  <!-- CABECERA: BRANDING Y BARRA DE ACCIONES (ESTRUCTURA WIREFRAME) -->
+  <header class="app-header">
+    <div class="header-brand-row">
+      <div class="brand-title-wrap">
+        <h1 class="brand-title"><strong>OpSys</strong> - Supervisión de Laboratorio</h1>
+        <div id="conn-status" class="status-badge">
+          <span class="pulse"></span> <span>Consultas a demanda</span>
+        </div>
       </div>
     </div>
 
-    <div class="header-actions">
+    <!-- FILA DE ACCIONES PRINCIPALES (MODO, ASIGNAR PRACTICAS, DIMENSIONAR, CONSULTAR, CERRAR SESION) -->
+    <div class="header-actions-bar">
+      <!-- Selector de Modo Operativo -->
       <div class="mode-selector">
-        <button id="btn-mode-clase" class="btn-mode active-clase" type="button">
-          🎓 Modo Clase
+        <button id="btn-mode-clase" class="btn-mode active-clase" type="button" title="Modo Clase (Operación normal)">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          <span>Modo Clase</span>
         </button>
-        <button id="btn-mode-practica" class="btn-mode" type="button">
-          🧪 Modo Práctica
+        <button id="btn-mode-practica" class="btn-mode" type="button" title="Modo Práctica (Red Aislada)">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+          <span>Modo Práctica</span>
+        </button>
+        <button id="btn-mode-cableado" class="btn-mode" type="button" title="Modo Verificación de Cableado (Pre-despliegue)">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6M9 22v-4M15 22v-4M8 8h8a2 2 0 0 1 2 2v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4v-4a2 2 0 0 1 2-2z"/></svg>
+          <span>Verif. Cableado</span>
         </button>
       </div>
 
-      <button id="btn-scan" class="btn-scan" type="button">
-        <span id="btn-scan-icon">🔄</span>
-        <span id="btn-scan-text">Consultar Estado Puestos</span>
-      </button>
+      <div class="header-right-actions">
+        <!-- [ Asignar a switch ] según wireframe RUP CU-04 -->
+        <button id="btn-asignar-switch" class="btn-action-primary" type="button" title="Asignar los puestos seleccionados a un switch">
+          <span class="btn-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/><circle cx="14" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/><path d="M6 16v1M10 16v1M14 16v1M18 16v1"/></svg>
+          </span>
+          <span id="btn-asignar-switch-text">Asignar a switch</span>
+        </button>
+
+        <!-- [ ⚡ Encender ] según wireframe para encendido masivo de puestos seleccionados -->
+        <button id="btn-encender-seleccionados" class="btn-action-wol" type="button" title="Encender con Wake-on-LAN los puestos seleccionados">
+          <span class="btn-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </span>
+          <span id="btn-encender-seleccionados-text">Encender</span>
+        </button>
+
+        <!-- [ Dimensionar: 6x10 ] según wireframe -->
+        <button id="btn-dimensionar-toggle" class="btn-control" type="button" title="Ajustar dimensiones y herramientas de cuadrícula">
+          <span class="btn-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          </span>
+          <span id="btn-dimensionar-label">Dimensionar: 5×8</span>
+        </button>
+
+        <!-- [ Consultar estado ] según wireframe -->
+        <button id="btn-scan" class="btn-control btn-scan" type="button" title="Consultar estado de todos los puestos">
+          <span id="btn-scan-icon" class="btn-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </span>
+          <span id="btn-scan-text">Consultar estado</span>
+        </button>
+
+        <!-- [ 🚪 Cerrar sesión ] según wireframe -->
+        <button id="btn-logout" class="btn-control btn-logout" type="button" title="Cerrar sesión de administrador">
+          <span class="btn-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+          </span>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <section class="toolbar">
-    <div class="search-box">
-      <span class="search-icon">🔍</span>
-      <input
-        type="search"
-        id="search-input"
-        class="search-input"
-        placeholder="Buscar por puesto, IP, MAC o boca switch (ej. UEA-C236, port1)..."
-        autocomplete="off"
-        spellcheck="false"
-        aria-label="Buscar puestos"
-      >
-      <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" aria-label="Limpiar búsqueda" style="display: none;">&times;</button>
+  <!-- MÉTRICAS EN TIEMPO REAL (SEGUNDA BANDA DEL WIREFRAME) -->
+  <section class="realtime-metrics-bar" aria-label="Métricas en tiempo real">
+    <div class="metrics-header-label">
+      <strong>Métricas en tiempo real:</strong>
     </div>
-
-    <!-- Controles de Cuadrícula Dinámica (Filas x Columnas por Hilera) -->
-    <div class="grid-dimension-controls" aria-label="Dimensiones de la Cuadrícula">
-      <span class="toolbar-label">Cuadrícula:</span>
-      <div class="dim-inputs">
-        <label for="input-filas" class="dim-label">Filas:</label>
-        <input type="number" id="input-filas" class="input-dim" min="1" max="20" value="5" title="Número de filas de mesas" />
-        <span class="dim-sep">&times;</span>
-        <label for="input-columnas" class="dim-label">Cols/Hilera:</label>
-        <input type="number" id="input-columnas" class="input-dim" min="1" max="20" value="4" title="Columnas a cada lado del pasillo central" />
-        <button id="btn-aplicar-cuadricula" class="btn-subtle" type="button" title="Aplicar cuadrícula (pasillo en medio siempre)">
-          📐 Aplicar
-        </button>
+    <div class="metrics-grid">
+      <div class="metric-pill verde" title="Equipos encendidos y reportando por agente">
+        <span class="status-dot VERDE"></span>
+        <span class="metric-name">Operativos:</span>
+        <strong id="metric-operativos" class="metric-val">0</strong>
       </div>
-    </div>
-
-    <!-- Herramienta de Asignación de Switch por Rango -->
-    <div class="switch-assign-tool" aria-label="Asignación de Switch por Rango">
-      <span class="toolbar-label">Switch Rango:</span>
-      <div class="range-inputs">
-        <span class="range-text">#</span>
-        <input type="number" id="input-range-desde" class="input-dim" min="1" value="1" title="Puesto inicial" />
-        <span class="range-text">a</span>
-        <input type="number" id="input-range-hasta" class="input-dim" min="1" value="20" title="Puesto final" />
-        <select id="select-range-switch" class="select-range-switch" title="Switch destino">
-          <option value="sw-docente">Sw. Docente</option>
-          <option value="sw-practicas" selected>Sw. Prácticas</option>
-        </select>
-        <button id="btn-aplicar-rango-switch" class="btn-subtle" type="button" title="Asignar switch a este rango de puestos">
-          ⚡ Asignar
-        </button>
+      <div class="metric-pill gris" title="Equipos apagados en Standby S5 listos para WoL">
+        <span class="status-dot GRIS"></span>
+        <span class="metric-name">Standby:</span>
+        <strong id="metric-standby" class="metric-val">0</strong>
       </div>
-    </div>
-
-    <div class="classroom-summary">
-      <span id="total-puestos-badge" class="summary-tag">40 Puestos</span>
-      <span id="grid-dims-badge" class="summary-tag">5 Filas &times; 4+4 Cols</span>
+      <div class="metric-pill amarillo" title="Equipos en Red de Prácticas o con fallo DHCP">
+        <span class="status-dot AMARILLO"></span>
+        <span class="metric-name">Prácticas/DHCP:</span>
+        <strong id="metric-practicas" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill naranja" title="Cables desconectados en roseta o PC en Deep Sleep">
+        <span class="status-dot NARANJA"></span>
+        <span class="metric-name">Desconectados:</span>
+        <strong id="metric-desconectados" class="metric-val">0</strong>
+      </div>
+      <div id="metric-pill-desconocido" class="metric-pill desconocido" style="display: none;" title="Puestos sin telemetría de red">
+        <span class="status-dot DESCONOCIDO"></span>
+        <span class="metric-name">Sin Telemetría:</span>
+        <strong id="metric-desconocido" class="metric-val">0</strong>
+      </div>
+      <div class="metric-pill total" title="Total de puestos monitorizados en el laboratorio">
+        <span class="metric-name">Total:</span>
+        <strong id="metric-total" class="metric-val">0</strong>
+      </div>
     </div>
   </section>
 
-  <!-- CUADRÍCULA DINÁMICA DEL AULA (PASILLO EN EL MEDIO SIEMPRE) -->
-  <main class="classroom-container">
-    <div class="classroom-headers" id="classroom-headers">
-      <div class="corner-header">Fila</div>
-      <div class="col-header" id="header-left-col">Hilera Izquierda (4 cols)</div>
-      <div class="aisle-header">Pasillo Central</div>
-      <div class="col-header" id="header-right-col">Hilera Derecha (4 cols)</div>
-      <div class="corner-header">Fila</div>
+  <!-- PESTAÑA DE SECCIÓN Y BARRA DE HERRAMIENTAS (TERCERA BANDA DEL WIREFRAME) -->
+  <section class="spatial-layout-section">
+    <div class="section-tab-bar">
+      <div class="section-tab active">
+        <span class="tab-title">Disposición Espacial del Aula</span>
+      </div>
+
+      <div class="tab-toolbar-actions">
+        <!-- Buscador integrado -->
+        <div class="search-box">
+          <span class="search-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Buscar puesto, IP, MAC o boca (ej. UEA-C236, port1)..."
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Buscar puestos"
+          >
+          <button id="btn-clear-search" class="search-clear" type="button" title="Limpiar búsqueda" style="display: none;">&times;</button>
+        </div>
+
+        <!-- Botón Selección Masiva Granular -->
+        <button id="btn-select-all" class="btn-subtle" type="button" title="Seleccionar o deseleccionar todos los puestos visibles">
+          <span id="btn-select-all-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </span>
+          <span id="btn-select-all-text">Seleccionar todos</span>
+        </button>
+
+        <!-- Botón Ajustar a Pantalla (Fit-to-Screen con Zoom Proporcional) -->
+        <button id="btn-fit-screen" class="btn-subtle active" type="button" title="Ajustar automáticamente la cuadrícula al ancho de la pantalla">
+          <span id="btn-fit-screen-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+          </span>
+          <span id="btn-fit-screen-text">Ajustar a pantalla</span>
+        </button>
+      </div>
     </div>
 
-    <div class="classroom-grid" id="classroom-grid">
-      <!-- filas generadas dinámicamente con pasillo en medio siempre -->
-    </div>
-  </main>
+    <!-- CUADRÍCULA DINÁMICA DEL AULA (PASILLO EN EL MEDIO SIEMPRE) -->
+    <main class="classroom-container">
+      <div class="classroom-canvas">
+        <div class="classroom-headers" id="classroom-headers">
+          <!-- Columnas generadas dinámicamente: Col 1..Col N | === PASILLO CENTRAL === | Col N+1..Col 2N -->
+        </div>
 
-  <script type="module" src="js/app.js?v=20261114_03"></script>
+        <div class="classroom-grid" id="classroom-grid">
+          <!-- Filas generadas dinámicamente con Fila X, Bloque Izquierdo, ║ Pasillo ║, Bloque Derecho, Fila X -->
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- MODAL DE INSPECCIÓN: DETALLE DE PUESTO (SEGÚN WIREFRAME RUP consultarDetallePuesto) -->
+  <div id="modal-detalle-puesto" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-puesto-nombre">
+    <div class="modal-window">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </span>
+          <h2 id="modal-puesto-nombre" class="modal-title">Detalle de Puesto: PC-01</h2>
+        </div>
+        <div class="modal-header-actions">
+          <div id="modal-estado-badge" class="modal-estado-pill VERDE">
+            <span class="status-dot VERDE"></span>
+            <span id="modal-estado-texto" class="modal-estado-texto">OPERATIVO</span>
+          </div>
+          <button id="btn-modal-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+        </div>
+      </div>
+
+      <!-- Cuerpo del Modal: 2 Columnas Minimalistas sin tablas -->
+      <div class="modal-body">
+        <div class="modal-columns">
+          <!-- Columna Izquierda: Red Lógica y Agente -->
+          <div class="modal-col">
+            <div class="modal-field">
+              <span class="modal-label">Dirección IPv4:</span>
+              <span id="modal-ip" class="modal-value mono">10.10.136.101</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Dirección MAC:</span>
+              <span id="modal-mac" class="modal-value mono">00:1A:2B:3C:4D:5E</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Agente:</span>
+              <div id="modal-agente" class="modal-agent-badge online">
+                <span class="agent-os-icon">
+                  <svg class="icon-windows" viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true">
+                    <path d="M6.555 1.375 0 2.237v5.45h6.555zM0 8.313l6.555.863v5.449l-6.555-.862zm7.278-6.945L16 0v7.688H7.278zm0 7.848L16 16V8.313H7.278z"/>
+                  </svg>
+                </span>
+                <span id="modal-agente-texto" class="agent-status-label">En línea</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna Derecha: Red Física y Asignación de Switch -->
+          <div class="modal-col">
+            <div class="modal-field">
+              <span class="modal-label">Switch Físico:</span>
+              <span id="modal-switch-fisico" class="modal-value">10.10.136.13 (R1_SW3)</span>
+            </div>
+            <div class="modal-field">
+              <span class="modal-label">Puerto de Switch:</span>
+              <span id="modal-switch-puerto" class="modal-value">port1 (1000 Mbps - UP)</span>
+            </div>
+            <div class="modal-field modal-field-switch">
+              <span class="modal-label">Switch Asignado:</span>
+              <button id="btn-modal-toggle-switch" type="button" class="btn-switch-assigned docente" title="Clic para alternar entre Switch Universitario y Switch Prácticas">
+                Switch Universitario
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección de Diagnóstico Detallado -->
+        <div class="modal-diagnostic-box">
+          <span class="diagnostic-title">Diagnóstico detallado:</span>
+          <p id="modal-diag-text" class="diagnostic-text">
+            Enlace eléctrico PHY activo a 1 Gbps en Switch Universitario y sesión de agente activa. El puesto se encuentra completamente disponible para la sesión docente.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pie del Modal: Acciones según Wireframe RUP -->
+      <div class="modal-footer">
+        <button id="btn-modal-wol" type="button" class="btn-modal-action btn-modal-wol" title="Enviar Magic Packet Wake-on-LAN">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>Enviar Wake-on-LAN</span>
+        </button>
+        <button id="btn-modal-dismiss" type="button" class="btn-modal-action btn-modal-dismiss">
+          <span>Cerrar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ASIGNAR PUESTOS A SWITCH (SEGÚN WIREFRAME RUP CU-04 asignarPuestosASwitch) -->
+  <div id="modal-asignar-switch" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-asignar-title">
+    <div class="modal-window modal-window-compact">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="12" r="1" fill="currentColor"/><circle cx="14" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/><path d="M6 16v1M10 16v1M14 16v1M18 16v1"/></svg>
+          </span>
+          <h2 id="modal-asignar-title" class="modal-title">Asignar Puestos a Switch</h2>
+        </div>
+        <button id="btn-modal-asignar-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <!-- Cuerpo del Modal Minimalista -->
+      <div class="modal-body">
+        <div class="modal-selection-card">
+          <div class="modal-selection-header">
+            <span class="modal-label">Puestos seleccionados</span>
+            <span id="modal-asignar-count" class="modal-count-pill">0 puestos</span>
+          </div>
+          <div id="modal-asignar-chips" class="modal-chips-container">
+            <!-- Chips inyectados dinámicamente -->
+          </div>
+        </div>
+
+        <div class="modal-field-group">
+          <label class="modal-label">Seleccione el switch de destino:</label>
+          <div class="switch-radio-options">
+            <label class="switch-radio-card" for="radio-switch-docente">
+              <input type="radio" id="radio-switch-docente" name="target-switch" value="sw-docente" checked>
+              <div class="switch-radio-content">
+                <span class="switch-radio-title">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  Switch Universitario
+                </span>
+                <span class="switch-radio-desc">Red Docente (10.10.136.0/24)</span>
+              </div>
+            </label>
+
+            <label class="switch-radio-card" for="radio-switch-practicas">
+              <input type="radio" id="radio-switch-practicas" name="target-switch" value="sw-practicas">
+              <div class="switch-radio-content">
+                <span class="switch-radio-title">
+                  <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.31L4.63 18.2A2 2 0 0 0 6.35 21h11.3a2 2 0 0 0 1.72-2.8L14 9.31V2z"/><line x1="8.5" y1="2" x2="15.5" y2="2"/></svg>
+                  Switch de Prácticas
+                </span>
+                <span class="switch-radio-desc">Red Aislada de Laboratorio</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Modal: Acciones según Wireframe RUP -->
+      <div class="modal-footer">
+        <button id="btn-modal-asignar-confirm" type="button" class="btn-modal-action btn-modal-confirm">
+          Confirmar
+        </button>
+        <button id="btn-modal-asignar-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DIMENSIONAR CUADRÍCULA (SEGÚN WIREFRAME RUP CU-05 dimensionarCuadricula) -->
+  <div id="modal-dimensionar-cuadricula" class="modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-dim-title">
+    <div class="modal-window modal-window-compact">
+      <!-- Cabecera del Modal -->
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-header-icon">
+            <svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          </span>
+          <h2 id="modal-dim-title" class="modal-title">Dimensionar Cuadrícula</h2>
+        </div>
+        <button id="btn-modal-dim-close" class="modal-btn-close" type="button" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <!-- Cuerpo del Modal -->
+      <div class="modal-body">
+        <div class="modal-info-box">
+          <p class="modal-info-text">
+            Configure las dimensiones espaciales del aula. La cuadrícula mantendrá siempre el pasillo central divisorio entre ambas hileras.
+          </p>
+        </div>
+
+        <div class="modal-dim-form">
+          <div class="modal-dim-field">
+            <label for="modal-input-filas" class="modal-label">Filas de mesas:</label>
+            <div class="dim-input-wrapper">
+              <input type="number" id="modal-input-filas" class="modal-dim-input" min="1" max="20" value="5" title="Número de filas de mesas">
+              <span class="dim-hint">Mesas en profundidad</span>
+            </div>
+          </div>
+
+          <div class="modal-dim-field">
+            <label for="modal-input-columnas" class="modal-label">Columnas por hilera:</label>
+            <div class="dim-input-wrapper">
+              <input type="number" id="modal-input-columnas" class="modal-dim-input" min="1" max="15" value="4" title="Columnas a cada lado del pasillo">
+              <span class="dim-hint">Puestos a cada lado del pasillo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-dim-preview-card">
+          <div class="dim-preview-row">
+            <span class="preview-label">Estructura resultante:</span>
+            <span id="modal-dim-preview-structure" class="preview-value mono">5 filas &times; 8 columnas (4 izq + 4 der)</span>
+          </div>
+          <div class="dim-preview-row">
+            <span class="preview-label">Capacidad máxima:</span>
+            <span id="modal-dim-preview-capacity" class="preview-value-highlight">40 puestos físicos</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="modal-footer">
+        <button id="btn-modal-dim-apply" type="button" class="btn-modal-action btn-modal-confirm">
+          <svg class="ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+          <span>Aplicar dimensiones</span>
+        </button>
+        <button id="btn-modal-dim-cancel" type="button" class="btn-modal-action btn-modal-dismiss">
+          Cancelar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js?v=20261117_01"></script>
 </body>
 
 </html>
