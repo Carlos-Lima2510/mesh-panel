@@ -37,8 +37,8 @@ El caso de uso modela el ajuste y dimensionado de la cuadrícula visual del aula
 1. **Invariantes Espaciales y Pasillo Central (ADR-004):**
    * El plano espacial del laboratorio organiza los puestos de trabajo en dos bloques simétricos (hilera izquierda e hilera derecha) divididos de forma permanente por un pasillo central explícito (`=== PASILLO CENTRAL ===` / `║ Pasillo ║`).
    * La geometría se parametriza mediante dos dimensiones independientes:
-     * **Filas (`filas`):** Cantidad de hileras de mesas en profundidad (ej. 5, 6, 7).
-     * **Columnas por hilera (`columnas_hilera`):** Cantidad de puestos por fila a cada lado del pasillo central (ej. 3, 4, 5). El total de columnas resultante en el aula es siempre $2 \times \text{columnas\_hilera}$.
+     • **Filas (`filas`):** Cantidad de hileras de mesas en profundidad (ej. 5, 6, 7).
+     • **Columnas por hilera (`columnas_hilera`):** Cantidad de puestos por fila a cada lado del pasillo central (ej. 3, 4, 5). El total de columnas resultante en el aula es siempre $2 \times \text{columnas\_hilera}$.
 
 2. **Flujo Principal:**
    * El Administrador solicita dimensionar la cuadrícula del aula.
@@ -50,6 +50,44 @@ El caso de uso modela el ajuste y dimensionado de la cuadrícula visual del aula
 3. **Flujos Alternativos y Excepcionales:**
    * **Dimensiones inválidas o fuera de rango:** Si el Administrador introduce valores menores a 1, no numéricos o incompatibles con los límites del laboratorio, el sistema presenta un aviso visual de advertencia y mantiene las dimensiones previas de la cuadrícula sin aplicar modificaciones.
    * **Cancelación de la solicitud:** Si el Administrador solicita cancelar la operación, el sistema cierra el diálogo y retorna al cuadro general sin modificar las dimensiones del laboratorio.
+
+### Conversación detallada
+
+#### Flujo principal (Dimensiones válidas)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita dimensionar cuadrícula |||
+|| **Sistema** | permite introducir | • filas de mesas<br>• columnas por hilera |
+|| **Sistema** | permite solicitar | • aplicar dimensiones<br>• cancelar dimensionamiento |
+| **Administrador** | introduce | • filas de mesas<br>• columnas por hilera ||
+| **Administrador** | solicita aplicar dimensiones |||
+|| **Sistema** | presenta | • cuadrícula del laboratorio reestructurada con las nuevas filas y columnas<br>• división física del pasillo central preservada entre hileras<br>• nuevas dimensiones en la cabecera |
+
+#### Flujo alternativo 1 (Valores no numéricos o fuera de límites)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | introduce | • filas de mesas<br>• columnas por hilera ||
+| **Administrador** | solicita aplicar dimensiones |||
+|| **Sistema** | presenta | • mensaje de advertencia y mantiene las dimensiones previas |
+
+#### Flujo alternativo 2 (Cancelación de la solicitud)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita cancelar dimensionamiento |||
+|| **Sistema** | presenta | • cuadro general manteniendo las dimensiones previas sin cambios |
+
+### Precondiciones
+* El Administrador ha iniciado sesión en el sistema (`SISTEMA_DISPONIBLE`).
+* La cuadrícula general se encuentra desplegada y visible.
+
+### Postcondiciones
+* La cuadrícula del aula adopta la nueva geometría de filas y columnas por hilera.
+* Se preserva el pasillo central divisorio entre las hileras izquierda y derecha.
+* Las asignaciones de puestos físicos y hosts existentes se conservan adaptadas a las nuevas dimensiones.
+* El total de puestos físicos soportados pasa a ser $\text{filas} \times (2 \times \text{columnas\_hilera})$.
 
 ### Referencias
 * **Diagrama de contexto de Admin:** 

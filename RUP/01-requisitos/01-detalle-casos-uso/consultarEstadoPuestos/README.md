@@ -45,6 +45,23 @@ El Administrador accede al cuadro de mando principal del laboratorio (`SISTEMA_D
 4. **Selección interactiva de tarjeta completa:** Se prescinde de casillas de verificación individuales (*checkbox*), haciendo que toda la tarjeta sea seleccionable directamente mediante clic (representada con resaltado de fondo azul `<back:#bfdbfe>`). Esto permite marcar puestos individuales o en bloque para operaciones masivas mediante los botones superiores `[ Asignar a switch ]` y `[ ⚡ Encender ]`.
 5. **Cabecera y métricas globales:** La barra superior presenta el título del sistema (`OpSys - Supervisión de Laboratorio`), el selector de modo operativo contextual (`[ 🎓 Modo Clase ]` / `[ 🧪 Modo Práctica ]`) a la izquierda, los botones de acción global (`[ Asignar a switch ]`, `[ ⚡ Encender ]`, `[Dimensionar: 6x10]`, `[Consultar estado]`, `[🚪 Cerrar sesión]`) y la barra de métricas consolidadas en tiempo real (Total, Operativos, Standby, Prácticas/DHCP y Desconectados).
 
+### Conversación detallada
+
+#### Flujo principal (Infraestructura disponible)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita consultar estado de los puestos |||
+|| **Sistema** | presenta | • cuadrícula del aula con puestos organizados en hileras y pasillo central<br>• diagnóstico semafórico, IP, boca y switch de cada puesto<br>• resumen de métricas consolidadas del laboratorio |
+|| **Sistema** | permite solicitar | • encendido remoto de un puesto en Standby<br>• consulta de la ficha técnica y detalle de un puesto<br>• selección de puestos individuales o en bloque<br>• cambio de modo operativo del aula (Clase / Práctica)<br>• actualización manual del estado del laboratorio |
+
+#### Flujo alternativo (Fallo de comunicación con la infraestructura)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita consultar estado de los puestos |||
+|| **Sistema** | presenta | • mensaje de advertencia por fallo de comunicación |
+
 ### Referencias
 * **Diagrama de contexto de Admin:** `SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : consultarEstadoPuestos()`
 * **Modelo del dominio:** `Laboratorio`, `Puesto`, `Host`, `Switch`, `Estado`

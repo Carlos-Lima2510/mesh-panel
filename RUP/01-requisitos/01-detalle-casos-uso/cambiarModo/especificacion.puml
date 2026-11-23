@@ -17,18 +17,24 @@ state cambiarModo as "cambiarModo()" {
     [*] -[#green]-> c
     note on link
     <b>Sistema</b> presenta el selector de modo del aula
-    <b>Administrador</b> introduce modo y alcance (Modo Clase / Modo Práctica: Todo, Hilera Izquierda, Hilera Derecha)
+    <b>Sistema</b> permite introducir:
+    • modo (Modo Clase / Modo Práctica)
+    • alcance (Toda el aula / Hilera Izquierda / Hilera Derecha)
+    <b>Administrador</b> introduce:
+    • modo
+    • alcance
     end note
 
     c -[#green]-> [*]
     note on link
-    [Modo y alcance válidos]
+    [modo y alcance válidos]
     <b>Sistema</b> presenta la cuadrícula del laboratorio con los diagnósticos actualizados según el nuevo modo y alcance
+    <b>Sistema</b> presenta el resumen consolidado de métricas recalculado
     end note
 
     c -[#red]-> [*]
     note on link
-    [Fallo de comunicación con el daemon o parámetros inválidos]
+    [fallo de comunicación con el daemon o parámetros inválidos]
     <b>Sistema</b> presenta mensaje de advertencia
     end note
 }

@@ -50,7 +50,7 @@ El Administrador selecciona una tarjeta de puesto en el cuadro de mando general 
    * **Encendido remoto (`[ ⚡ Enviar Wake-on-LAN ]`):** Habilitado en reposo `STANDBY` o `AMARILLO`. En puestos `OPERATIVO` (encendidos), figura explícitamente **desactivado** (`[ ⚡ Enviar Wake-on-LAN (Desactivado) ]`) para prevenir órdenes redundantes.
    * **Cierre de ficha (`[ ✖ Cerrar ]`):** Cierra el modal de inspección y retorna al cuadro de mando panorámico (`SISTEMA_DISPONIBLE`).
 
-### Conversación detallada (Estilo pySigHor)
+### Conversación detallada
 
 #### Flujo principal (Puesto identificado en el laboratorio)
 
