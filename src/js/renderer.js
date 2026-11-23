@@ -331,7 +331,7 @@ export class DashboardRenderer {
           <span class="host-name" title="${escapeHtml(p.nombre || 'PC-???')}">${escapeHtml(p.nombre || 'PC-???')}</span>
         </div>
         <div class="card-top-right">
-          <button type="button" class="btn-card-wol ${canWake ? '' : 'disabled'}" title="${canWake ? 'Encender equipo (Wake-on-LAN)' : (p.estado === 'VERDE' ? 'Equipo ya operativo' : 'Sin enlace físico para WoL')}" ${canWake ? `onclick="event.stopPropagation(); window.ejecutarWoL('${escapeHtml(p.node_id)}')"` : 'disabled'}>${ICON_WOL_SVG}</button>
+          <button type="button" class="btn-card-wol ${canWake ? '' : 'disabled'}" title="${canWake ? 'Encender equipo (Wake-on-LAN)' : (p.estado === 'VERDE' ? 'Equipo ya operativo' : 'Sin enlace físico para WoL')}" ${canWake ? `onclick="event.stopPropagation(); window.ejecutarWoL('${escapeHtml(p.node_id)}', '${escapeHtml(p.mac || '')}')"` : 'disabled'}>${ICON_WOL_SVG}</button>
           <span class="slot-badge">#${slotStr}</span>
         </div>
       </div>

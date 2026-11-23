@@ -520,6 +520,64 @@ const mockNetworkProvider = {
   assert.strictEqual(labConRed.obtenerSwitch('sw-01').alcanzable, true);
   assert.strictEqual(labConRed.hosts.length > 0, true);
 
+  // 13. Verificación de WakeOnLanAdapter y encendido nativo (sin MeshCentral)
+  const WakeOnLanAdapter = require('../daemon/infrastructure/network/WakeOnLanAdapter');
+  assert.strictEqual(WakeOnLanAdapter.esMacValida('20:88:10:71:fc:3d'), true);
+  assert.strictEqual(WakeOnLanAdapter.esMacValida('20881071fc3d'), true);
+  assert.strictEqual(WakeOnLanAdapter.esMacValida('invalida'), false);
+  assert.strictEqual(WakeOnLanAdapter.formatearMac('20881071fc3d'), '20:88:10:71:FC:3D');
+
+  const magicPacket = WakeOnLanAdapter.crearMagicPacket('20:88:10:71:fc:3d');
+  assert.strictEqual(magicPacket.length, 102);
+  assert.strictEqual(magicPacket.subarray(0, 6).toString('hex'), 'ffffffffffff');
+  assert.strictEqual(magicPacket.subarray(6, 12).toString('hex'), '20881071fc3d');
+  assert.strictEqual(magicPacket.subarray(96, 102).toString('hex'), '20881071fc3d');
+
+  assert.throws(() => WakeOnLanAdapter.crearMagicPacket('abc'), /Dirección MAC inválida/);
+
+  // Mock de adapter WoL para probar LaboratorioService.ejecutarAccion
+  let macEnviada = null;
+  const mockWolAdapter = {
+    enviarMagicPacket: async (mac) => {
+      macEnviada = mac;
+      return { success: true, mac, bytes: 102, salida: `Magic packet enviado a ${mac}` };
+    }
+  };
+
+  const serviceWol = new LaboratorioService({
+    meshCentralAdapter: {
+      listarDispositivos: async () => [],
+      despertarDispositivo: async () => ({ success: false, salida: 'Invalid nodeid' })
+    },
+    networkProvider: {
+      obtenerTodosLosPuertos: async () => ({
+        port41: { port: 41, portName: 'port41', link: 'UP', speed: 100, source: 'snmp_real' }
+      })
+    },
+    wakeOnLanAdapter: mockWolAdapter,
+    autoCompletarPuertos: true,
+    filas: 6,
+    columnasHilera: 4
+  });
+
+  await serviceWol.obtenerLaboratorio({ forzar: true });
+
+  // Despertar UEA-C271 por su ID de inventario: debe encontrar su MAC e invocar el adapter nativo
+  const resWolUea = await serviceWol.ejecutarAccion('inv-uea-c271', 'WAKE_ON_LAN');
+  assert.strictEqual(resWolUea.success, true);
+  assert.strictEqual(macEnviada, '20:88:10:71:fc:3d');
+
+  // Despertar pasando directamente la MAC
+  macEnviada = null;
+  const resWolDirecto = await serviceWol.ejecutarAccion('20:88:10:71:fc:3d', 'WAKE_ON_LAN');
+  assert.strictEqual(resWolDirecto.success, true);
+  assert.strictEqual(macEnviada, '20:88:10:71:fc:3d');
+
+  // Despertar un puesto sin MAC debe retornar error descriptivo sin explotar
+  const resWolSinMac = await serviceWol.ejecutarAccion('puesto-inexistente-sin-mac', 'WAKE_ON_LAN');
+  assert.strictEqual(resWolSinMac.success, false);
+  assert.strictEqual(resWolSinMac.salida.includes('No se encontró dirección MAC física'), true);
+
   console.log('✔ Todas las pruebas unitarias y de integración pasaron con éxito.');
   process.exit(0);
 })();

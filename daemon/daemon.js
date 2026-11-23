@@ -4,6 +4,7 @@ const config = require('./config');
 const MeshCentralAdapter = require('./infrastructure/meshcentral/MeshCentralAdapter');
 const SnmpSwitchProvider = require('./infrastructure/network/SnmpSwitchProvider');
 const SimulatedSwitchProvider = require('./infrastructure/network/SimulatedSwitchProvider');
+const WakeOnLanAdapter = require('./infrastructure/network/WakeOnLanAdapter');
 
 const LaboratorioService = require('./application/LaboratorioService');
 
@@ -33,9 +34,15 @@ const networkProvider = config.switchMode === 'simulado'
       community: config.switchCommunity
     });
 
+const wolAdapter = new WakeOnLanAdapter({
+  broadcastAddresses: config.wolBroadcastAddresses,
+  ports: [9, 7]
+});
+
 const laboratorioService = new LaboratorioService({
   meshCentralAdapter: meshAdapter,
   networkProvider: networkProvider,
+  wakeOnLanAdapter: wolAdapter,
   filas: 7,
   columnasHilera: 4,
   autoCompletarPuertos: config.switchMode === 'snmp',
@@ -69,22 +76,12 @@ const router = registrarRutas({
 
 const server = http.createServer((req, res) => router.handle(req, res));
 
-const pollTimer = setInterval(async () => {
-  if (sseBroadcaster.tieneClientes()) {
-    try {
-      const lab = await laboratorioService.obtenerLaboratorio({ forzar: true });
-      sseBroadcaster.difundir('INIT', { laboratorio: lab.toJSON() });
-    } catch (_) {}
-  }
-}, 5000);
-
 const PORT = config.port || 3001;
 server.listen(PORT, () => {
   console.log(`[*] Daemon de telemetría y observabilidad escuchando en http://0.0.0.0:${PORT}`);
 });
 
 function apagarGracefully() {
-  clearInterval(pollTimer);
   server.close(() => {
     process.exit(0);
   });

@@ -3,6 +3,7 @@ const Host = require('../domain/Host');
 const Red = require('../domain/Red');
 const Puesto = require('../domain/Puesto');
 const Switch = require('../domain/Switch');
+const WakeOnLanAdapter = require('../infrastructure/network/WakeOnLanAdapter');
 
 /**
  * Crea la cuadrícula del aula según filas y columnas por hilera configuradas por el administrador,
@@ -85,7 +86,9 @@ class LaboratorioService {
   constructor({
     meshCentralAdapter,
     networkProvider,
+    wakeOnLanAdapter,
     mapeoBocas = {},
+    mapeoMacs = {},
     cacheTtlMs = 3000,
     filas = 5,
     columnasHilera = 4,
@@ -96,6 +99,7 @@ class LaboratorioService {
   } = {}) {
     this.meshAdapter = meshCentralAdapter;
     this.networkProvider = networkProvider;
+    this.wolAdapter = wakeOnLanAdapter || new WakeOnLanAdapter();
     this.cacheTtlMs = cacheTtlMs;
     this.filas = filas;
     this.columnasHilera = columnasHilera || Math.ceil(columnas / 2);
@@ -106,6 +110,13 @@ class LaboratorioService {
     this.ultimoLaboratorio = null;
     this.ultimoRefresco = 0;
     this.promesaRefresco = null;
+
+    this.mapeoMacs = {
+      'UEA-C271': '20:88:10:71:fc:3d',
+      'C271': '20:88:10:71:fc:3d',
+      'inv-uea-c271': '20:88:10:71:fc:3d',
+      ...mapeoMacs
+    };
 
     this.mapeoBocas = {
       'UEA-C226': 'port1',
@@ -386,12 +397,13 @@ class LaboratorioService {
         };
 
       const redAsignada = laboratorio.obtenerRedDeIp(ip) || this.redesPorDefecto[0];
+      const macDetectada = infoBoca && infoBoca.mac ? infoBoca.mac : null;
 
       const host = new Host({
         id: nodeId,
         nombre: nombre,
         ip: ip,
-        mac: dev.mac || null,
+        mac: dev.mac || macDetectada || this.mapeoMacs[nombre] || null,
         bocaSwitch: bocaAsignada,
         soportaWoL: true,
         red: redAsignada,
@@ -467,10 +479,10 @@ class LaboratorioService {
         { nombre: 'UEA-C421', boca: 'port34', slot: 37 },
 
         // Switch .13 fila 6 (rosetas individuales)
-        { nombre: 'UEA-C271', boca: 'port41', slot: 41 },
-        { nombre: 'UEA-C272', boca: 'port42', slot: 42 },
-        { nombre: 'UEA-C273', boca: 'port43', slot: 43 },
-        { nombre: 'UEA-C277', boca: 'port44', slot: 44 }
+        { nombre: 'UEA-C271', boca: 'port41', slot: 41, mac: '20:88:10:71:fc:3d' },
+        { nombre: 'UEA-C272', boca: 'port42', slot: 42, mac: null },
+        { nombre: 'UEA-C273', boca: 'port43', slot: 43, mac: null },
+        { nombre: 'UEA-C277', boca: 'port44', slot: 44, mac: null }
       ];
 
       for (const eq of equiposEspeciales) {
@@ -490,11 +502,12 @@ class LaboratorioService {
               source: 'unreachable'
             };
 
+          const macDetectada = infoBoca && infoBoca.mac ? infoBoca.mac : null;
           const host = new Host({
             id: `inv-${eq.nombre.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
             nombre: eq.nombre,
             ip: null,
-            mac: null,
+            mac: macDetectada || eq.mac || this.mapeoMacs[eq.nombre] || null,
             bocaSwitch: eq.boca,
             soportaWoL: true,
             red: this.redesPorDefecto[0],
@@ -541,11 +554,12 @@ class LaboratorioService {
         };
 
         const nombreHost = `Puesto-${String(numPuerto).padStart(2, '0')}`;
+        const macDetectada = infoBoca && infoBoca.mac ? infoBoca.mac : null;
         const host = new Host({
           id: `puesto-port-${numPuerto}`,
           nombre: nombreHost,
           ip: null,
-          mac: null,
+          mac: macDetectada || this.mapeoMacs[nombreHost] || null,
           bocaSwitch: boca,
           soportaWoL: true,
           red: this.redesPorDefecto[0],
@@ -593,11 +607,12 @@ class LaboratorioService {
           };
 
         const nombreHost = `Puesto-Aux${pIdx}`;
+        const macDetectada = infoBoca && infoBoca.mac ? infoBoca.mac : null;
         const host = new Host({
           id: `puesto-sw39-${pIdx}`,
           nombre: nombreHost,
           ip: null,
-          mac: null,
+          mac: macDetectada || this.mapeoMacs[nombreHost] || null,
           bocaSwitch: boca,
           soportaWoL: true,
           red: this.redesPorDefecto[0],
@@ -629,14 +644,79 @@ class LaboratorioService {
     return laboratorio;
   }
 
-  async ejecutarAccion(nodeId, tipoAccion) {
+  async ejecutarAccion(nodeId, tipoAccion, opciones = {}) {
     if (tipoAccion === 'WAKE_ON_LAN') {
-      return await this.meshAdapter.despertarDispositivo(nodeId);
+      return await this.ejecutarWakeOnLan(nodeId, opciones);
     }
     if (tipoAccion === 'POWER_OFF' || tipoAccion === 'SHUTDOWN' || tipoAccion === 'APAGAR') {
       return await this.meshAdapter.apagarDispositivo(nodeId);
     }
     throw new Error(`Acción ${tipoAccion} no es ejecutable remotamente.`);
+  }
+
+  async ejecutarWakeOnLan(nodeId, opciones = {}) {
+    // 1. Obtener dirección MAC si se especificó directamente
+    let mac = opciones.mac;
+    if (!mac && WakeOnLanAdapter.esMacValida(nodeId)) {
+      mac = nodeId;
+    }
+
+    // 2. Buscar en el modelo del laboratorio actual
+    let hostEncontrado = null;
+    if (this.ultimoLaboratorio) {
+      hostEncontrado = this.ultimoLaboratorio.obtenerHost(nodeId);
+
+      if (!hostEncontrado) {
+        const puesto = this.ultimoLaboratorio.obtenerPuesto(nodeId);
+        if (puesto) hostEncontrado = puesto.obtenerHost();
+      }
+
+      if (!hostEncontrado) {
+        hostEncontrado = this.ultimoLaboratorio.hosts.find(h =>
+          h.id === nodeId ||
+          (h.nombre && h.nombre.toLowerCase() === String(nodeId).toLowerCase()) ||
+          h.slot === parseInt(nodeId, 10) ||
+          h.puestoId === nodeId
+        );
+      }
+    }
+
+    if (!mac && hostEncontrado) {
+      mac = hostEncontrado.mac || this.mapeoMacs[hostEncontrado.nombre];
+    }
+
+    if (!mac && this.mapeoMacs[nodeId]) {
+      mac = this.mapeoMacs[nodeId];
+    }
+
+    // 3. Si se localizó MAC física, emitir Magic Packet nativo mediante WakeOnLanAdapter
+    if (mac && WakeOnLanAdapter.esMacValida(mac)) {
+      const nombreHost = hostEncontrado ? hostEncontrado.nombre : nodeId;
+      console.log(`[*] [LaboratorioService] Emitiendo Wake-on-LAN nativo a MAC ${mac} (Host: ${nombreHost})...`);
+      const resultado = await this.wolAdapter.enviarMagicPacket(mac, opciones);
+      return {
+        ...resultado,
+        host: nombreHost,
+        node_id: nodeId
+      };
+    }
+
+    // 4. Si no se dispone de MAC pero el ID es de MeshCentral (node//...), fallback
+    if (nodeId && String(nodeId).startsWith('node//') && this.meshAdapter) {
+      console.log(`[*] [LaboratorioService] Intentando WoL vía MeshCentral para nodo registrado ${nodeId}...`);
+      return await this.meshAdapter.despertarDispositivo(nodeId);
+    }
+
+    // 5. Sin MAC física registrada
+    const nombreHost = hostEncontrado ? hostEncontrado.nombre : nodeId;
+    const errorMsg = `No se encontró dirección MAC física para el host "${nombreHost}" (ID: ${nodeId}). Registre la MAC en el inventario para emitir Wake-on-LAN.`;
+    console.warn(`[-] [LaboratorioService] ${errorMsg}`);
+    return {
+      success: false,
+      salida: errorMsg,
+      host: nombreHost,
+      node_id: nodeId
+    };
   }
 
   async obtenerPuertosRed() {

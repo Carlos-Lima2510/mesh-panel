@@ -16,8 +16,7 @@ services:
       dockerfile: Dockerfile.daemon
     container_name: tfg-daemon
     restart: unless-stopped
-    ports:
-      - "${SSE_PORT:-3001}:3001"
+    network_mode: host
     volumes:
       - ./daemon:/app:ro
     environment:
@@ -40,10 +39,6 @@ services:
       - SWITCH_COMMUNITY=${SWITCH_COMMUNITY:-public}
       - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
       - NODE_NO_WARNINGS=${NODE_NO_WARNINGS}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - tfg-net
 
   virtual-switch:
     build:

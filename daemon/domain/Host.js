@@ -53,6 +53,10 @@ class Host {
     puesto = null,
     modoDespliegue = false
   }) {
+    if (!this.mac && this.enlaceFisico && this.enlaceFisico.mac) {
+      this.mac = this.enlaceFisico.mac;
+    }
+
     const sw = switchAsignado || (puesto && puesto.obtenerSwitch ? puesto.obtenerSwitch() : null);
 
     this.telemetria = {
@@ -63,7 +67,8 @@ class Host {
         portName: this.enlaceFisico.portName,
         link: this.enlaceFisico.link,
         speed: this.enlaceFisico.speed,
-        source: this.enlaceFisico.source
+        source: this.enlaceFisico.source,
+        mac: this.enlaceFisico.mac || null
       },
       switch_asignado: sw ? sw.nombre : null,
       red_asignada: this.red ? this.red.nombre : (sw && sw.red ? sw.red.nombre : 'No identificada'),
@@ -95,10 +100,13 @@ class Host {
       nombre: this.nombre,
       slot: this.slot,
       puesto_id: this.puestoId,
+      mac: this.mac,
+      ip: this.ip,
       estado: this.color,
       categoria: this.categoria,
       diagnostico: this.diagnostico,
       boca_switch: this.bocaSwitch,
+      soporta_wol: this.soportaWoL,
       red: this.red ? this.red.toJSON() : null,
       accion: {
         tipo: this.accion.tipo,

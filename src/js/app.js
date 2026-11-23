@@ -655,7 +655,7 @@ if (btnEncenderSeleccionados) {
         await fetch(`${DAEMON_URL}/api/power/wake`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ node_id: h.node_id })
+          body: JSON.stringify({ node_id: h.node_id, mac: h.mac })
         });
       }
       setStatusBadge(`Paquetes Wake-on-LAN emitidos hacia ${nodosAEncender.length} puestos.`);
@@ -821,13 +821,17 @@ window.cambiarSwitchPuesto = async function (puestoId, switchId) {
   }
 };
 
-window.ejecutarWoL = async function (nodeId) {
+window.ejecutarWoL = async function (nodeId, mac = null) {
   try {
     setStatusBadge('Enviando Wake-on-LAN...');
+    const body = { node_id: nodeId };
+    if (mac) {
+      body.mac = mac;
+    }
     const res = await fetch(`${DAEMON_URL}/api/power/wake`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ node_id: nodeId })
+      body: JSON.stringify(body)
     });
     const data = await res.json();
     if (data.success) {
@@ -987,7 +991,7 @@ window.abrirDetallePuesto = function (nodeId, puestoId, isSilentRefresh = false)
         btnModalWol.disabled = false;
         btnModalWol.classList.remove('disabled');
         btnModalWol.title = 'Enviar paquete Wake-on-LAN para encender el equipo';
-        btnModalWol.onclick = () => window.ejecutarWoL(host.node_id);
+        btnModalWol.onclick = () => window.ejecutarWoL(host.node_id, host.mac);
       }
     }
 

@@ -206,9 +206,11 @@ class SnmpSwitchProvider extends NetworkProvider {
 
   async _consultarSwitch(targetHost, esPrincipal = false) {
     const indicesANombre = await this._obtenerNombresPuertos(targetHost);
-    const [resEstados, resVelocidades] = await Promise.all([
+    const [resEstados, resVelocidades, resFdbPuertos, resFdbDirecciones] = await Promise.all([
       this._consultarSubtree('1.3.6.1.2.1.2.2.1.8', targetHost),
-      this._consultarSubtree('1.3.6.1.2.1.31.1.1.1.15', targetHost)
+      this._consultarSubtree('1.3.6.1.2.1.31.1.1.1.15', targetHost),
+      this._consultarSubtree('1.3.6.1.2.1.17.4.3.1.2', targetHost),
+      this._consultarSubtree('1.3.6.1.2.1.17.4.3.1.1', targetHost)
     ]);
 
     const resultadoSwitch = new Map();
@@ -237,6 +239,52 @@ class SnmpSwitchProvider extends NetworkProvider {
       }
     }
 
+    // Extracción automática de direcciones MAC desde la tabla FDB del switch (Bridge MIB)
+    // 1. Mapa de índice de entrada -> dirección MAC física (dot1dTpFdbAddress: 1.3.6.1.2.1.17.4.3.1.1.<idx>)
+    const indiceAMac = new Map();
+    if (!resFdbDirecciones.error && resFdbDirecciones.varbinds) {
+      for (const vb of resFdbDirecciones.varbinds) {
+        const match = vb.oid.match(/\.(\d+)$/);
+        const idx = match ? match[1] : vb.oid.split('.').pop();
+        if (Buffer.isBuffer(vb.value) && vb.value.length === 6) {
+          const mac = vb.value.toString('hex').match(/.{1,2}/g).join(':').toLowerCase();
+          indiceAMac.set(idx, mac);
+        } else if (typeof vb.value === 'string' && vb.value.length === 6) {
+          const buf = Buffer.from(vb.value, 'binary');
+          const mac = buf.toString('hex').match(/.{1,2}/g).join(':').toLowerCase();
+          indiceAMac.set(idx, mac);
+        }
+      }
+    }
+
+    // 2. Mapear puerto físico del switch -> dirección(es) MAC (dot1dTpFdbPort: 1.3.6.1.2.1.17.4.3.1.2.<idx>)
+    const puertoAMac = new Map();
+    const puertoAMacs = new Map();
+
+    if (!resFdbPuertos.error && resFdbPuertos.varbinds) {
+      for (const vb of resFdbPuertos.varbinds) {
+        const match = vb.oid.match(/\.(\d+)$/);
+        const idx = match ? match[1] : vb.oid.split('.').pop();
+        const bridgePort = parseInt(vb.value, 10);
+        // Descartar puertos virtuales de CPU o troncales internos (ej: 32768, 32769)
+        if (isNaN(bridgePort) || bridgePort <= 0 || bridgePort > 56) continue;
+
+        const mac = indiceAMac.get(idx);
+        if (!mac) continue;
+
+        const nombreBoca = indicesANombre.get(String(bridgePort)) || `port${bridgePort}`;
+
+        if (!puertoAMacs.has(nombreBoca)) {
+          puertoAMacs.set(nombreBoca, []);
+        }
+        puertoAMacs.get(nombreBoca).push(mac);
+
+        if (!puertoAMac.has(nombreBoca)) {
+          puertoAMac.set(nombreBoca, mac);
+        }
+      }
+    }
+
     for (const [indice, nombreBoca] of indicesANombre.entries()) {
       if (!nombreBoca.startsWith('port')) continue;
 
@@ -244,12 +292,16 @@ class SnmpSwitchProvider extends NetworkProvider {
       const link = indicesAEstado.get(indice) || 'DOWN';
       const realSpeed = indicesAVelocidad.get(indice);
       const speed = link === 'UP' ? (realSpeed !== undefined ? realSpeed : 1000) : 0;
+      const mac = puertoAMac.get(nombreBoca) || null;
+      const macs = puertoAMacs.get(nombreBoca) || [];
 
       resultadoSwitch.set(nombreBoca, {
         port: numPuerto,
         portName: nombreBoca,
         link: link,
         speed: speed,
+        mac: mac,
+        macs: macs,
         source: 'snmp_real'
       });
     }

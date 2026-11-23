@@ -26,5 +26,10 @@ module.exports = {
   snmpSwitches: (process.env.SNMP_SWITCHES || '10.10.136.13,10.10.136.42,10.10.136.39')
     .split(',')
     .map(s => s.trim())
+    .filter(Boolean),
+
+  wolBroadcastAddresses: (process.env.WOL_BROADCAST_ADDRESSES || '255.255.255.255,172.22.255.255,192.168.122.255')
+    .split(',')
+    .map(a => a.trim())
     .filter(Boolean)
 };
