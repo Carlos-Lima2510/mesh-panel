@@ -48,7 +48,7 @@ El caso de uso permite al Administrador establecer el mapeo físico imperativo e
    * **Sin puestos seleccionados:** Si el Administrador solicita la asignación sin puestos marcados en la cuadrícula panorámica, el sistema no abre el diálogo y presenta un aviso informativo de selección requerida.
    * **Cancelación de la solicitud:** Si el Administrador solicita cancelar el diálogo, el sistema retorna a la cuadrícula general sin modificar el mapeo existente.
 
-### Conversación detallada (Estilo pySigHor)
+### Conversación detallada
 
 #### Flujo principal (Puestos seleccionados y mapeo confirmado)
 

@@ -57,6 +57,25 @@ El caso de uso modela la conmutación del contexto operacional del aula, permiti
 3. **Flujos Alternativos y Excepcionales:**
    * **Parámetros inválidos o error de comunicación:** Si se produce un error de comunicación o los parámetros introducidos son inválidos, el sistema presenta un aviso visual de advertencia y mantiene el contexto operacional previo sin modificaciones.
 
+### Conversación detallada
+
+#### Flujo principal (Modo y alcance válidos)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita cambiar modo operativo del laboratorio |||
+|| **Sistema** | presenta | • selector de modo del aula |
+|| **Sistema** | permite introducir | • modo (Modo Clase / Modo Práctica)<br>• alcance (Toda el aula / Hilera Izquierda / Hilera Derecha) |
+| **Administrador** | introduce | • modo<br>• alcance ||
+|| **Sistema** | presenta | • cuadrícula del laboratorio con los diagnósticos actualizados según el nuevo modo y alcance<br>• resumen consolidado de métricas recalculado |
+
+#### Flujo alternativo (Fallo de comunicación o parámetros inválidos)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | introduce | • modo<br>• alcance ||
+|| **Sistema** | presenta | • mensaje de advertencia |
+
 ### Referencias
 * **Diagrama de contexto de Admin:** 
   * `SISTEMA_DISPONIBLE --> SISTEMA_DISPONIBLE : cambiarModo()`
