@@ -20,8 +20,15 @@ state consultarDetallePuesto as "consultarDetallePuesto()" {
     note on link
     [Puesto identificado en el laboratorio]
     <b>Sistema</b> presenta la ficha técnica, cableado y diagnóstico pormenorizado del puesto
-    <b>Sistema</b> permite solicitar encender puesto (WoL)
-    <b>Sistema</b> permite solicitar cerrar detalle
+    <b>Sistema</b> presenta datos del puesto:
+    • dirección IP
+    • dirección MAC
+    • estado del agente
+    • switch mapeado
+    • puerto del switch
+    <b>Sistema</b> permite solicitar:
+    • encender puesto (WoL)
+    • cerrar detalle
     end note
 
     c -[#red]-> [*]

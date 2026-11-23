@@ -50,6 +50,23 @@ El Administrador selecciona una tarjeta de puesto en el cuadro de mando general 
    * **Encendido remoto (`[ ⚡ Enviar Wake-on-LAN ]`):** Habilitado en reposo `STANDBY` o `AMARILLO`. En puestos `OPERATIVO` (encendidos), figura explícitamente **desactivado** (`[ ⚡ Enviar Wake-on-LAN (Desactivado) ]`) para prevenir órdenes redundantes.
    * **Cierre de ficha (`[ ✖ Cerrar ]`):** Cierra el modal de inspección y retorna al cuadro de mando panorámico (`SISTEMA_DISPONIBLE`).
 
+### Conversación detallada (Estilo pySigHor)
+
+#### Flujo principal (Puesto identificado en el laboratorio)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita consultar detalle de un puesto |||
+|| **Sistema** | presenta | • ficha técnica, cableado y diagnóstico pormenorizado del puesto<br>• datos del puesto:<br>&nbsp;&nbsp;• dirección IP<br>&nbsp;&nbsp;• dirección MAC<br>&nbsp;&nbsp;• estado del agente<br>&nbsp;&nbsp;• switch mapeado<br>&nbsp;&nbsp;• puerto del switch |
+|| **Sistema** | permite solicitar | • encender puesto (WoL)<br>• cerrar detalle |
+
+#### Flujo alternativo (Fallo de lectura o puesto no encontrado)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita consultar detalle de un puesto |||
+|| **Sistema** | presenta | • mensaje de error |
+
 ### Referencias
 * **Diagrama de contexto de Admin:** 
   * `SISTEMA_DISPONIBLE --> PUESTO_ABIERTO : consultarDetallePuesto()`

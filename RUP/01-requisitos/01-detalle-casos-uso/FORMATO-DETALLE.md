@@ -88,6 +88,34 @@ c --> ORIGEN : [error o cancelación] / [Sistema] presenta <mensaje>
 @enduml
 ```
 
+### 2.4. Formato Canónico de Listas y Enumeraciones (Estándar pySigHor)
+
+Cuando en una nota de interacción o estado del autómata se requiera desglosar múltiples opciones permitidas, campos a introducir o elementos presentados (por ejemplo, tras `Sistema permite solicitar:`, `Sistema permite introducir:` o `Sistema presenta:`):
+
+* **Obligatorio:** Utilizar exclusivamente el bullet point tipográfico `•` (Unicode `\u2022`).
+* **Terminantemente Prohibido:** Usar guiones (`-`), asteriscos (`*`) o números correlativos (`1.`, `2.`) para desglosar ítems en las notas de interacción.
+
+**Ejemplo en `especificacion.puml`:**
+```plantuml
+note on link
+[Infraestructura disponible]
+<b>Sistema</b> presenta cuadrícula del aula y resumen de métricas
+<b>Sistema</b> permite solicitar:
+• el encendido remoto de un puesto en Standby
+• la consulta de la ficha técnica y detalle de un puesto
+• el cambio de modo operativo del aula
+end note
+```
+
+**Ejemplo en tablas de conversación Markdown (`README.md`):**
+```markdown
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita acceder |||
+|| **Sistema** | permite introducir | • usuario<br>• contraseña |
+| **Administrador** | introduce | • usuario<br>• contraseña ||
+```
+
 ---
 
 ## 3. Prototipado de Interfaz de Usuario (`wireframes.puml`)
@@ -235,6 +263,7 @@ Al abordar un nuevo caso de uso (`CU-XX`), seguir rigurosamente este protocolo:
 Antes de dar por cerrado un caso de uso detallado, verificar:
 
 - [ ] ¿El autómata en `especificacion.puml` respeta la gramática de verbos (`solicita`/`introduce` vs `presenta`/`permite`) sin fugar procesos internos del backend?
+- [ ] ¿Toda lista o enumeración de opciones, campos o acciones en notas del autómata o tablas utiliza el bullet point tipográfico `•` (estándar pySigHor) sin recurrir a guiones, asteriscos o números?
 - [ ] ¿Las transiciones concuerdan con el estado del Diagrama de Contexto (`SESION_CERRADA`, `SISTEMA_DISPONIBLE` o `PUESTO_ABIERTO`)?
 - [ ] ¿Los wireframes en `wireframes.puml` utilizan la sintaxis limpia de checkbox (`[]` / `[X]`) y presentan la cabecera alineada?
 - [ ] ¿Ambas imágenes vectoriales `.svg` existen y están compiladas en `images/01-requisitos/01-detalle-casos-uso/<nombreCasoUso>/`?

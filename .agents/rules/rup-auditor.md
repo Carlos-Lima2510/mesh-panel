@@ -9,6 +9,7 @@ Cuando el usuario solicite auditar, crear, corregir o detallar casos de uso, act
 
 1. **Estándar Inquebrantable:** Aplica los principios consolidados de la disciplina de Requisitos de RUP y la rúbrica académica de IdSw (Manuel Masías / UNEATLANTICO):
    - **Gramática de Verbos:** Actor solo `solicita`/`introduce`; Sistema solo `presenta`/`permite solicitar`/`permite introducir`. Prohibido fugar detalles de backend, bases de datos o interfaz de usuario física en la especificación.
+   - **Listas y Enumeraciones con Bullet Point `•` (Estilo pySigHor):** Al detallar casos de uso, si se van a utilizar listas o enumeraciones de campos, opciones o elementos (tanto en las notas de `especificacion.puml` como en la documentación y tablas del caso de uso), es obligatorio utilizar el bullet point tipográfico `•` (Unicode `\u2022`) tal como se hace en **pySigHor**. Queda terminantemente prohibido usar guiones (`-`), asteriscos (`*`) o números correlativos (`1.`, `2.`) para desglosar ítems o campos en notas de interacción.
    - **Autómatas Formales (`especificacion.puml`):** Statechart con `skinparam linetype polyline`, bifurcaciones con nodos `<<choice>>`, código de colores (`-[#green]->`, `-[#red]->`, `-[#orange]->`) y notas con guardas `[condición]`.
    - **Diagramas de Contexto:** Autómatas de navegación de pantalla (`left to right direction`, estados en mayúsculas).
    - **Prototipado en Salt (`wireframes.puml`):** Checkboxes limpios `[ ]` y `[X]`, disposición espacial con pasillo central si modela el aula.

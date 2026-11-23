@@ -38,15 +38,43 @@ El caso de uso permite al Administrador establecer el mapeo físico imperativo e
    * **Precondición:** El Administrador debe haber seleccionado previamente uno o varios puestos en la cuadrícula general del aula.
    * **Bloqueo preventivo si no hay selección:** Si no existe ningún puesto seleccionado previamente, el sistema no permite acceder al modal y presenta un aviso de advertencia indicando que se requiere seleccionar puestos antes de proceder.
    * **Apertura de modal de asignación:** Con puestos seleccionados, el Administrador solicita asignar a switch. El sistema presenta el diálogo modal de infraestructura de red:
-     * Resumen de puestos seleccionados (ej. `4 puestos (PC-01, PC-02, PC-03, PC-04)`).
-     * Selector del conmutador gestionado destino del rack del aula (ej. `SW-01 (10.10.136.13)`, `SW-02 (10.10.136.42)`, `SW-03 (10.10.136.39)`).
-     * Tabla con los puestos y la boca física detectada por SNMP para cada uno (`port01`, `port02`, `port03`, `port04`).
-     * Muestra previa de la línea informativa resultante para la tarjeta (`Switch: 10.10.136.13 - Boca: port01`).
+     • Resumen de puestos seleccionados (ej. `4 puestos (PC-01, PC-02, PC-03, PC-04)`).
+     • Selector del conmutador gestionado destino del rack del aula (ej. `SW-01 (10.10.136.13)`, `SW-02 (10.10.136.42)`, `SW-03 (10.10.136.39)`).
+     • Tabla con los puestos y la boca física detectada por SNMP para cada uno (`port01`, `port02`, `port03`, `port04`).
+     • Muestra previa de la línea informativa resultante para la tarjeta (`Switch: 10.10.136.13 - Boca: port01`).
    * **Confirmación:** El Administrador introduce el conmutador gestionado de destino y solicita guardar el mapeo. El sistema actualiza en memoria el inventario físico de los puestos y presenta en la cuadrícula general las tarjetas de los puestos con su información de switch y boca actualizada.
 
 2. **Flujos alternativos y de excepción**:
    * **Sin puestos seleccionados:** Si el Administrador solicita la asignación sin puestos marcados en la cuadrícula panorámica, el sistema no abre el diálogo y presenta un aviso informativo de selección requerida.
    * **Cancelación de la solicitud:** Si el Administrador solicita cancelar el diálogo, el sistema retorna a la cuadrícula general sin modificar el mapeo existente.
+
+### Conversación detallada (Estilo pySigHor)
+
+#### Flujo principal (Puestos seleccionados y mapeo confirmado)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita asignar puestos a switch |||
+|| **Sistema** | presenta | • diálogo modal de infraestructura de red:<br>&nbsp;&nbsp;• resumen de puestos seleccionados<br>&nbsp;&nbsp;• selector de switch gestionado de destino<br>&nbsp;&nbsp;• tabla de puestos con bocas físicas detectadas por SNMP<br>&nbsp;&nbsp;• vista previa de línea informativa en tarjeta |
+|| **Sistema** | permite introducir | • switch gestionado de destino |
+|| **Sistema** | permite solicitar | • guardar mapeo<br>• cancelar asignación |
+| **Administrador** | introduce | • switch gestionado ||
+| **Administrador** | solicita guardar mapeo |||
+|| **Sistema** | presenta | • tarjetas de puestos con línea informativa de switch y boca actualizadas |
+
+#### Flujo alternativo 1 (Sin puestos seleccionados previamente)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita asignar puestos a switch |||
+|| **Sistema** | presenta | • aviso indicando que se requiere seleccionar puestos antes de mapear |
+
+#### Flujo alternativo 2 (Cancelación de la operación)
+
+| Actor | Acción | Sistema | Respuesta |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | solicita cancelar asignación |||
+|| **Sistema** | presenta | • pantalla de origen manteniendo el mapeo previo sin cambios |
 
 ### Precondiciones
 * El Administrador ha iniciado sesión en el sistema (`SISTEMA_DISPONIBLE`).

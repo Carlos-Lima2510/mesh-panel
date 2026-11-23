@@ -123,6 +123,23 @@ end note
    * `-[#red]->` para fallos de precondición o bloqueos críticos.
    * `-[#orange]->` para caminos alternativos o excepciones no fatales.
 3. **Estados Externos Visibles:** Siempre mostrar el estado previo y los estados de salida esperados en el Diagrama de Contexto.
+4. **Listas y Enumeraciones con Bullet Point Canónico `•` (Estándar pySigHor):**
+   Al enumerar acciones permitidas, campos a introducir o datos presentados dentro de una nota de transición (o en la especificación/conversación detallada del caso de uso):
+   * Es **obligatorio** utilizar el bullet point tipográfico `•` (Unicode `\u2022`).
+   * Queda **terminantemente prohibido** utilizar guiones (`-`), asteriscos (`*`) o números correlativos (`1.`, `2.`) para desglosar ítems en las notas de interacción.
+   * *Ejemplo en PlantUML (`especificacion.puml`):*
+     ```plantuml
+     note on link
+     <b>Sistema</b> permite solicitar:
+     • el encendido remoto de un puesto en Standby
+     • la consulta de la ficha técnica y detalle de un puesto
+     <b>Sistema</b> permite introducir:
+     • fila
+     • columna
+     end note
+     ```
+   * *Ejemplo en tablas de conversación Markdown (`README.md`):*
+     `• campo 1<br>• campo 2`
 
 ---
 
@@ -147,6 +164,9 @@ Esta es la regla más exigente del temario de Requisitos. **No se permiten desvi
 * ❌ **Prohibido lenguaje prematuro de widgets o hardware de entrada en la especificación:**  
   *Incorrecto:* *"El usuario hace click en el botón rojo"*, *"Arrastra con el ratón el cuadro"*.  
   *Justificación:* Los controles específicos pertenecen al prototipo (Salt/Wireframe). En la especificación se usa *«Actor solicita...»*.
+* ❌ **Prohibido usar guiones (`-`), asteriscos (`*`) o números correlativos (`1.`, `2.`) en enumeraciones de interacción:**  
+  *Incorrecto:* `- usuario`, `* contraseña`, `1. encender puesto`.  
+  *Justificación:* El estándar canónico de referencia (**pySigHor**) prescribe el uso exclusivo del bullet point tipográfico `•` para preservar la limpieza visual y uniformidad en las notas del autómata y tablas del caso de uso.
 
 ---
 
@@ -214,13 +234,15 @@ Cuando se audite un caso de uso o conjunto de artefactos:
 1. **Paso 1: Análisis Estructural y Política de Espejo**
    * Verificar existencia de `README.md`, `especificacion.puml`, `wireframes.puml`.
    * Verificar presencia de sus gemelos `especificacion.svg` y `wireframes.svg` en `images/`.
-2. **Paso 2: Auditoría Gramatical de la Especificación**
+2. **Paso 2: Auditoría Gramatical y Tipográfica de la Especificación**
    * Buscar y señalar cualquier verbo prohibido (*hace clic, pulsa, decide, graba en base de datos, envía snmp*).
    * Validar que solo se usen las parejas: `solicita`/`permite solicitar`, `introduce`/`permite introducir`, `presenta`.
+   * Verificar que toda enumeración de campos, opciones o acciones (en notas de `especificacion.puml` o tablas de `README.md`) utilice rigurosamente el bullet point `•` estilo **pySigHor**, señalando como falta cualquier guion (`-`), asterisco (`*`) o número correlativo.
 3. **Paso 3: Validación del Autómata Formal**
    * Comprobar que los estados estén en mayúsculas.
    * Verificar que las bifurcaciones usen `<<choice>>`.
    * Verificar notas con guardas `[condición]` en ramas verde, roja y naranja.
+   * Comprobar formato de listas dentro de las notas (`•`).
 4. **Paso 4: Auditoría del Wireframe Salt**
    * Comprobar sintaxis estándar (`[]`, `[X]`, alineación, pasillo si aplica).
    * Comprobar consistencia con los datos descritos en el flujo principal.

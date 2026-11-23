@@ -13,18 +13,9 @@ end note
 state asignarPuestosASwitch as "asignarPuestosASwitch()" {
 
     state c <<choice>>
+    state " " as MapeandoPuestos
 
     [*] -[#green]-> c
-
-    c -[#green]-> [*]
-    note on link
-    [puestos seleccionados y switch especificado]
-    <b>Sistema</b> presenta diálogo modal con switches del rack y bocas detectadas por SNMP
-    <b>Sistema</b> permite introducir switch de destino
-    <b>Administrador</b> introduce switch gestionado
-    <b>Administrador</b> solicita guardar mapeo
-    <b>Sistema</b> presenta las tarjetas de puestos con la línea informativa de switch y boca actualizadas
-    end note
 
     c -[#red]-> [*]
     note on link
@@ -32,9 +23,31 @@ state asignarPuestosASwitch as "asignarPuestosASwitch()" {
     <b>Sistema</b> presenta aviso indicando que se requiere seleccionar puestos antes de mapear
     end note
 
-    c -[#orange]-> [*]
+    c -[#green]-> MapeandoPuestos
+    note on link
+    [puestos seleccionados previamente en cuadrícula]
+    <b>Sistema</b> presenta:
+    • resumen de puestos seleccionados
+    • selector de switch gestionado de destino
+    • tabla de puestos con bocas físicas detectadas por SNMP
+    <b>Sistema</b> permite introducir:
+    • switch gestionado de destino
+    <b>Sistema</b> permite solicitar:
+    • guardar mapeo
+    • cancelar asignación
+    end note
+
+    MapeandoPuestos -[#green]-> [*]
+    note on link
+    [switch gestionado especificado]
+    <b>Administrador</b> introduce switch gestionado
+    <b>Administrador</b> solicita guardar mapeo
+    end note
+
+    MapeandoPuestos -[#orange]-> [*]
     note on link
     [solicitud cancelada por el usuario]
+    <b>Administrador</b> solicita cancelar asignación
     <b>Sistema</b> presenta pantalla de origen manteniendo el mapeo previo sin cambios
     end note
 }

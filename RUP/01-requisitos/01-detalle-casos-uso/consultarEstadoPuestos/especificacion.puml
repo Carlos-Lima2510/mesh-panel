@@ -19,8 +19,15 @@ state consultarEstadoPuestos as "consultarEstadoPuestos()" {
     c -[#green]-> [*]
     note on link
     [Infraestructura de monitorización disponible]
-    <b>Sistema</b> presenta la cuadrícula del aula con el estado de los puestos
-    <b>Sistema</b> presenta el resumen de métricas del laboratorio
+    <b>Sistema</b> presenta la cuadrícula del aula con los puestos organizados en hileras y pasillo central
+    <b>Sistema</b> presenta el diagnóstico semafórico, IP, boca y switch de cada puesto 
+    <b>Sistema</b> presenta el resumen de métricas consolidadas del laboratorio
+    <b>Sistema</b> permite solicitar: 
+    • el encendido remoto de un puesto en Standby 
+    • la consulta de la ficha técnica y detalle de un puesto
+    • la selección de puestos individuales o en bloque 
+    • el cambio de modo operativo del aula (Clase / Práctica)
+    • la actualización manual del estado del laboratorio 
     end note
 
     c -[#red]-> [*]
