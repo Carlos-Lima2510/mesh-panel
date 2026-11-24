@@ -1,13 +1,13 @@
 {
   "daemon/application/LaboratorioService.js": {
-    "mtime": 1795387370.9469967,
-    "seen": 1795387373.613004,
+    "mtime": 1795387819.9439623,
+    "seen": 1795504521.909376,
     "ast_hash": "5922a8263d507bd46cfd9494a5fe6176",
     "semantic_hash": ""
   },
   "daemon/config.js": {
-    "mtime": 1795387021.9064267,
-    "seen": 1795387023.504572,
+    "mtime": 1795387819.9441166,
+    "seen": 1795504521.909379,
     "ast_hash": "62066cc41c2b66fff29e7b4f87c5f40e",
     "semantic_hash": ""
   },
@@ -30,20 +30,20 @@
     "semantic_hash": "120ca44ce7c9f69674d5618c953f97a3"
   },
   "daemon/domain/Host.js": {
-    "mtime": 1795384973.5426137,
-    "seen": 1795384976.0289452,
+    "mtime": 1795387819.9442875,
+    "seen": 1795504521.9093857,
     "ast_hash": "e16ea9a37b6d967efbcd83ae7aad4455",
     "semantic_hash": ""
   },
   "daemon/domain/Laboratorio.js": {
-    "mtime": 1795384036.787692,
-    "seen": 1795384039.1716473,
+    "mtime": 1795387819.9444888,
+    "seen": 1795504521.909387,
     "ast_hash": "759713dd3b3d19f5ab131b1378c1e7ee",
     "semantic_hash": ""
   },
   "daemon/domain/Puesto.js": {
-    "mtime": 1795383985.0094483,
-    "seen": 1795383987.4057412,
+    "mtime": 1795387819.9446661,
+    "seen": 1795504521.909388,
     "ast_hash": "2e560107f9b2d11a7bdb0f178b0b530a",
     "semantic_hash": ""
   },
@@ -102,8 +102,8 @@
     "semantic_hash": "e6fe02f31c32a9c2a36890f3aa434ab7"
   },
   "daemon/domain/estado/EvaluadorEstado.js": {
-    "mtime": 1795383998.522512,
-    "seen": 1795384000.8288236,
+    "mtime": 1795387819.9448516,
+    "seen": 1795504521.9093993,
     "ast_hash": "243b73bb96492ce1b005faa2f13da3d3",
     "semantic_hash": ""
   },
@@ -150,8 +150,8 @@
     "semantic_hash": "c1c149406c4eb4f5188d6bf7026d3154"
   },
   "daemon/interfaces/http/controllers/LaboratorioController.js": {
-    "mtime": 1795384065.1458256,
-    "seen": 1795384066.8058906,
+    "mtime": 1795387819.9450457,
+    "seen": 1795504521.9094083,
     "ast_hash": "17b494223b625da35af93e18d0070787",
     "semantic_hash": ""
   },
@@ -192,8 +192,8 @@
     "semantic_hash": ""
   },
   "scripts/test-domain.js": {
-    "mtime": 1795387438.3062997,
-    "seen": 1795387440.42815,
+    "mtime": 1795387819.9548984,
+    "seen": 1795504521.9094186,
     "ast_hash": "9720b0776a897fe2da9dd1f045f02cf6",
     "semantic_hash": ""
   },
@@ -210,14 +210,14 @@
     "semantic_hash": "790696d6758e900c8009a823f5795935"
   },
   "src/js/app.js": {
-    "mtime": 1795387411.69518,
-    "seen": 1795387413.7194736,
+    "mtime": 1795387819.956717,
+    "seen": 1795504521.909422,
     "ast_hash": "f39d772749580408dd0e9259a5550c8a",
     "semantic_hash": ""
   },
   "src/js/renderer.js": {
-    "mtime": 1795387392.8790953,
-    "seen": 1795387394.4818487,
+    "mtime": 1795387819.9571145,
+    "seen": 1795504521.909423,
     "ast_hash": "d6af8f83d3e1cba2781e53a18cf4a7c3",
     "semantic_hash": ""
   },
@@ -234,10 +234,10 @@
     "semantic_hash": "a2238bad723704bb0030c411f774b23f"
   },
   "AGENTS.md": {
-    "mtime": 1794945093.0022626,
-    "seen": 1795124177.6340106,
-    "ast_hash": "370e14664da4939a32bb8cc56edd11e6",
-    "semantic_hash": "370e14664da4939a32bb8cc56edd11e6"
+    "mtime": 1795505529.4468374,
+    "seen": 1795506632.9084032,
+    "ast_hash": "b52ce84d70fffd0a4cbd7533a785b88a",
+    "semantic_hash": ""
   },
   "README.md": {
     "mtime": 1795374316.4716227,
@@ -246,21 +246,21 @@
     "semantic_hash": ""
   },
   "RUP/00-modelo-del-dominio/README.md": {
-    "mtime": 1795383884.2109709,
-    "seen": 1795383987.405857,
+    "mtime": 1795387819.9409475,
+    "seen": 1795504521.9094307,
     "ast_hash": "4370b5cb4c0fbb459af9d1af0603e682",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/00-actores-casos-uso/README.md": {
-    "mtime": 1795383783.1752949,
-    "seen": 1795383805.0721169,
+    "mtime": 1795387819.941848,
+    "seen": 1795504521.9094317,
     "ast_hash": "351ff96e927953bb746af3f6df13d425",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/FORMATO-DETALLE.md": {
-    "mtime": 1795374316.4729347,
-    "seen": 1795383805.0721192,
-    "ast_hash": "ba5286d4e614ceda813991b4510738a6",
+    "mtime": 1795458773.2415705,
+    "seen": 1795504521.909433,
+    "ast_hash": "b87fa5c9b8933fb3f326b9c136d6712c",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/README.md": {
@@ -300,9 +300,9 @@
     "semantic_hash": ""
   },
   "docs/adr/ADR-004-inclusion-switch-asignacion-distribuciones.md": {
-    "mtime": 1795374316.4823008,
-    "seen": 1795383805.0721555,
-    "ast_hash": "d79232b8e0ce175b4e6900fb55c8494b",
+    "mtime": 1795505492.9746747,
+    "seen": 1795505515.3469176,
+    "ast_hash": "c94c9c611b7edcd2932e2ef91e78691a",
     "semantic_hash": ""
   },
   "docs/doc/DOC-01-microsoft-windows-internals-dhcp-wol.md": {
@@ -324,69 +324,69 @@
     "semantic_hash": ""
   },
   "docs/matriz-documental-general.md": {
-    "mtime": 1795374316.4842427,
-    "seen": 1795383805.072169,
-    "ast_hash": "aaf9e6b9b504e5a6aa040ed8e982bb44",
+    "mtime": 1795504532.768981,
+    "seen": 1795505515.346925,
+    "ast_hash": "6903bb819f14579ec6ca61b2a7875c23",
     "semantic_hash": ""
   },
   "src/index.html": {
-    "mtime": 1795386673.3888588,
-    "seen": 1795387010.854636,
-    "ast_hash": "a7327f95877e3c671cb39e911686f73d",
+    "mtime": 1795387819.955965,
+    "seen": 1795504521.9094627,
+    "ast_hash": "bb86f9fe4cbda0a0fc12ea573f20fe92",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-clases.svg": {
-    "mtime": 1795384568.178386,
-    "seen": 1795384723.5383031,
-    "ast_hash": "f4b9a61e98c9b4afb982f2074931e74f",
+    "mtime": 1795458773.2425396,
+    "seen": 1795504521.909464,
+    "ast_hash": "d5df124babc3a62d1934263fe911e550",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/especificacion.svg": {
-    "mtime": 1795374316.493523,
-    "seen": 1795383805.07221,
-    "ast_hash": "78009335f6e0fa112b12de3165ac9774",
+    "mtime": 1795458773.2437696,
+    "seen": 1795504521.9094744,
+    "ast_hash": "f636a4f82c48b9811b7c2d80f8f5ef54",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/especificacion.svg": {
-    "mtime": 1795374316.494308,
-    "seen": 1795383805.0722156,
-    "ast_hash": "0b065f79f1ac9cc037068caf2e26fd74",
-    "semantic_hash": "0b065f79f1ac9cc037068caf2e26fd74"
+    "mtime": 1795458773.2439868,
+    "seen": 1795504521.9094763,
+    "ast_hash": "5cf37dec947ec3525632ba522ad0d826",
+    "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/especificacion.svg": {
-    "mtime": 1795374316.4951398,
-    "seen": 1795383805.072221,
-    "ast_hash": "e6994166636d3006356d45ecafd2b305",
+    "mtime": 1795458773.2442605,
+    "seen": 1795504521.9094784,
+    "ast_hash": "25507dc5b7232e7e72edc685c254fde1",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/README.md": {
-    "mtime": 1795387072.215653,
-    "seen": 1795387073.698157,
-    "ast_hash": "61fe0e093875f6c6cb81c37407fdf610",
+    "mtime": 1795458773.2416987,
+    "seen": 1795504521.9094355,
+    "ast_hash": "c3036ef3ea23b796a829f32578146e6e",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/cambiarModo/README.md": {
-    "mtime": 1795385283.0132685,
-    "seen": 1795385284.7307782,
-    "ast_hash": "ddc361d07bc71dc558fba150110f2cd2",
+    "mtime": 1795458773.2418528,
+    "seen": 1795504521.9094367,
+    "ast_hash": "b76194bb7df9ad5597e0c2e842fed823",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/README.md": {
-    "mtime": 1795387129.999913,
-    "seen": 1795387131.5257823,
-    "ast_hash": "38185c012c4bb7b25b125f6eee0a3a4e",
+    "mtime": 1795458773.2420053,
+    "seen": 1795504521.9094377,
+    "ast_hash": "04171bec23c2557511196470164e3019",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/README.md": {
-    "mtime": 1795387158.3480403,
-    "seen": 1795387160.0990586,
-    "ast_hash": "25aa583653efa93131241564a32067d5",
+    "mtime": 1795458773.2421815,
+    "seen": 1795504521.9094386,
+    "ast_hash": "7e610cca508772ee9c097278e4cda026",
     "semantic_hash": ""
   },
   "RUP/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/README.md": {
-    "mtime": 1795374316.4757082,
-    "seen": 1795383805.0721364,
-    "ast_hash": "9d68b9a783b306b667b13f8ae05613ff",
+    "mtime": 1795458773.242346,
+    "seen": 1795504521.9094398,
+    "ast_hash": "25a6530229e20e833019179f95654e2b",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-host.svg": {
@@ -396,15 +396,15 @@
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-estados/diagrama-estados-laboratorio.svg": {
-    "mtime": 1795384320.0761387,
-    "seen": 1795384510.3036373,
-    "ast_hash": "db7d3b3d22b4a5bb3415974ad93d5bdf",
+    "mtime": 1795458773.242665,
+    "seen": 1795504521.9094658,
+    "ast_hash": "112fccb51cb89b4e1531dac219ac2afa",
     "semantic_hash": ""
   },
   "images/00-modelo-del-dominio/diagrama-objetos.svg": {
-    "mtime": 1795387347.4124396,
-    "seen": 1795387363.950064,
-    "ast_hash": "eec7fe0e75765cd45844a06071af283c",
+    "mtime": 1795458773.2427883,
+    "seen": 1795504521.909467,
+    "ast_hash": "37a07263f866d0aa2489a9d3cf934fd1",
     "semantic_hash": ""
   },
   "images/01-requisitos/00-actores-casos-uso/actoresCasosUsoAdministrador.svg": {
@@ -414,45 +414,45 @@
     "semantic_hash": ""
   },
   "images/01-requisitos/00-actores-casos-uso/diagramaContextoAdmin.svg": {
-    "mtime": 1795383688.3163514,
-    "seen": 1795383805.0721955,
-    "ast_hash": "2fb5af26844c5bb3ab4191b025941e82",
+    "mtime": 1795458773.2429018,
+    "seen": 1795504521.9094691,
+    "ast_hash": "a330957bd66d8a2bc34f4959cec168c1",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/especificacion.svg": {
-    "mtime": 1795374316.492243,
-    "seen": 1795383805.0721984,
-    "ast_hash": "ad899d73466e629fda3bee65a3a85db7",
+    "mtime": 1795458773.2432463,
+    "seen": 1795504521.9094703,
+    "ast_hash": "0cb6510cb5fa9865978ae847223e57d4",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/asignarPuestosASwitch/wireframes.svg": {
-    "mtime": 1795387193.6380007,
-    "seen": 1795387363.9500768,
-    "ast_hash": "6943dae1172808e7a2f81b28d7a10320",
+    "mtime": 1795458773.243359,
+    "seen": 1795504521.9094713,
+    "ast_hash": "40fcc82b6739a679154473cf15ab3478",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/especificacion.svg": {
-    "mtime": 1795384597.4879422,
-    "seen": 1795384723.5383258,
-    "ast_hash": "c53bdaf2e45b994182fa8e6256606c28",
+    "mtime": 1795458773.2434754,
+    "seen": 1795504521.9094722,
+    "ast_hash": "b68383fce9140d6d80996511d7daab3d",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/cambiarModo/wireframes.svg": {
-    "mtime": 1795385242.7044914,
-    "seen": 1795385284.7308664,
-    "ast_hash": "998942e52afbafc562909ab3d9385b50",
+    "mtime": 1795458773.2436562,
+    "seen": 1795504521.9094732,
+    "ast_hash": "d0f69d1246d6412c08e33950002a87d3",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarDetallePuesto/wireframes.svg": {
-    "mtime": 1795387194.414166,
-    "seen": 1795387363.9500895,
-    "ast_hash": "bfa1d8399aa5cb992a83182a3d8334cb",
+    "mtime": 1795458773.2438736,
+    "seen": 1795504521.9094753,
+    "ast_hash": "a8a2d7abbd20b0621c9658e7922c6420",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/consultarEstadoPuestos/wireframes.svg": {
-    "mtime": 1795387195.4321847,
-    "seen": 1795387363.9500957,
-    "ast_hash": "11d7aeb45378555008c60afa6ac25f00",
+    "mtime": 1795458773.244147,
+    "seen": 1795504521.9094775,
+    "ast_hash": "fdffa23b016ed009a43c0b175f474eeb",
     "semantic_hash": ""
   },
   "images/01-requisitos/01-detalle-casos-uso/dimensionarCuadricula/wireframes.svg": {
@@ -480,15 +480,15 @@
     "semantic_hash": ""
   },
   ".agents/rules/rup-auditor.md": {
-    "mtime": 1795374316.4700854,
-    "seen": 1795383805.0721,
-    "ast_hash": "ec8c24a4cf06fe24ed295982fa489817",
+    "mtime": 1795458773.2409322,
+    "seen": 1795504521.9094255,
+    "ast_hash": "fe0d718bc3ecd2bddf35d9b4b2eef925",
     "semantic_hash": ""
   },
   ".agents/skills/rup-auditor/SKILL.md": {
-    "mtime": 1795374316.4706602,
-    "seen": 1795383805.0721025,
-    "ast_hash": "9a1569921b227988c563ee3e3bc23108",
+    "mtime": 1795458773.24116,
+    "seen": 1795504521.9094265,
+    "ast_hash": "a69bfd0397db5e445ad2a1a453ff56e4",
     "semantic_hash": ""
   },
   "docs/matriz-snmpwalk-switches.md": {
@@ -513,6 +513,18 @@
     "mtime": 1795374316.4824834,
     "seen": 1795383805.0721579,
     "ast_hash": "e884f0a22f20403073f05d9f17eac357",
+    "semantic_hash": ""
+  },
+  "docs/matrices-documentales/matriz-evaluacion-mecanismos-observabilidad.md": {
+    "mtime": 1795507299.5411043,
+    "seen": 1795507300.5407734,
+    "ast_hash": "4af547854dd67c069c65b8f26be7e953",
+    "semantic_hash": ""
+  },
+  "docs/sintesis-debate-observabilidad-agentless-vs-agente.md": {
+    "mtime": 1795507294.529085,
+    "seen": 1795507295.6073549,
+    "ast_hash": "fe7f970233d52c6fc3578e864591c824",
     "semantic_hash": ""
   },
   "daemon/package-lock.json": {

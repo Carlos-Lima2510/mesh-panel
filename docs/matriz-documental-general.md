@@ -62,6 +62,7 @@ Las revisiones detalladas sobre decisiones de diseño puntuales se ramifican en 
 | :---: | :--- | :---: | :---: | :--- |
 | **MDE-01** | Control de Energía, Apagado Remoto y Realidad Hardware Dell | Eje 4 | **Completada** | [matriz-referencias-apagado.md](matrices-documentales/matriz-referencias-apagado.md) |
 | **MDE-02** | Plataforma Microsoft Learn, Windows Internals y Diagnóstico de Red | Eje 1, Eje 4 | **Completada** | [matriz-referencias-plataforma-microsoft.md](matrices-documentales/matriz-referencias-plataforma-microsoft.md) (Dossier: [DOC-01](doc/DOC-01-microsoft-windows-internals-dhcp-wol.md), [ADR-003](adr/ADR-003-arquitectura-remediacion-gpo-exclusion-switch.md)) |
+| **MDE-03** | Evaluación y Comparativa de Mecanismos de Observabilidad (Ping vs. ARP vs. MeshAgent) | Eje 1, Eje 2 | **Completada** | [matriz-evaluacion-mecanismos-observabilidad.md](matrices-documentales/matriz-evaluacion-mecanismos-observabilidad.md) |
 
 ---
 

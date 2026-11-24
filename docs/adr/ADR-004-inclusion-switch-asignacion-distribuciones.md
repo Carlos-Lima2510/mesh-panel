@@ -155,6 +155,32 @@ Se formaliza la frontera estricta entre datos de inventario/configuración y dat
 | **Ciclo de Actualización** | En la instalación inicial o ante reconfiguraciones de aula. | Polling regular cada 5 segundos y streaming SSE en vivo. |
 | **Justificación de Ingeniería** | Garantizar que el plano y el cableado sobrevivan a reinicios del servidor. | Evitar saturación de disco (*I/O bottleneck*) por escrituras continuas de telemetría. |
 
+### 3.5. Desambiguación de Telemetría Masiva (Bulk Polling) y Resolución de Colisiones de Puertos Homónimos
+
+En la implementación real de alto rendimiento del daemon (`LaboratorioService.js`), el sistema no realiza sondeos puerto a puerto, sino que lanza consultas **masivas en paralelo (*Bulk SNMP Polling*)** a los 3 switches gestionados del rack mediante `Promise.all`:
+```javascript
+const [sw13, sw42, sw39] = await Promise.all([
+  snmpProvider.obtenerPuertos('10.10.136.13'),
+  snmpProvider.obtenerPuertos('10.10.136.42'),
+  snmpProvider.obtenerPuertos('10.10.136.39')
+]);
+```
+
+Esta arquitectura introduce el **Problema de la Colisión de Puertos Homónimos**:
+1. **La Coexistencia de Bocas Idénticas en RAM:** Los tres conmutadores poseen interfaces con la misma nomenclatura física (`port1`, `port2`, ..., `port14`, etc.). En cada ciclo de refresco, la memoria RAM del daemon alberga simultáneamente **tres bocas 14 distintas**:
+   * `10.10.136.13:port14` $\to$ `UP (10/100 Mbps)` (Cable conectado a puesto docente en Standby).
+   * `10.10.136.42:port14` $\to$ `DOWN` (Boca vacía en switch de prácticas).
+   * `10.10.136.39:port14` $\to$ `DOWN` (Boca vacía en switch auxiliar).
+2. **El Rol Discriminador de `asignarPuestosASwitch` (CU-04):**  
+   Al evaluar el puesto físico `Puesto 14`, el motor de correlación consulta la clave foránea `puestos.switch_id`:
+   * Identifica que `Puesto 14` está asignado al switch `10.10.136.13`.
+   * **Filtra y extrae exclusivamente la telemetría de `10.10.136.13:port14`**.
+   * **Descarta de forma determinista** las bocas homónimas de los otros dos switches (`.42` y `.39`), impidiendo que el puesto se clasifique erróneamente en falso estado `DESCONECTADO (Naranja)`.
+3. **El Ancla de Identidad para Wake-on-LAN en Estado Apagado ($S5$):**  
+   Cuando los puestos se apagan, la tabla de direcciones MAC del switch (FDB / CAM) expira y se purga automáticamente tras 5 minutos de inactividad (*Aging Timeout*). Al carecer de MAC viva en el switch y tener `conn = 0` en MeshCentral:
+   * El mapeo persistente de `Puesto` garantiza que el panel retiene la asociación fija entre la plaza física, la boca del conmutador y la dirección MAC del host alojado.
+   * Esto permite que, a primera hora de la mañana con el aula 100% apagada, el panel reconozca el enlace de standby a 10/100 Mbps y arme el botón interactivo **`[⚡ WoL]` con la MAC exacta del puesto**, haciendo viable el encendido masivo del aula sin depender de que los puestos estén previamente transmitiendo tráfico en red.
+
 ---
 
 ## 4. Decisión Arquitectónica 3: Evaluación Contextual por Puesto (`EvaluadorEstado`)

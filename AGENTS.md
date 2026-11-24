@@ -317,6 +317,9 @@ docker exec -it tfg-daemon snmpwalk -v 2c -c public virtual-switch:1616 1.3.6.1.
    - El mapeo Host-Switch es siempre **transitivo a través del puesto físico**: $\text{Host} \rightarrow \text{Puesto} \rightarrow \text{Switch}$. Jamás asociar directamente `Host` con `Switch` en base de datos (evita violaciones de 3FN y anomalías de actualización al mover torres).
    - **Persistencia en Base de Datos**: Exclusivamente para configuración e inventario estático (tablas `switches`, `puestos` con coordenadas de cuadrícula y `hosts`).
    - **Memoria RAM**: Exclusivamente para telemetría viva (estados de enlace SNMP, presencia de agentes MeshCentral y diagnósticos de color). Jamás persistir estados volátiles en disco.
+8. **Desambiguación de Telemetría Masiva y Persistencia para WoL (CU-04 / ADR-004)**:
+   - El daemon sondea masivamente en paralelo los 3 switches del rack (`.13`, `.42`, `.39`). Para resolver colisiones de nombres de boca homónimos (ej. `port14` existe en los 3 switches a la vez) y evitar falsos estados desconectados, el motor de correlación se apoya estrictamente en la asignación `Puesto-Switch` de CU-04 para filtrar exclusivamente la telemetría del conmutador asignado.
+   - En estado Standby ($S5$), la tabla de direcciones MAC del conmutador se purga a los 5 minutos; el mapeo persistente de `Puesto` retiene la MAC física del host para armar el botón interactivo `[⚡ WoL]` con el aula 100% apagada.
 
 ---
 
